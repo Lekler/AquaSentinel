@@ -2,10 +2,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 import streamlit as st
+import pytest
 from streamlit.testing.v1 import AppTest
 from previsao import ErroPrevisao
 
 APP = str(Path(__file__).resolve().parents[1] / 'app.py')
+
+
+@pytest.fixture(autouse=True)
+def banco_isolado(tmp_path, monkeypatch):
+    monkeypatch.setenv('AQUASENTINEL_DB', str(tmp_path/'app.sqlite3'))
+    st.cache_data.clear()
 
 
 def resposta():
@@ -23,30 +30,30 @@ def test_fluxo_cache_coordenadas_e_falha():
         app = AppTest.from_file(APP, default_timeout=15).run()
         assert not app.exception
         assert not app.metric
-        app.button[0].click().run()
+        app.button(key="atualizar").click().run()
         assert not app.exception
-        assert app.session_state['resultado']['priority_score'] == 67.5
+        assert app.session_state['resultado']['ari_score'] == 65.33
         assert len(app.metric) == 4
         assert consulta.call_count == 1
-        app.slider[0].set_value(100)
-        app.button[0].click().run()
+        app.selectbox[0].select('Alto')
+        app.button(key="atualizar").click().run()
         assert not app.exception
-        assert app.session_state['resultado']['priority_score'] == 90
+        assert app.session_state['resultado']['ari_score'] == 86.67
         assert consulta.call_count == 1
         app.number_input[0].set_value(-23.)
-        app.button[0].click().run()
+        app.button(key="atualizar").click().run()
         assert consulta.call_count == 2
-        app.checkbox[0].check()
-        app.button[0].click().run()
+        app.checkbox[2].check()
+        app.button(key="atualizar").click().run()
         assert not app.exception
         assert consulta.call_count == 3
         consulta.side_effect = ErroPrevisao('Serviço indisponível (HTTP 503).')
-        app.button[0].click().run()
+        app.button(key="atualizar").click().run()
         assert not app.exception
         assert app.error and '503' in app.error[0].value
         assert not app.metric
         consulta.side_effect = None
-        app.button[0].click().run()
+        app.button(key="atualizar").click().run()
         assert not app.exception
         assert len(app.metric) == 4
         assert not app.error
@@ -57,7 +64,46 @@ def test_nome_vazio_sem_consulta():
     with patch('previsao.consultar_previsao') as consulta:
         app = AppTest.from_file(APP, default_timeout=15).run()
         app.text_input[0].set_value('   ')
-        app.button[0].click().run()
+        app.button(key="atualizar").click().run()
         assert not app.exception
         assert app.error
         consulta.assert_not_called()
+
+
+def test_triagem_e_revisao_persistente():
+    from historico import listar
+    with patch('previsao.consultar_previsao', return_value=resposta()) as consulta:
+        app = AppTest.from_file(APP, default_timeout=15).run()
+        app.slider[0].set_value(70)
+        app.button(key="atualizar").click().run()
+        assert not app.exception
+        assert app.session_state['resultado']['status_validacao'] == 'pendente'
+        assert not app.metric
+        consulta.assert_not_called()
+        app.button(key='salvar').click().run()
+        app.button(key='salvar').click().run()
+        assert len(listar()) == 1
+        app.text_input(key='responsavel_revisao').set_value('Pessoa revisora')
+        [b for b in app.button if b.label == 'Confirmar relato'][0].click().run()
+        assert not app.exception
+        assert listar()[0]['status_validacao'] == 'confirmado_humano'
+        app.button(key='nova').click().run()
+        app.slider[0].set_value(90)
+        app.button(key="atualizar").click().run()
+        assert not app.exception
+        assert app.session_state['resultado']['componentes']['F'] == 25
+        app.button(key='salvar').click().run()
+        assert not app.exception  # inclusive mapa do histórico
+
+
+def test_transbordamento_com_api_indisponivel():
+    with patch('previsao.consultar_previsao', side_effect=ErroPrevisao('HTTP 503')):
+        app = AppTest.from_file(APP, default_timeout=15).run()
+        app.selectbox[1].select('Transbordamento')
+        app.checkbox[1].check()
+        app.text_input[2].set_value('Fonte oficial, estação e horário de exemplo')
+        app.button(key="atualizar").click().run()
+        assert not app.exception
+        assert app.session_state['resultado']['avaliacao_urgente']
+        assert app.session_state['resultado']['ari_score'] is None
+        assert any('transbordamento' in e.value for e in app.error)

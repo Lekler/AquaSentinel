@@ -1,5 +1,18 @@
 # Validação da entrega
 
+## Atualização ARI de 19/09/2026
+
+99 testes passaram em Python 3.12.14 (1,61 s). A suíte cobre a fórmula composta,
+normalização, ausência de nível, limites de chuva em 24h e de recorrência,
+confiança, confirmação humana, persistência SQLite, IDs únicos, distância,
+janela de 30 dias e transbordamento oficial mesmo sem previsão disponível.
+Os testes de interface usam fonte meteorológica controlada e banco temporário.
+
+As decisões sobre lacunas do rascunho e as limitações de fontes manuais estão
+descritas no README. Esta validação verifica software, não calibra risco hidrológico.
+
+## Registro da versão inicial
+
 Executada em 15/09/2026, macOS Apple Silicon, Python 3.12.14, Streamlit 1.63.0.
 Versões completas registradas em `requirements-lock.txt`.
 

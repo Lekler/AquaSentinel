@@ -1,32 +1,23 @@
 # 💧 AquaSentinel
 
-**MVP executável de previsão de chuva e priorização de ocorrências em canais urbanos.** Interface em português, consulta real ao Open-Meteo e cálculo transparente de pontuações. Feito em Python 3.12 + Streamlit para demonstrar sem separar frontend e backend.
+MVP criado por [Lekler](https://github.com/Lekler) para avaliações de canais na Baía de Guanabara. O **AquaSentinel Risk Index (ARI)** combina resíduos, previsão de chuva, condição do rio e recorrência. A versão 2 implementa o documento “AquaSentinel Risk Index”, contextualizado pela reunião da equipe.
 
-[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-MVP-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-2EA44F)](LICENSE)
 [![Testes](https://github.com/Lekler/AquaSentinel/actions/workflows/tests.yml/badge.svg)](https://github.com/Lekler/AquaSentinel/actions/workflows/tests.yml)
 
-Criado por **[Lekler](https://github.com/Lekler)** para o projeto AquaSentinel. Este repositório começa com o módulo de *rainfall forecast* e priorização e foi estruturado para que o time possa baixar, testar, adaptar e adicionar novos módulos.
-
-> A prioridade é uma heurística operacional para apoiar vistorias. Não representa probabilidade de inundação, alerta oficial, diagnóstico hidráulico ou orientação de segurança.
+O ARI é experimental, não representa probabilidade de inundação nem alerta oficial. Os limiares precisam ser calibrados por bacia.
 
 ## Baixar e executar
 
-Você pode [baixar a versão mais recente em ZIP](https://github.com/Lekler/AquaSentinel/archive/refs/heads/main.zip) e descompactar, ou clonar o repositório:
+[Baixar ZIP](https://github.com/Lekler/AquaSentinel/archive/refs/heads/main.zip), ou:
 
 ```bash
 git clone https://github.com/Lekler/AquaSentinel.git
 cd AquaSentinel
 ```
 
-Como o repositório está privado, o download e o clone exigem uma conta GitHub autorizada como colaboradora.
+Repositórios privados exigem acesso de colaborador. Instale Python 3.12 e entre na pasta extraída ou clonada.
 
-### macOS e Linux
-
-Pré-requisitos: Python 3.12 e internet para instalar dependências e consultar a previsão. Se necessário, instale o Python pelo [site oficial](https://www.python.org/downloads/macos/) ou com `brew install python@3.12` se já usar Homebrew.
-
-No Terminal, entre na pasta extraída ou clonada:
+macOS/Linux:
 
 ```bash
 python3.12 -m venv .venv
@@ -35,120 +26,111 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-Abra **http://localhost:8501**. Para encerrar, use `Control+C` no Terminal. Para reiniciar, ative `.venv` e repita o último comando. Não é necessário banco de dados, serviço externo de backend ou chave de API.
-
-Alternativa com [uv](https://docs.astral.sh/uv/): `uv venv --python 3.12 .venv`, `uv pip install --python .venv/bin/python -r requirements.txt` e `.venv/bin/python -m streamlit run app.py`.
-
-### Windows (PowerShell)
+Windows PowerShell:
 
 ```powershell
 py -3.12 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-python -m streamlit run app.py
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-`requirements.txt` contém faixas compatíveis. `requirements-lock.txt`, quando presente, registra as versões efetivamente testadas e pode substituir esse arquivo na instalação.
+Abra http://localhost:8501. Encerre com Control+C. Internet é necessária para previsão e mapas, sem chave de API. SQLite está incluído no Python. `requirements-lock.txt` registra as versões da validação original; `requirements.txt` define faixas compatíveis.
 
-## Adaptar e ampliar
+## Demonstrar
 
-As regras de negócio ficam em `motor.py`, isoladas da interface, e o cliente meteorológico fica em `previsao.py`. Assim, o time pode trocar o Streamlit por FastAPI ou outro frontend sem reescrever o cálculo.
+1. Informe local, classe de resíduos e confiança. Classe/confiança são entradas manuais para futura integração com IA; nenhum modelo de imagem roda neste MVP.
+2. Informe a condição do rio, se disponível. Se transcrita de fonte oficial, marque essa origem e identifique fonte/estação e horário observado.
+3. Atualize a previsão. Veja o ARI, componentes, pesos e contribuições em **Como calculamos**.
+4. Salve a ocorrência no histórico. Atualizar a previsão mantém a ocorrência atual. Use **Nova ocorrência** para outro relato no mesmo ponto; mudar nome/coordenadas também inicia outra ocorrência.
+5. Relatos de confiança entre 60 e menos de 80% exigem confirmação humana, no formulário inicial ou no histórico, com identificação do responsável.
+6. Novas ocorrências próximas consideram os relatos validados anteriores. O histórico mostra avaliações salvas, mapa de hotspots e exportação JSON.
 
-Para contribuir, crie uma branch a partir de `main`, faça uma alteração pequena e focada, execute os testes e abra um pull request. Consulte [CONTRIBUTING.md](CONTRIBUTING.md) para o fluxo sugerido. Ideias futuras e decisões técnicas estão em **Próximos passos** no fim deste documento.
+O banco começa vazio. Confirmar um relato pendente o habilita para a recorrência futura; não recalcula seu ARI usando previsão antiga. Para uma avaliação atualizada, faça nova consulta.
 
-## Roteiro de demo (2 minutos)
+## Fórmula
 
-1. Informe nome do canal, latitude/longitude e Waste Score. O ponto inicial é demonstrativo, no Rio; não identifica um canal real cadastrado.
-2. Clique em **Atualizar previsão**. A consulta usa as coordenadas informadas e previsão real — não há dados simulados de fallback.
-3. Mostre as três pontuações, intensidade máxima, acumulados de 6h/24h e gráfico horário.
-4. Mude o Waste Score e atualize: para a mesma localização, a previsão vem do cache de até 45 minutos; a prioridade é recalculada.
-5. Abra **Como calculamos** para explicar a fórmula. Em **Dados da consulta**, baixe o JSON para integrar com o app do time.
-6. Para uma consulta nova à API, marque **Consultar API sem usar cache**. Evite repetir sem necessidade.
+Componentes de 0–100:
 
-Sem chuva no dia da apresentação, o resultado real pode ser baixo ou zero. Para explicar um cenário intenso, use o exemplo matemático abaixo, explicitamente hipotético; o aplicativo não troca previsão real por cenário fictício.
-
-## Arquitetura
-
-```text
-Formulário Streamlit: nome + latitude/longitude + Waste Score
-    → validação de entrada
-    → cache em memória por coordenadas (45 min, máximo 128 entradas)
-    → cliente HTTPS Open-Meteo (timeout de conexão e leitura)
-    → seleção de 24 intervalos futuros completos
-    → métricas + Rainfall Score + Priority Score
-    → cartões, níveis, gráfico, tabela e download JSON
-```
-
-- `app.py`: interface, cache e estado da última consulta por sessão.
-- `previsao.py`: requisição HTTP e erros explícitos.
-- `motor.py`: validação, janela temporal, métricas e regras puras reutilizáveis em FastAPI.
-- `tests/`: testes de cálculos, contrato HTTP e fluxo da interface.
-- `.streamlit/config.toml`: tema, uso local e telemetria do Streamlit desativada.
-
-A separação permite reaproveitar o motor em um endpoint futuro sem reescrever as regras. O MVP não expõe uma API HTTP de negócio: usa o próprio servidor Streamlit.
-
-## Integração Open-Meteo
-
-Endpoint: `https://api.open-meteo.com/v1/forecast`.
-
-Parâmetros: `latitude`, `longitude`, `hourly=precipitation,precipitation_probability`, `forecast_days=3`, `timezone=auto`, `timeformat=unixtime`, `precipitation_unit=mm`. A seleção de modelo é a padrão do provedor. Três dias garantem espaço para uma janela futura de 24h mesmo perto da meia-noite.
-
-A documentação do Open-Meteo define `precipitation` como o total da **hora anterior ao timestamp**. O MVP interpreta cada registro como um intervalo terminado naquele instante, calcula em UTC e exibe o fuso retornado pela API.
-
-**Janela:** começa na próxima hora cheia UTC (ou na hora atual quando a consulta ocorre exatamente na hora cheia). Se a consulta for às 12h30 no Rio, são analisados os intervalos de 13h–14h até 12h–13h do dia seguinte. A primeira soma de 6h vai de 13h a 19h. Isso exclui a hora parcialmente passada, sem inventar uma distribuição sub-horária. O horário exato da janela está visível. Em locais cujo fuso não é múltiplo de uma hora, o alinhamento UTC pode corresponder a meia hora local.
-
-| Campo JSON | Definição |
+| Componente | Regra |
 | --- | --- |
-| `max_1h_mm` | Máximo dos 24 totais horários; equivalente à intensidade média máxima em mm/h para intervalos de 1h. |
-| `acumulado_6h_mm` | Soma dos seis primeiros intervalos da janela, não a maior soma móvel. |
-| `acumulado_24h_mm` | Soma dos 24 intervalos. |
-| `precipitation_probability_peak` | Máxima probabilidade horária na janela; não é a probabilidade de chover em qualquer momento das 24h. |
-| `rainfall_score`, `level` | Pontuação e categoria obtidas de `max_1h_mm`. |
-| `priority_score`, `priority_level` | Pontuação e nível de prioridade operacional. |
-| `janela_inicio`, `janela_fim`, `timezone` | Cobertura temporal com fuso. |
-| `consultado_em`, `calculado_em` | Horários da coleta HTTP e do cálculo. Coleta não é emissão do modelo. |
-| `horas` | Série de intervalos, precipitação e probabilidade para auditoria. |
-
-### Erros, ausência de dados e cache
-
-- Timeout, conexão, HTTP 429/4xx/5xx, JSON inválido e formato inesperado geram mensagem explícita; não geram chuva zero.
-- Precipitação ausente, negativa, não finita, unidades erradas ou cobertura incompleta impedem o cálculo.
-- Probabilidade `null` em qualquer hora deixa o pico como **Indisponível** (`null` no JSON), com aviso; volume e score continuam disponíveis. Probabilidade não participa da fórmula.
-- São rejeitadas séries com horários duplicados, fora de ordem ou com lacunas.
-- Uma consulta que falha remove o resultado anterior, evitando apresentá-lo como resposta atual.
-- O cache guarda a resposta por até 45 minutos por coordenadas, em memória do servidor. Ao atualizar, a janela é calculada de novo com a hora atual. Reiniciar o processo limpa o cache. Não há atualização automática em segundo plano.
-- O resultado exibido é um retrato da última consulta. O usuário precisa atualizar; a interface mostra horário da coleta e sinaliza idade ≥ 45 min quando é renderizada.
-- Timeout configurado: 5s de conexão e 20s de leitura, sem tentativas automáticas.
-
-## Pontuação de chuva
-
-A [legenda oficial do Alerta Rio](https://websempre.rio.rj.gov.br/estacoes/) apresenta as categorias de intensidade. **A conversão dessas categorias para score de 0 a 100 é uma heurística do MVP, não uma pontuação oficial do Alerta Rio.**
-
-| Intensidade de referência (mm/h) | Categoria | Rainfall Score |
-| --- | --- | ---: |
-| < 0,2 | Sem chuva significativa (rótulo do MVP) | 0 |
-| 0,2–5,0 | Fraca | 25 |
-| 5,1–25,0 | Moderada | 50 |
-| 25,1–50,0 | Forte | 75 |
-| > 50,0 | Muito forte | 100 |
-
-**Precisão e lacunas:** a legenda é expressa com uma casa decimal. Para valores de maior precisão não arredondamos antes de classificar: `5 < x <= 25` recebe 50, `25 < x <= 50` recebe 75. Assim 5,01 recebe 50 e 25,01 recebe 75. Este fechamento contínuo das lacunas é uma decisão explícita do MVP. Os limites 5,0, 25,0 e 50,0 ficam na faixa inferior.
-
-As categorias são aplicadas ao máximo horário previsto; não ao acumulado de 6h ou 24h. A probabilidade não multiplica o score. Todas essas decisões podem ser calibradas após avaliação com dados locais.
-
-## Prioridade operacional
+| W — resíduos | Baixo 25; moderado 60; alto 100 |
+| R — acumulado previsto em 24h | <10 mm: 0; 10–30: 25; >30–50: 50; >50–80: 75; >80: 100 |
+| L — condição do rio | Vigilância 0; atenção 25; alerta 50; alerta máximo 75; transbordamento 100 |
+| F — registros anteriores validados | 0: 0; 1: 25; 2–3: 50; 4–5: 75; 6 ou mais: 100 |
 
 ```text
-l = WasteScore / 100
-r = RainfallScore / 100
-p = 100 × (0,6·l + 0,2·r + 0,2·l·r)
+ARI (0–1) = (0,40×W + 0,25×R + 0,25×L + 0,10×F) / 100
+ARI exibido (0–100) = ARI × 100
 ```
 
-Faixas **criadas para o MVP**: baixa `p < 25`; média `25 ≤ p < 50`; alta `50 ≤ p < 75`; crítica `75 ≤ p ≤ 100`. Calcula-se o nível antes do arredondamento; o score é exibido/exportado com duas casas decimais.
+Exemplo: W=60, R=50, L=50, F=50 → ARI=0,54 → 54/100 → Alto.
 
-Exemplo hipotético: Waste Score 70 e máximo horário de 30 mm → Rainfall Score 75 → `100 × (0,42 + 0,15 + 0,105) = 67,5` → prioridade **Alta**.
+| ARI exibido | Classe | Cor | Interpretação |
+| --- | --- | --- | --- |
+| 0 ≤ ARI <25 | Baixo | Verde | Monitorar |
+| 25 ≤ ARI <50 | Moderado | Amarelo | Intensificar monitoramento |
+| 50 ≤ ARI <75 | Alto | Laranja | Avaliação prioritária |
+| 75 ≤ ARI ≤100 | Crítico | Vermelho | Avaliação urgente recomendada |
 
-A fórmula cresce com chuva e resíduos. Sem resíduos, chuva máxima produz prioridade 20; com resíduos máximos e sem chuva, produz 60. Isso expressa o foco operacional em resíduos. Não corresponde a segurança do local nem a risco hidrológico.
+Classificação antes do arredondamento. JSON: `ari` (0–1), `ari_score` (0–100), `ari_level`, `componentes`, `pesos_efetivos`, `contribuicoes`, `cobertura_pesos`, `parcial` e `versao_metodologia=ari-2`.
+
+### Confiança
+
+- C ≥80%: aceita.
+- 60% ≤ C <80%: pendente até confirmação de responsável identificado.
+- C <60%: excluída do ARI e recorrência, mesmo com confirmação marcada.
+
+Confiança controla aceitação; não multiplica W nem comprova veracidade. O modelo e a conversão das detecções em classes serão integrados pela equipe.
+
+### Nível ausente e transbordamento
+
+Sem L, o componente fica `null`, nunca zero por conveniência. Calculamos **ARI parcial** dividindo a soma ponderada de W, R e F por 0,75. Pesos efetivos: 0,40/0,75; 0,25/0,75; 0,10/0,75. Cobertura original de 75% e condição parcial ficam visíveis. O resultado não equivale ao ARI completo e pode ficar numericamente maior.
+
+Transbordamento informado como oficial com referência produz `avaliacao_urgente=true` e hotspot vermelho independentemente do ARI. O índice numérico é preservado. A sinalização funciona também com erro da API ou relato pendente/excluído. A origem oficial é declarada pelo operador: o MVP não consulta/verifica o INEA automaticamente. Confira a atualidade da observação e sua referência.
+
+### Recorrência
+
+Contamos IDs distintos aceitos ou confirmados nos últimos 30 dias, em raio configurável (padrão 500 m), usando distância Haversine. Incluímos os limites de raio e de 30 dias; excluímos a ocorrência atual, relatos futuros e confirmações posteriores ao instante analisado.
+
+Reenviar o mesmo ID não duplica nem sobrescreve a ocorrência salva. Relatos novos criados propositalmente no mesmo ponto contam separadamente; deduplicação por foto/identidade é futura. Ausência de relatos nesta instalação não significa ausência de problemas na região. O histórico não é um catálogo completo de enchentes e não é compartilhado entre computadores.
+
+## Decisões sobre lacunas do documento
+
+- “25–29” deixava 30–49 sem classe: adotado **25 a menos de 50**.
+- “>6” omitia seis registros: adotado **6 ou mais**.
+- Faixas de chuva sobrepostas: limite superior na faixa inferior (30→25; 50→50; 80→75).
+- Escalas 0–1 e 0–100: ambas são explícitas, incluindo os extremos.
+- Janela de 30 dias e raio padrão de 500 m são escolhas de protótipo.
+- ARI parcial com pesos reajustados é uma decisão desta implementação; o rascunho não definia a política sem L.
+- As interrogações na confiança foram resolvidas com triagem e confirmação registradas.
+- Poluição Q continua pendente, pois ainda não há normalização ou peso definido.
+
+Essas decisões precisam ser revisadas pela equipe e calibradas por bacia.
+
+## Previsão e falhas
+
+Cliente real: `https://api.open-meteo.com/v1/forecast`, latitude/longitude, `hourly=precipitation,precipitation_probability`, `timezone=auto`, `timeformat=unixtime`, `forecast_days=3`, `precipitation_unit=mm`. Cache de 45 minutos por coordenadas, máximo 128 entradas, com opção de ignorar cache. Timeout: conexão 5s, leitura 20s.
+
+O timestamp do provedor representa o fim do intervalo de precipitação. Usamos 24 intervalos futuros completos a partir da próxima hora cheia UTC (ou a própria hora, se exata). Consulta às 12h30 no Rio usa 13h de hoje até 13h de amanhã. A soma de 6h usa os primeiros seis intervalos. Datas são mostradas no fuso retornado. Coleta não é emissão do modelo.
+
+Erros HTTP, timeout, JSON inválido, unidades erradas ou precipitação incompleta impedem ARI e geram mensagem explícita. Probabilidade incompleta fica `null`, com aviso, sem afetar R. Não há atualização em segundo plano. Relatos pendentes/excluídos dispensam a consulta meteorológica.
+
+`max_1h_mm`, `acumulado_6h_mm`, `acumulado_24h_mm`, `precipitation_probability_peak` e `horas` continuam disponíveis. Agora `rainfall_score` é R do acumulado de 24h. A classificação horária anterior está em `rainfall_intensity_score` e `rainfall_intensity_level`. O campo legado `level` continua sendo a categoria horária; use `ari_level` para o índice. Os antigos `priority_score`/`priority_level` saem da exportação principal. `calcular_prioridade` permanece em `motor.py` somente para compatibilidade.
+
+## Estrutura e extensão
+
+- `ari.py`: regras puras, normalização, triagem e urgência.
+- `historico.py`: SQLite, confirmação e contagem espacial/temporal.
+- `motor.py`: métricas meteorológicas e funções legadas.
+- `previsao.py`: cliente HTTP.
+- `app.py`: formulário, explicações, gráfico, histórico e hotspots.
+- `tests/`: testes automatizados.
+
+Banco padrão: `dados/ocorrencias.sqlite3`, ignorado pelo Git. A variável `AQUASENTINEL_DB` permite outro caminho. Faça backup do arquivo para preservar os relatos. O banco é criado na primeira abertura. Revisão registra responsável e horário; o MVP local não autentica revisores. As avaliações salvas são retratos históricos, não alertas atualizados automaticamente.
+
+A IA pode fornecer classe e confiança a `calcular_ari`; uma integração hidrológica pode fornecer condição, referência e proveniência. Mapas e planos técnicos da equipe permanecem no repositório como referências, ainda sem alimentar L ou Q automaticamente.
+
+Próximos passos: modelo de imagem; fonte oficial com controle de defasagem; identificação de bacias; definição de Q; autenticação; histórico compartilhado; calibração retrospectiva. Consulte [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Testes
 
@@ -157,40 +139,12 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-Os testes automatizados não precisam de rede e usam respostas controladas. Verificam fronteiras de classificação, fórmula, janela futura, ausência de dados, falhas HTTP, cache por coordenadas e sucesso/erro na interface Streamlit. Para verificar a integração real manualmente:
+Os testes usam banco temporário e previsão controlada, sem rede e sem alterar o histórico real. Cobrem fórmulas, fronteiras, confiança, persistência, recorrência, revisão, reenvios e transbordamento com falha de API. [VALIDACAO.md](VALIDACAO.md) contém o registro da demo inicial.
 
-```bash
-python -c 'from previsao import consultar_previsao; from motor import analisar_previsao; import json; print(json.dumps(analisar_previsao(consultar_previsao(-22.9068, -43.1729)["dados"]), ensure_ascii=False, indent=2))'
-```
+## Fontes e autoria
 
-Veja `VALIDACAO.md` para os resultados efetivamente executados na entrega.
+Proposta: documento “AquaSentinel Risk Index”, recebido em 19/09/2026. Notas da reunião usadas como contexto; a transcrição pessoal não foi publicada.
 
-## Limitações
+Dados: [Open-Meteo](https://open-meteo.com/en/docs), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Confira as [condições para uso comercial](https://open-meteo.com/en/pricing). As categorias horárias legadas se baseiam no [Alerta Rio](https://websempre.rio.rj.gov.br/estacoes/); as faixas novas de R são limiares do protótipo, não oficiais.
 
-- Previsão de modelo em grade: coordenada solicitada não implica medição no próprio canal. A célula meteorológica pode ser diferente da coordenada exata.
-- `precipitation` inclui chuva, pancadas e equivalente de neve. É um indicador prático no contexto do Rio, não uma seleção de chuva líquida para todos os climas.
-- A previsão tem incerteza; acumulados recentes observados, nível/vazão, bacia, declividade, impermeabilização e capacidade do canal ainda não entram no modelo.
-- Waste Score é manual. Não há reconhecimento de imagem, persistência de ocorrências, ranking de múltiplos canais, autenticação ou notificações.
-- “Crítica” é somente uma faixa de prioridade interna, não um estágio oficial da cidade.
-- Nomes e Waste Score ficam em memória da sessão; coordenadas são enviadas ao provedor. O JSON exportado contém dados da ocorrência. Não há credenciais embutidas.
-- O endpoint gratuito público é destinado a uso não comercial; antes de uso comercial, confirme o plano e os limites na [página de preços](https://open-meteo.com/en/pricing). Atribuição do provedor permanece visível na interface.
-
-## Próximos passos
-
-1. Cadastrar canais e bacias contribuintes, validar coordenadas e vincular foto, severidade e confiança do modelo de resíduos.
-2. Integrar chuva **observada** das estações do Alerta Rio: verificar meio de acesso, termos, frequência, qualidade e defasagem; associar estações à bacia, sem confundir observação com previsão. Começar pelo [portal de estações](https://websempre.rio.rj.gov.br/estacoes/) e pela [página institucional](https://www.sistema-alerta-rio.com.br/).
-3. Incorporar histórico hídrico com identificadores comuns, fuso, unidades e tratamento de faltantes: precipitação antecedente, nível, vazão e capacidade do canal. Não atribuir peso arbitrário ao histórico sem validação.
-4. Avaliar retrospectivamente a prioridade contra ocorrências e vistorias conhecidas; ajustar pesos/limiares com agentes comunitários e especialistas. Só então estudar um modelo específico de risco de inundação.
-5. Expor um endpoint FastAPI reutilizando `motor.py` e `previsao.py`; adicionar banco de dados, fila de atualizações, cache compartilhado e ranking de canais.
-
-## Referências
-
-- [Open-Meteo — API e semântica das variáveis](https://open-meteo.com/en/docs)
-- [Open-Meteo — atribuição e licença](https://open-meteo.com/en/terms)
-- [Alerta Rio — legenda de intensidade](https://websempre.rio.rj.gov.br/estacoes/)
-
-Fontes consultadas em 15/09/2026. O MVP não é afiliado ao Alerta Rio ou ao Open-Meteo.
-
-## Licença e autoria
-
-Copyright © 2026 Lekler. O código é disponibilizado sob a [Licença MIT](LICENSE), permitindo uso, estudo, modificação e redistribuição com preservação do aviso de copyright e da licença.
+Copyright © 2026 Lekler. [Licença MIT](LICENSE). Sem credenciais embutidas. Coordenadas são enviadas ao Open-Meteo; mapas carregam recursos externos; ocorrências e revisores ficam no banco local e nas exportações.

@@ -2,13 +2,17 @@
 from datetime import datetime, timezone
 from html import escape
 import json
+import sqlite3
+from uuid import uuid4
 import altair as alt
 import pandas as pd
 import streamlit as st
-from motor import DadosInvalidos, analisar_previsao, calcular_prioridade, validar_entrada
+from motor import DadosInvalidos, analisar_previsao, validar_entrada
+from ari import CLASSES_RESIDUOS, NIVEIS_RIO, calcular_ari, triar_confianca
+from historico import listar, salvar, confirmar, contar_proximos
 from previsao import ErroPrevisao, consultar_previsao
 
-st.set_page_config(page_title='AquaSentinel · Chuva e prioridade', page_icon='💧', layout='wide')
+st.set_page_config(page_title='AquaSentinel · Risk Index', page_icon='💧', layout='wide')
 
 @st.cache_data(ttl=45 * 60, max_entries=128, show_spinner=False)
 def previsao_em_cache(latitude, longitude):
@@ -41,10 +45,16 @@ h2,h3{letter-spacing:-.5px}
 </style>''', unsafe_allow_html=True)
 
 st.title('💧 AquaSentinel')
-st.caption('INTELIGÊNCIA PARA CANAIS URBANOS · MVP / HACKATHON')
+st.caption('AQUASENTINEL RISK INDEX · BAÍA DE GUANABARA · MVP / HACKATHON')
 st.markdown('''<div class="hero"><div class="eyebrow">Prever para priorizar</div>
 <h2>Chuva no horizonte. Ação no lugar certo.</h2>
-<p>Combine a previsão de precipitação com a presença de resíduos para apoiar a priorização de vistorias nos canais.</p></div>''', unsafe_allow_html=True)
+<p>Combine resíduos, chuva em 24 horas, condição do rio e recorrência para priorizar avaliações nos canais.</p></div>''', unsafe_allow_html=True)
+
+try:
+    registros = listar()
+except (sqlite3.Error, OSError, ValueError) as exc:
+    st.error('Não foi possível abrir o histórico local. Verifique o arquivo e as permissões da pasta dados.')
+    st.stop()
 
 with st.sidebar:
     st.header('Consultar ocorrência')
@@ -53,13 +63,29 @@ with st.sidebar:
         nome = st.text_input('Nome do canal / ocorrência', 'Canal de demonstração · Rio', max_chars=100)
         latitude = st.number_input('Latitude', min_value=-90.0, max_value=90.0, value=-22.9068, step=0.0001, format='%.4f')
         longitude = st.number_input('Longitude', min_value=-180.0, max_value=180.0, value=-43.1729, step=0.0001, format='%.4f')
-        waste = st.slider('Pontuação de resíduos (Waste Score)', 0, 100, 70, help='0 = nenhum resíduo; 100 = severidade máxima. Entrada manual neste MVP.')
+        classe = st.selectbox('Acúmulo de resíduos (W)', list(CLASSES_RESIDUOS), index=1)
+        waste = CLASSES_RESIDUOS[classe]
+        confianca = st.slider('Confiança da classificação (%)', 0, 100, 85)
+        st.caption('Classe e confiança informadas manualmente para integração com a IA. Nenhum modelo de imagem é executado aqui.')
+        confirmado = st.checkbox('Confirmar avaliação humana (confiança de 60 a <80%)')
+        revisor = st.text_input('Responsável pela confirmação', max_chars=100)
+        condicao = st.selectbox('Condição do rio (L)', ['Indisponível'] + list(NIVEIS_RIO))
+        nivel = None if condicao == 'Indisponível' else condicao
+        oficial = st.checkbox('Condição transcrita de fonte oficial')
+        fonte_nivel = st.text_input('Referência da fonte / estação / horário observado', max_chars=300)
+        st.caption('O nível é informado manualmente. A referência permite rastrear a observação; não há consulta automática ao INEA.')
+        raio = st.number_input('Raio para recorrência (metros)', min_value=1, max_value=10000, value=500, step=100)
+        st.caption('F usa registros validados dos últimos 30 dias no histórico local, dentro deste raio.')
         forcar = st.checkbox('Consultar API sem usar cache', help='Normalmente a previsão é reutilizada por até 45 minutos para as mesmas coordenadas.')
-        enviar = st.form_submit_button('Atualizar previsão', type='primary', use_container_width=True)
+        enviar = st.form_submit_button('Atualizar previsão', type='primary', use_container_width=True, key='atualizar')
     st.caption('As coordenadas iniciais são um ponto de demonstração no Rio, sem associação a um canal cadastrado.')
     st.divider()
     st.markdown('**Como funciona**\n\n1. Localizar a ocorrência\n2. Consultar a chuva prevista\n3. Combinar chuva e resíduos')
     st.caption('Cache: 45 min · Sem chave de API\n\nAo consultar, as coordenadas são enviadas ao Open-Meteo.')
+    if st.button('Nova ocorrência', key='nova'):
+        for chave in ('resultado', 'erro', 'identidade_ocorrencia', 'ocorrencia_id'):
+            st.session_state.pop(chave, None)
+    st.caption('Atualizar a previsão mantém a ocorrência atual. Use Nova ocorrência para registrar outro relato no mesmo ponto.')
 
 if enviar:
     # Uma falha nunca deixa a pontuação da ocorrência anterior parecendo atual.
@@ -67,38 +93,77 @@ if enviar:
     st.session_state.pop('erro', None)
     try:
         validar_entrada(nome, latitude, longitude, waste)
-        if forcar:
-            previsao_em_cache.clear(latitude, longitude)
-        with st.spinner('Consultando previsão e calculando prioridade…'):
-            bruto = previsao_em_cache(latitude, longitude)
-            previsao = analisar_previsao(bruto['dados'])
-        p, nivel = calcular_prioridade(waste, previsao['rainfall_score'])
+        identidade = (nome.strip(), latitude, longitude)
+        if st.session_state.get('identidade_ocorrencia') != identidade:
+            st.session_state.identidade_ocorrencia = identidade
+            st.session_state.ocorrencia_id = str(uuid4())
+        agora = datetime.now(timezone.utc)
+        quantidade = contar_proximos(registros, latitude, longitude, agora, raio_m=raio,
+                                     excluir_id=st.session_state.ocorrencia_id)
+        indice = calcular_ari(classe, None, quantidade, nivel, confianca, confirmado, revisor, oficial, fonte_nivel)
+        previsao, bruto = {}, {}
+        if indice['status_validacao'] in ('aceito', 'confirmado_humano'):
+            if forcar:
+                previsao_em_cache.clear(latitude, longitude)
+            try:
+                with st.spinner('Consultando previsão e calculando ARI…'):
+                    bruto = previsao_em_cache(latitude, longitude)
+                    previsao = analisar_previsao(bruto['dados'])
+                indice = calcular_ari(classe, previsao['acumulado_24h_mm'], quantidade,
+                                      nivel, confianca, confirmado, revisor, oficial, fonte_nivel)
+            except (ErroPrevisao, DadosInvalidos) as exc:
+                st.session_state.erro = str(exc)
         st.session_state.resultado = {
-            **previsao, 'nome': nome.strip(), 'latitude': latitude, 'longitude': longitude,
-            'waste_score': waste, 'priority_score': p, 'priority_level': nivel,
-            'consultado_em': bruto['consultado_em'], 'fonte': 'Open-Meteo', 'url_fonte': bruto['url'],
-            'versao_metodologia': 'mvp-1',
+            **previsao, **indice, 'id': st.session_state.ocorrencia_id, 'registrado_em': agora.isoformat(),
+            'nome': nome.strip(), 'latitude': latitude, 'longitude': longitude,
+            'waste_score': waste, 'classe_residuos': classe, 'confianca': confianca,
+            'origem_residuos': 'entrada_manual', 'revisor': revisor.strip() if confirmado else '',
+            'nivel_rio': nivel, 'nivel_oficial': oficial, 'fonte_nivel': fonte_nivel,
+            'registros_anteriores': quantidade, 'raio_m': raio, 'janela_recorrencia_dias': 30,
+            'rainfall_intensity_score': previsao.get('rainfall_score'),
+            'rainfall_intensity_level': previsao.get('level'),
+            'rainfall_score': indice['componentes']['R'],
+            'consultado_em': bruto.get('consultado_em'), 'fonte': 'Open-Meteo', 'url_fonte': bruto.get('url'),
         }
     except (ErroPrevisao, DadosInvalidos) as exc:
         st.session_state.erro = str(exc)
 
 if st.session_state.get('erro'):
     st.error(st.session_state.erro)
-    st.info('Nenhuma pontuação foi gerada para esta consulta. Confira os dados e use “Atualizar previsão” para tentar novamente.')
+    st.info('ARI indisponível nesta consulta. Confira os dados e atualize a previsão para tentar novamente.')
 
 resultado = st.session_state.get('resultado')
 if resultado:
     r = resultado
+    if r['avaliacao_urgente']:
+        st.error('Avaliação urgente recomendada: transbordamento informado como oficial. Esta sinalização independe do valor do ARI e da validação do relato de resíduos.')
+    if r['status_validacao'] == 'pendente':
+        st.warning('Confiança entre 60 e <80%: relato aguardando confirmação humana. Não participa do ARI ou da recorrência enquanto estiver pendente.')
+    elif r['status_validacao'] == 'excluido':
+        st.warning('Confiança abaixo de 60%: relato excluído do cálculo e da recorrência.')
+    if st.button('Salvar ocorrência no histórico', key='salvar'):
+        try:
+            inserido = salvar(r)
+            st.success('Ocorrência salva.' if inserido else 'Esta ocorrência já foi salva. Nenhuma duplicação foi criada.')
+            registros = listar()
+        except (sqlite3.Error, OSError) as exc:
+            st.error('Não foi possível salvar a ocorrência no histórico local.')
+
+if resultado and resultado['ari_score'] is not None:
+    r = resultado
     st.subheader(r['nome'])
     st.caption(f"Ocorrência consultada: {r['latitude']:.4f}, {r['longitude']:.4f} · Resíduos: {r['waste_score']}/100. Alterações no formulário só são aplicadas ao atualizar.")
-    cores = {'Baixa': '#226F56', 'Média': '#93620A', 'Alta': '#AD4D1B', 'Crítica': '#B33042'}
     cols = st.columns(3)
     with cols[0]:
-        cartao('Prioridade operacional', formatar(r['priority_score'], 2), r['priority_level'], 'Combinação de resíduos, chuva e interação.', cores[r['priority_level']])
+        cartao('ARI · índice composto', formatar(r['ari_score'], 2), r['ari_level'], r['acao'], r['cor_hotspot'])
     with cols[1]:
-        cartao('Pontuação de chuva', str(r['rainfall_score']), r['level'], 'Baseada no maior volume previsto em 1 hora.', '#087F8C')
+        cartao('Pontuação de chuva · R', str(r['rainfall_score']), 'Acumulado previsto em 24h', 'Faixas do protótipo a calibrar por bacia.', '#087F8C')
     with cols[2]:
         cartao('Pontuação de resíduos', str(r['waste_score']), 'Informada pela equipe', 'Entrada manual; reconhecimento por IA é uma próxima integração.', '#42617B')
+    st.caption(f"ARI normalizado: {formatar(r['ari'], 4)} · Confiança: {r['confianca']}% · Validação: {r['status_validacao']} · Registros anteriores: {r['registros_anteriores']}")
+    if r['parcial']:
+        st.warning('ARI parcial: nível do rio indisponível. Pesos W, R e F reajustados para somar 100%; cobertura original de 75%. Não compare como equivalente a um ARI completo.')
+    st.caption(f"L: {r['componentes']['L'] if r['componentes']['L'] is not None else 'Indisponível'} · F: {r['componentes']['F']} · Raio: {r['raio_m']} m · Histórico: 30 dias")
     st.write('')
     cols = st.columns(4)
     cols[0].metric('Precipitação · 6 horas', f"{formatar(r['acumulado_6h_mm'])} mm")
@@ -128,16 +193,15 @@ if resultado:
         st.altair_chart(chart, use_container_width=True)
         st.caption('Cada barra representa uma hora completa. Probabilidade é a chance horária de precipitação; o pico não representa a chance de chuva em toda a janela.')
     with metodo:
-        st.markdown('**Pontuação de chuva (Rainfall Score)** — usa o máximo de precipitação em 1h nas 24h analisadas.')
-        st.table(pd.DataFrame({'Intensidade (mm/h)': ['< 0,2', '0,2–5,0', '5,1–25,0', '25,1–50,0', '> 50,0'], 'Chuva': ['Sem chuva significativa', 'Fraca', 'Moderada', 'Forte', 'Muito forte'], 'Score': [0, 25, 50, 75, 100]}))
-        st.caption('Categorias de intensidade baseadas no Alerta Rio; transformação em score criada para o MVP. Valores entre 5,0 e 5,1 ou entre 25,0 e 25,1 entram na faixa superior, sem arredondamento prévio.')
-        st.code('l = WasteScore / 100\nr = RainfallScore / 100\nPriorityScore = 100 × (0,6·l + 0,2·r + 0,2·l·r)', language=None)
-        st.markdown('**Faixas de prioridade do MVP:** baixa < 25; média ≥ 25 e < 50; alta ≥ 50 e < 75; crítica ≥ 75. A classificação usa o valor antes do arredondamento.')
-        st.caption('Os acumulados e a probabilidade são contexto visual: não entram diretamente nesta fórmula.')
+        st.code('ARI (0–1) = (0,40×W + 0,25×R + 0,25×L + 0,10×F) / 100', language=None)
+        st.table(pd.DataFrame({'Acumulado em 24h (mm)': ['<10', '10 a 30', '>30 a 50', '>50 a 80', '>80'], 'R': [0,25,50,75,100]}))
+        st.markdown('**Faixas:** baixo <25; moderado ≥25 e <50; alto ≥50 e <75; crítico ≥75. Classificação antes do arredondamento. Sem L, a soma ponderada é dividida por 0,75.')
+        st.dataframe(pd.DataFrame([{'Componente': k, 'Score': v, 'Peso efetivo': r['pesos_efetivos'].get(k), 'Contribuição (0–100)': r['contribuicoes'].get(k)} for k,v in r['componentes'].items()]), hide_index=True)
+        st.caption('Probabilidade e máximo horário são contexto. A chuva do ARI usa o acumulado de 24h. A confiança controla a aceitação do relato; não multiplica W.')
     with dados:
         st.dataframe(df[['Intervalo', 'precipitacao_mm', 'probabilidade_pct']].rename(columns={'precipitacao_mm': 'Precipitação (mm)', 'probabilidade_pct': 'Probabilidade (%)'}), hide_index=True, use_container_width=True)
         st.download_button('Baixar resultado JSON', json.dumps(r, ensure_ascii=False, indent=2, allow_nan=False), file_name='aquasentinel-previsao.json', mime='application/json')
-else:
+elif not resultado:
     if not st.session_state.get('erro'):
         st.info('Comece pelo painel lateral: informe a ocorrência e clique em “Atualizar previsão”.')
     a, b, c = st.columns(3)
@@ -151,6 +215,32 @@ else:
         st.subheader('03 · Priorize')
         st.write('Combine a chuva prevista com a severidade dos resíduos, em uma escala de 0 a 100.')
 
+with st.expander('Histórico local e confirmação humana'):
+    st.caption('Registros salvos persistem neste computador. A confirmação registra o responsável, mas o MVP não autentica revisores. Para uma nova avaliação, consulte novamente com previsão atualizada.')
+    pendentes = [item for item in registros if item['status_validacao'] == 'pendente']
+    if pendentes:
+        with st.form('revisao'):
+            por_id = {item['id']: item for item in pendentes}
+            escolhido = st.selectbox('Ocorrência pendente', list(por_id), format_func=lambda i: f"{por_id[i]['nome']} · {por_id[i]['registrado_em']} · {i[:8]}")
+            responsavel = st.text_input('Responsável pela revisão', max_chars=100, key='responsavel_revisao')
+            if st.form_submit_button('Confirmar relato'):
+                try:
+                    confirmar(escolhido, responsavel)
+                    st.success('Relato confirmado. Ele passa a participar da recorrência nas próximas consultas.')
+                    registros = listar()
+                except (DadosInvalidos, sqlite3.Error, OSError) as exc:
+                    st.error(str(exc))
+    if registros:
+        st.dataframe(pd.DataFrame([{'Canal': item['nome'], 'Registrado em': item['registrado_em'], 'Validação': item['status_validacao'], 'ARI na consulta': item['ari_score'], 'Condição': 'Parcial' if item['parcial'] else 'Completo', 'Ação na consulta': item['acao']} for item in registros]), hide_index=True)
+        st.download_button('Baixar histórico JSON', json.dumps(registros, ensure_ascii=False, indent=2, allow_nan=False), file_name='aquasentinel-historico.json', mime='application/json')
+        pontos = [item for item in registros if item['ari_score'] is not None or item['avaliacao_urgente']]
+        if pontos:
+            st.caption('Hotspots das avaliações salvas, com suas cores originais. São registros históricos, não alertas atualizados automaticamente.')
+            st.map(pd.DataFrame([{'latitude': item['latitude'], 'longitude': item['longitude'], 'cor': item['cor_hotspot']} for item in pontos]), color='cor')
+    else:
+        st.info('Nenhuma ocorrência salva ainda. A ausência de relatos neste histórico não significa ausência de problemas na região.')
+
 st.divider()
 st.caption('Protótipo de apoio à priorização. Não é previsão de inundação, alerta oficial nem orientação de segurança. Pesos e faixas de score ainda precisam de validação local.')
-st.markdown('Dados: [Open-Meteo](https://open-meteo.com/) · [Licença CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Categorias: [Alerta Rio](https://websempre.rio.rj.gov.br/estacoes/)')
+st.markdown('Dados: [Open-Meteo](https://open-meteo.com/) · [Licença CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Intensidade horária legada: [Alerta Rio](https://websempre.rio.rj.gov.br/estacoes/)')
+st.caption('As faixas de chuva em 24h e do ARI são propostas do protótipo e precisam de calibração por bacia.')
