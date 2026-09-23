@@ -4,7 +4,7 @@ import base64
 from PIL import Image
 import pytest
 
-from relatos import RelatoInvalido, criar_relato, listar, revisar, salvar
+from relatos import RelatoInvalido, _conectar, criar_relato, listar, revisar, salvar
 
 
 @pytest.fixture(autouse=True)
@@ -41,3 +41,33 @@ def test_dados_invalidos_nao_criam_relato():
     with pytest.raises(RelatoInvalido):
         criar_relato("Canal", -22, -43, "Alto", "Pessoa", "", b"invalid image")
     assert listar() == []
+
+
+def test_postgres_aceita_senha_com_simbolos_em_segredo_separado(monkeypatch):
+    import sys
+    from types import SimpleNamespace
+
+    uri = "postgresql://postgres.projeto@pooler.exemplo:5432/postgres"
+    monkeypatch.setenv("AQUASENTINEL_DATABASE_URL", uri)
+    monkeypatch.setenv("AQUASENTINEL_DATABASE_PASSWORD", "senha@forte:#%")
+    recebidos = {}
+
+    class Conexao:
+        def execute(self, comando):
+            assert comando.startswith("CREATE TABLE IF NOT EXISTS relatos")
+
+        def commit(self):
+            pass
+
+    def conectar(url, **opcoes):
+        recebidos.update(url=url, **opcoes)
+        return Conexao()
+
+    monkeypatch.setitem(sys.modules, "psycopg", SimpleNamespace(connect=conectar))
+    _conectar()
+    assert recebidos == {
+        "url": uri,
+        "connect_timeout": 8,
+        "sslmode": "require",
+        "password": "senha@forte:#%",
+    }
