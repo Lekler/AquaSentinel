@@ -33,7 +33,11 @@ def _conectar():
     if url:
         import psycopg
 
-        con = psycopg.connect(url, connect_timeout=8, sslmode="require")
+        opcoes = {"connect_timeout": 8, "sslmode": "require"}
+        senha = os.environ.get("AQUASENTINEL_DATABASE_PASSWORD", "")
+        if senha:
+            opcoes["password"] = senha
+        con = psycopg.connect(url, **opcoes)
         con.execute("CREATE TABLE IF NOT EXISTS relatos (id TEXT PRIMARY KEY, conteudo TEXT NOT NULL)")
     else:
         caminho = Path(os.environ.get("AQUASENTINEL_DB", "dados/relatos.sqlite3"))
