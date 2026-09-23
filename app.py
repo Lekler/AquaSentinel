@@ -61,6 +61,7 @@ with enviar:
         latitude = a.number_input("Latitude", min_value=-90.0, max_value=90.0, value=-22.8667, format="%.6f")
         longitude = b.number_input("Longitude", min_value=-180.0, max_value=180.0, value=-43.2317, format="%.6f")
         st.caption("Exemplo inicial: região do Canal do Fundão. Confira e altere as coordenadas antes de enviar.")
+        confirmar_local = st.checkbox("Conferi que as coordenadas correspondem à foto")
         classe = st.select_slider("Acúmulo observado", options=["Baixo", "Moderado", "Alto"], value="Moderado")
         origem = st.selectbox("Quem está enviando?", ["Pessoa", "Equipe/órgão (declarado)"])
         observacao = st.text_area("Observações", max_chars=500, placeholder="Descreva o lixo e um ponto de referência próximo.")
@@ -70,6 +71,8 @@ with enviar:
         try:
             if imagem is None:
                 raise RelatoInvalido("Tire ou selecione uma foto antes de enviar.")
+            if not confirmar_local:
+                raise RelatoInvalido("Confirme que as coordenadas correspondem ao local fotografado.")
             relato = criar_relato(nome, latitude, longitude, classe, origem, observacao, imagem.getvalue())
             salvar(relato)
             st.success(f"Relato recebido para revisão. Código: {relato['id'][:8]}")
@@ -99,6 +102,9 @@ with mapa:
                     st.caption(f"{r['latitude']:.5f}, {r['longitude']:.5f} · Revisado em {r['validado_em'][:16]}")
     else:
         st.info("O mapa ficará disponível quando a equipe validar o primeiro relato.")
+        arte_mapa = ASSETS / "mão e fundo.png"
+        if arte_mapa.exists():
+            st.image(str(arte_mapa), width=450)
 
 senha_configurada = os.environ.get("AQUASENTINEL_REVIEW_PASSWORD", "")
 with st.sidebar:
