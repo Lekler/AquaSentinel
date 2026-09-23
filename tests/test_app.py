@@ -6,7 +6,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 from previsao import ErroPrevisao
 
-APP = str(Path(__file__).resolve().parents[1] / 'app.py')
+APP = str(Path(__file__).resolve().parents[1] / 'legacy_app.py')
 
 
 @pytest.fixture(autouse=True)
