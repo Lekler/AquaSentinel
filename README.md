@@ -37,10 +37,11 @@ Recomendação: **Streamlit Community Cloud + PostgreSQL gerenciado**, como Supa
 
 1. Crie um projeto PostgreSQL e copie a conexão **Session pooler (porta 5432)** no painel do provedor. No Supabase, esse modo aceita IPv4; a conexão direta pode depender de IPv6.
 2. Entre em [share.streamlit.io](https://share.streamlit.io/), conecte sua conta GitHub e crie um app a partir de `Lekler/AquaSentinel`, `main`, `app.py`.
-3. Em **Advanced settings → Secrets**, adicione, com seus valores reais:
+3. Em **Advanced settings → Secrets**, adicione, com seus valores reais. A senha do banco fica separada da URL para não precisar codificar caracteres especiais:
 
 ```toml
-AQUASENTINEL_DATABASE_URL = "postgresql://USUARIO:SENHA@HOST:5432/postgres"
+AQUASENTINEL_DATABASE_URL = "postgresql://USUARIO@HOST:5432/postgres"
+AQUASENTINEL_DATABASE_PASSWORD = "senha-do-banco-criado-no-provedor"
 AQUASENTINEL_REVIEW_PASSWORD = "uma-senha-longa-e-exclusiva"
 ```
 
