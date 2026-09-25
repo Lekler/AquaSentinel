@@ -1,0 +1,36 @@
+body:has(.registro-header) [data-testid="stAppViewContainer"] {background:linear-gradient(160deg,#fff,#f7fcfe);color:#062d47}
+body:has(.registro-header) [data-testid="stHeader"] {display:none}
+body:has(.registro-header) .block-container {max-width:1360px;padding:18px 32px 0}
+.registro-header {display:flex;justify-content:space-between;align-items:center;padding:0 22px 24px;border-bottom:1px solid #f0f9fc}
+.registro-header .language-switch {display:inline-flex;align-items:center;gap:5px;margin-right:2px;padding:6px 8px;border:1px solid #dcecf5;border-radius:20px;background:#fff;font-size:11px;font-weight:800;letter-spacing:.7px}.registro-header .language-switch a{color:#008fa7!important}.registro-header .language-current{color:#6982a6}
+.registro-header>a {width:300px}.registro-header img {width:100%}.registro-header nav {display:flex;gap:42px}.registro-header a {color:#07305b;text-decoration:none}
+.registro-header details {position:relative}.registro-header summary {cursor:pointer;list-style:none}.registro-header details p {position:absolute;right:0;top:24px;width:260px;padding:18px;background:white;border:1px solid #dcecf5;border-radius:12px;z-index:5;box-shadow:0 8px 24px #07305b16;font-size:14px}
+.registro-title {display:flex;justify-content:space-between;align-items:center;padding:24px 22px 22px;gap:25px}
+.registro-title h1 {font-size:46px;letter-spacing:-1.8px;color:#062a44;margin:0;padding:0;font-weight:800}.registro-title p {font-size:20px;color:#58729b;margin:0}
+.registro-steps {display:flex;gap:22px;color:#5273a0}.registro-steps span:first-child {color:#00a9b7;font-weight:bold}
+.st-key-photo-card,.st-key-location-card,.st-key-level-card {background:#ffffffdb;border:1px solid #e0eef6;border-radius:18px;padding:22px;box-shadow:0 5px 18px #169bc508}
+.card-heading {display:flex;gap:18px;align-items:center;margin-bottom:16px}.card-heading>b {display:grid;place-items:center;flex-shrink:0;width:52px;height:52px;border-radius:50%;background:#bfebfc;color:#066699;font-size:29px}.card-heading h2 {font-size:23px;letter-spacing:-.6px;margin:0;padding:0;color:#082e5a}.card-heading p {font-size:14px;color:#6982a6;margin:3px 0 0}
+.foto-pair {display:grid;grid-template-columns:1fr 1fr;gap:14px}.foto-pair figure {margin:0;height:242px;border:1px solid #d8e9f4;border-radius:14px;overflow:hidden;position:relative;background:#f5faff}.foto-pair figure>img {width:100%;height:100%;object-fit:contain}.foto-pair figcaption {position:absolute;bottom:0;left:0;right:0;background:#ffffffeb;text-align:center;padding:6px;font-size:13px;color:#245276}.foto-pair .foto-vazia {border:1px dashed #c5dff2;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:18px;color:#6884a8}.foto-pair .foto-vazia img {width:55px;height:52px}.foto-vazia small {font-size:13px}
+body:has(.registro-header) button[kind="primary"] {background:linear-gradient(110deg,#008ac7,#00babb);border:0;border-radius:32px;min-height:52px;color:white;font-weight:700}
+.st-key-photo-actions button {border-radius:32px;min-height:50px;color:#005de4;border-color:#0079ee}.st-key-photo-actions button[kind="primary"] {color:white}
+body:has(.registro-header) [data-testid="stMetric"] {padding:8px!important}body:has(.registro-header) [data-testid="stMetricValue"] {font-size:25px}
+.st-key-foto_nivel [data-baseweb="select"] {border-radius:12px}
+.st-key-foto_nivel button {min-height:64px;border-radius:12px!important;margin:0 6px!important;background:#fff;font-weight:700;color:#07345c;border:1px solid #dcecf5!important;gap:10px}
+.st-key-foto_nivel button:before {content:'';width:29px;height:29px;border-radius:50%;flex-shrink:0;background:#46cb77}
+.st-key-foto_nivel button:nth-child(2):before {background:#ffcd2b}
+.st-key-foto_nivel button:nth-child(3):before {background:#ff8838}
+.st-key-foto_nivel button:nth-child(4):before {background:#ff3559}
+.st-key-foto_nivel button[aria-pressed="true"] {outline:2px solid #009db9;background:#edfaff}
+body:has(.registro-header) [data-testid="stForm"] {border:1px solid #e0eef6;border-radius:18px;padding:22px;background:#ffffffd9}
+body:has(.registro-header) [data-testid="stFormSubmitButton"] {display:flex;justify-content:center;margin:18px auto 4px}
+body:has(.registro-header) [data-testid="stFormSubmitButton"] button {min-width:310px}
+.registro-footer {margin-top:35px;text-align:center;color:#6987aa;font-size:13px}.registro-footer p img {width:23px;vertical-align:middle;margin-right:8px}.registro-waves {width:100%;height:76px;object-fit:fill;margin-top:18px}
+.st-key-mapa-resumo,.st-key-mapa-pontos,.st-key-mapa-registros,.st-key-mapa-avaliacoes,.st-key-mapa-gerenciar {background:#ffffffd9;border:1px solid #e0eef6;border-radius:18px;padding:22px;box-shadow:0 5px 18px #169bc508;margin-bottom:20px}
+.mapa-section-label,.mapa-kicker {color:#00a1b2;font-size:12px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase}
+.mapa-section-label {margin-bottom:12px}.mapa-section-heading {margin-bottom:16px}.mapa-section-heading h2 {color:#082e5a;font-size:25px;letter-spacing:-.6px;margin:4px 0 3px}.mapa-section-heading p {color:#6982a6;font-size:14px;margin:0}
+body:has(.registro-header) [data-testid="stMetric"] {background:#f5fbfe;border:1px solid #dcecf5;border-radius:14px;padding:14px 16px!important}body:has(.registro-header) [data-testid="stMetricLabel"] {color:#58729b}body:has(.registro-header) [data-testid="stMetricValue"] {color:#07345c;font-size:28px}
+.st-key-mapa-pontos [data-testid="stMap"] {border:1px solid #d8e9f4;border-radius:14px;overflow:hidden}.st-key-mapa-pontos [data-testid="stCaptionContainer"] {margin-top:10px}
+.st-key-mapa-registros [data-testid="stDataFrame"],.st-key-mapa-avaliacoes [data-testid="stDataFrame"] {border:1px solid #d8e9f4;border-radius:12px;overflow:hidden}.st-key-mapa-registros [data-testid="stSelectbox"] {margin-top:18px}.st-key-mapa-registros [data-baseweb="select"] {border-radius:11px;border-color:#cfe3ef}.st-key-mapa-registros [data-testid="stExpander"],.st-key-mapa-avaliacoes [data-testid="stExpander"] {border:1px solid #d8e9f4;border-radius:12px}
+.st-key-mapa-registros button,.st-key-mapa-avaliacoes button {border-radius:24px}.st-key-mapa-registros button[kind="primary"] {background:linear-gradient(110deg,#008ac7,#00babb);border:0;color:white}
+@media(max-width:800px){body:has(.registro-header) .block-container{padding:16px}.registro-header{padding:0 0 20px}.registro-header>a{width:215px}.registro-header nav{gap:12px;font-size:13px}.registro-title{padding:20px 0;display:block}.registro-title h1{font-size:34px}.registro-title p{font-size:16px}.registro-steps{margin-top:20px;gap:16px;font-size:13px}.st-key-photo-card,.st-key-location-card{padding:16px}.foto-pair figure{height:210px}}
+@media(max-width:800px){.st-key-mapa-resumo,.st-key-mapa-pontos,.st-key-mapa-registros,.st-key-mapa-avaliacoes,.st-key-mapa-gerenciar{padding:16px}.mapa-section-heading h2{font-size:22px}.st-key-mapa-resumo [data-testid="stMetricValue"]{font-size:23px}}

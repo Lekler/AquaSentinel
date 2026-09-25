@@ -1,5 +1,44 @@
 # Validação da entrega
 
+## Página inicial com identidade visual — 19/09/2026
+
+- Substituída a home simples pela composição da referência com os 11 PNGs do usuário.
+- Hashes dos PNGs copiados conferidos com os arquivos da pasta Imagens: iguais.
+- Seis testes do fluxo fotográfico passaram após a troca da home.
+- AppTest verificou o carregamento da home e o acesso a registro, mapa e ARI.
+- Links e imagens embutidas inspecionados; SVGs são transportados como `img`
+  porque o sanitizador de `st.html` remove SVG inline.
+- CSS da home isolado por presença de `.aqua-page`; não troca o tema dos formulários.
+- Layout com quebras para tablet e celular, menus HTML nativos e foco de teclado.
+- Serviço local respondeu HTTP 200. Não houve inspeção visual em navegador:
+  o inventário de navegadores da automação estava vazio. Fidelidade pixel a pixel
+  e aparência real em dispositivos ainda não foram verificadas.
+
+## Integração fotográfica — 19/09/2026
+
+- 121 testes passaram em Windows/Python 3.12, incluindo os 99 testes anteriores.
+- Novos testes: NMS entre classes, IDs, fronteiras da confiança, ausência de
+  detecções, validação de imagens, hash independente dos metadados, coordenadas,
+  reenvios idempotentes, Excel, recortes ZIP e navegação entre páginas.
+- Fluxo de interface via Streamlit AppTest: upload, detecção, preenchimento,
+  salvamento, leitura, downloads, vínculo ARI, troca por imagem inválida e
+  preservação do rascunho ao navegar. Nova foto exige nova confirmação.
+- Teste ponta a ponta adicional com `models/best.pt` real e frame 50 da gravação
+  local `rodada_20260919_195907`: 8 itens, 58,55% de confiança média, triagem de
+  baixa confiança. A foto foi salva em banco temporário, reaberta no mapa e
+  vinculada ao ARI; o Excel reaberto tinha oito linhas de itens.
+- Um frame anterior sem detecções produziu total zero e média ausente.
+- `pip check`: nenhuma dependência quebrada.
+
+O frame de teste já continha anotações do contador antigo: é um teste de integração,
+não uma amostra apropriada para medir precisão. As evidências locais ficam em
+`validacao_local/`, ignorada pelo Git, sem contaminar o banco de trabalho.
+
+Não foi possível fazer inspeção visual no navegador, pois não havia navegador
+conectado à automação. Captura por câmera e permissão/GPS real precisam de teste
+no dispositivo. O fluxo de upload foi exercitado pelo AppTest, inclusive com a rede real.
+Não há validação de autenticidade de imagens nem calibração do acúmulo/risco.
+
 ## Atualização ARI de 19/09/2026
 
 99 testes passaram em Python 3.12.14 (1,61 s). A suíte cobre a fórmula composta,

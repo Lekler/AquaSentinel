@@ -1,75 +1,83 @@
-# 💧 AquaSentinela
+# AquaSentinela — MVP do hackathon
 
-Site experimental para moradores e equipes registrarem **focos de lixo em canais da Baía de Guanabara**. O fluxo principal tem duas telas: envio de foto e localização; mapa dos relatos revisados. A equipe confere os envios antes de exibi-los publicamente.
+Aplicativo colaborativo para registrar resíduos em rios e canais da Baía de Guanabara. Esta versão reúne o novo site da equipe, detecção de plásticos em fotografias, localização, revisão humana, mapa de pontos revisados e o módulo experimental de chuva. O objetivo é apoiar **triagem de resíduos**, sem afirmar qualidade da água, doença ou risco de inundação.
 
-Este MVP foi iniciado por [Alexandre Rodrigues (Lekler)](https://github.com/Lekler). A identidade visual e as artes enviadas pela **Alessandra Vaz dos Anjos Santos** estão em `Imagens/`. A interface atual segue o escopo acordado na 3ª reunião da equipe (19/09/2026).
-
-[![Testes](https://github.com/Lekler/AquaSentinel/actions/workflows/tests.yml/badge.svg)](https://github.com/Lekler/AquaSentinel/actions/workflows/tests.yml)
-
-## O que funciona
-
-- Envio ou captura de foto pelo navegador do celular, nome do local e coordenadas.
-- Compressão da foto e remoção dos metadados EXIF antes de gravá-la.
-- Triagem visual **manual e provisória**: baixo, moderado ou alto. As cores do mapa mostram essa classificação somente após revisão humana.
-- Fila de revisão protegida por senha da equipe; relatos rejeitados não aparecem no mapa.
-- Banco SQLite para teste local ou PostgreSQL para vários usuários em uma implantação online.
-
-**Ainda não há modelo de IA conectado, fórmula final do W-index, GPS automático, login de cidadãos/órgãos nem relatório PDF.** A opção “equipe/órgão” é autodeclarada e não recebe confiança adicional. O mapa não expressa risco de enchente nem diagnóstico de qualidade da água. A chuva e o ARI v2 anteriores ficam preservados em `legacy_app.py` e descritos em [README-ARI-v2.md](README-ARI-v2.md), fora da experiência principal.
+**Autoria:** MVP inicial de previsão de chuva e priorização criado por Lekler para o AquaSentinel; interface, fluxo fotográfico e modelo recebidos da equipe e integrados nesta versão. O projeto foi organizado para que outras pessoas possam executar, estudar e adaptar o código.
 
 ## Executar no macOS
 
-Instale Python 3.12 e, na pasta do projeto:
+Requer Python 3.12. Na raiz do repositório:
 
-```bash
+```sh
 python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-export AQUASENTINEL_ALLOW_LOCAL_DB=1
-export AQUASENTINEL_REVIEW_PASSWORD='defina-uma-senha-forte-aqui'
-python -m streamlit run app.py
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m streamlit run app.py
 ```
 
-Abra `http://localhost:8501`. O banco local fica em `dados/relatos.sqlite3` e não entra no Git. Para alterar seu caminho, use `AQUASENTINEL_DB`. A senha de revisão é necessária apenas para validar ou rejeitar relatos.
+Abra o endereço local mostrado no terminal. Para Windows, use `setup.bat` e `run.bat`. O arquivo `models/best.pt` precisa estar presente; a primeira instalação baixa bibliotecas de IA e pode demorar. Sem PostgreSQL, o app usa SQLite em `dados/ocorrencias.sqlite3`, apenas para desenvolvimento local.
 
-## Publicar durante o hackathon
+## Fluxo
 
-Recomendação: **Streamlit Community Cloud + PostgreSQL gerenciado**, como Supabase. O código pode continuar no repositório privado; no Streamlit, configure o aplicativo como público para que qualquer pessoa com o link consiga abrir. O serviço exige que a conta Streamlit tenha acesso ao repositório GitHub. O arquivo inicial é `app.py`, na branch `main`, com Python 3.12 e dependências em `requirements.txt`.
+1. **Início** apresenta o projeto.
+2. **Registrar ocorrência** recebe uma foto, executa o detector de quatro classes de plástico, pede nome do local, coordenadas e o nível observado pela pessoa. O app solicita confirmação dos dados e autorização para publicação antes de salvar. O envio fica **pendente**.
+3. **Mapa e registros** mostra somente ocorrências **validadas por um revisor** e com autorização de publicação. A equipe acessa a fila com a senha configurada no ambiente. Relatos rejeitados permanecem no banco para auditoria, mas não aparecem no mapa.
+4. **Chuva e ARI · experimental** mantém a integração Open-Meteo e os cálculos anteriores para estudo. O ARI é separado do WPS/CS e não é um alerta de inundação.
 
-1. Crie um projeto PostgreSQL e copie a conexão **Session pooler (porta 5432)** no painel do provedor. No Supabase, esse modo aceita IPv4; a conexão direta pode depender de IPv6.
-2. Entre em [share.streamlit.io](https://share.streamlit.io/), conecte sua conta GitHub e crie um app a partir de `Lekler/AquaSentinel`, `main`, `app.py`.
-3. Em **Advanced settings → Secrets**, adicione, com seus valores reais. A senha do banco fica separada da URL para não precisar codificar caracteres especiais:
+O modelo `best.pt` reconhece `other_plastic`, `plastic_bag`, `plastic_bottle` e `plastic_package`. Ele **não** classifica a gravidade do acúmulo. Contagens e confiança de detecção não são massa, obstrução ou prova de autenticidade da foto.
+
+## Metodologia de resíduos: WPS e CS
+
+Esta implementação segue a metodologia WPS/CS fornecida pela equipe como **heurística experimental**, com as limitações abaixo:
+
+| Componente | Cálculo no MVP |
+|---|---|
+| `W` | Nível informado e confirmado na revisão: sem resíduos 0, pouco 25, moderado 60, muito poluído/bloqueando 100 |
+| `F` | 1 foto distinta validada = 25; 2 = 50; 3–4 = 75; 5 ou mais = 100 |
+| `WPS` | `0,70 × W + 0,30 × F`, de 0 a 100 |
+| `CS` | Confiança média das detecções × confiabilidade da fonte comunitária (0,8), exibida em % |
+
+Para `F`, contam fotos distintas registradas nos últimos **30 dias**, a até **200 m**, com o mesmo nome de corpo hídrico e revisão validada. O hash da imagem reduz reenvios idênticos. **Não existe identidade verificada dos autores**: duas fotos podem vir da mesma pessoa. Por isso, `F` é uma aproximação de recorrência, e a independência entre relatos deve ser validada antes de uso operacional. O nome do corpo hídrico é texto livre; padronizar esse identificador é um próximo passo.
+
+Faixas WPS: 0–24 baixa, 25–49 moderada, 50–74 alta, 75–100 crítica. Faixas CS: abaixo de 60% baixa, 60–79% moderada, 80% ou mais alta. A confiança do detector **não é probabilidade calibrada de acerto**. Todas as submissões usam confiabilidade 0,8; o app não concede 1,0 a quem apenas declara vínculo institucional. Sem detecções, o CS é 0 e exige interpretação humana. Ausência de pontos não prova ausência de resíduos.
+
+Exemplo: W=100, F=75 e confiança média=94% produzem WPS=92,5 e CS=75,2%.
+
+## Arquitetura e dados
+
+```text
+app.py → Streamlit multipágina
+app_pages/registrar.py → visao.py (YOLO) → relatos.py → SQLite/PostgreSQL
+app_pages/mapa.py → revisão humana + wps.py → mapa público
+painel_ari.py → previsao.py (Open-Meteo) + ari.py/motor.py → historico.py
+```
+
+`relatos_foto` guarda foto reduzida, foto anotada e metadados em uma transação; `ocorrencias` guarda as avaliações ARI. O banco antigo `relatos` de versões anteriores **não é apagado**, mas seus registros não são convertidos automaticamente para o novo fluxo fotográfico. Antes de uma migração, faça backup e defina uma regra para consentimento e revisão desses relatos.
+
+Para usar PostgreSQL compartilhado, configure variáveis de ambiente ou [Secrets do Streamlit](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management):
 
 ```toml
 AQUASENTINEL_DATABASE_URL = "postgresql://USUARIO@HOST:5432/postgres"
-AQUASENTINEL_DATABASE_PASSWORD = "senha-do-banco-criado-no-provedor"
-AQUASENTINEL_REVIEW_PASSWORD = "uma-senha-longa-e-exclusiva"
+AQUASENTINEL_DATABASE_PASSWORD = "SENHA_DO_BANCO"
+AQUASENTINEL_REVIEW_PASSWORD = "SENHA_DIFERENTE_PARA_REVISAO"
 ```
 
-4. Publique o app e teste em um telefone: enviar foto, revisar com a senha, abrir o mapa em outra sessão. Confirme que o relato continua lá após reiniciar o app.
-5. Torne o app **público** nas configurações de compartilhamento e divulgue seu endereço `*.streamlit.app`.
+Não coloque valores reais no Git. A conexão usa TLS. Se a senha de revisão não estiver configurada, a revisão fica desabilitada. O banco SQLite local é efêmero em hospedagens como Streamlit Community Cloud; configure PostgreSQL para produção. O app em produção é atualizado automaticamente quando `main` muda no GitHub.
 
-Nunca salve a senha ou a URL do banco no repositório. O app só aceita envios quando encontra um banco PostgreSQL ou quando a opção local de desenvolvimento está explicitamente ativa. O Streamlit Community Cloud não garante persistência de arquivos locais; por isso SQLite não é indicado para os relatos online. O projeto PostgreSQL deve ser monitorado quanto a espaço, especialmente por conter fotos comprimidas.
+## Limitações e próximos passos
 
-**Antes de divulgar:** defina a senha de revisão, confirme o funcionamento do banco externo, faça o teste de ponta a ponta e verifique os termos de uso para fotos reais. A senha da equipe é uma solução temporária para o hackathon; o login institucional precisará de autenticação individual e verificação de vínculo.
+- O nível `W` é informado por pessoa e confirmado manualmente; falta um modelo treinado especificamente para severidade de acúmulo.
+- Revisão por senha compartilhada é suficiente para demo curta, mas precisa virar autenticação individual e trilha de auditoria antes de operação real.
+- Fotos, GPS e local são declarados/confirmados por usuários. Falta checagem de EXIF, área de cobertura, ponto hídrico padronizado e denúncias abusivas.
+- Recorrência precisa deduplicar autores, fotos semelhantes e relatos quase simultâneos.
+- Calibrar confiança do detector, pesos/faixas WPS e CS com exemplos locais rotulados.
+- Integrar histórico hídrico, dados do Alerta Rio/INEA e chuva apenas como contexto, sem misturá-los à prioridade de resíduos até validação técnica.
+- Definir retenção de fotos, proteção de dados, moderação e capacidade do banco para uso além do hackathon.
 
-## Estrutura
+## Testar e contribuir
 
-| Arquivo | Papel |
-| --- | --- |
-| `app.py` | Site responsivo de envio, mapa e revisão |
-| `relatos.py` | Validação, imagens e armazenamento SQLite/PostgreSQL |
-| `Imagens/` | Identidade visual da Alessandra |
-| `legacy_app.py`, `ari.py`, `historico.py`, `motor.py`, `previsao.py` | Protótipo anterior de chuva e ARI, preservado para referência |
-| `tests/` | Testes automatizados |
+```sh
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pytest -q
+```
 
-Para executar os testes: `python -m pip install -r requirements-dev.txt` e `python -m pytest -q`.
-
-## Próximos passos da equipe
-
-1. Integrar o modelo de imagem e a fórmula final do W-index, com confiança e possibilidade de correção humana.
-2. Obter localização do navegador com consentimento e permitir ajustar o ponto no mapa. Fotos capturadas no navegador não garantem GPS no EXIF.
-3. Implementar contas para pessoas e órgãos, com verificação institucional e trilha de auditoria por revisor.
-4. Acrescentar proteção contra relatos repetidos e abuso, política de retenção e remoção de imagens.
-5. Gerar relatório PDF após estabilizar os campos e a pontuação.
-
-Contribuições são bem-vindas; consulte [CONTRIBUTING.md](CONTRIBUTING.md). Licença [MIT](LICENSE).
+Veja [CONTRIBUTING.md](CONTRIBUTING.md). Não envie bancos locais, fotografias de usuários, senhas ou arquivos `.env` ao repositório. O modelo fornecido pela equipe está em `models/best.pt`; confirme a licença dos pesos antes de redistribuir o repositório publicamente.

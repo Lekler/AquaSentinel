@@ -11,8 +11,8 @@ from motor import DadosInvalidos, analisar_previsao, validar_entrada
 from ari import CLASSES_RESIDUOS, NIVEIS_RIO, calcular_ari, triar_confianca
 from historico import listar, salvar, confirmar, contar_proximos
 from previsao import ErroPrevisao, consultar_previsao
+from i18n import alternador_html, texto
 
-st.set_page_config(page_title='AquaSentinel · Risk Index', page_icon='💧', layout='wide')
 
 @st.cache_data(ttl=45 * 60, max_entries=128, show_spinner=False)
 def previsao_em_cache(latitude, longitude):
@@ -43,32 +43,43 @@ h2,h3{letter-spacing:-.5px}
 [data-testid="stMetric"]{background:white;padding:15px;border-radius:12px;border:1px solid #dce6ea}
 [data-testid="stMetricValue"]{font-size:27px}
 </style>''', unsafe_allow_html=True)
+st.markdown(f'<div class="ari-language">{alternador_html("/avaliacao")}</div>', unsafe_allow_html=True)
 
-st.title('💧 AquaSentinel')
-st.caption('AQUASENTINEL RISK INDEX · BAÍA DE GUANABARA · MVP / HACKATHON')
-st.markdown('''<div class="hero"><div class="eyebrow">Prever para priorizar</div>
-<h2>Chuva no horizonte. Ação no lugar certo.</h2>
-<p>Combine resíduos, chuva em 24 horas, condição do rio e recorrência para priorizar avaliações nos canais.</p></div>''', unsafe_allow_html=True)
+st.title(texto('Chuva e ARI · experimental', 'Rain and ARI · experimental'))
+st.info('Este painel é um estudo separado. A prioridade de resíduos deste MVP usa WPS e CS no mapa. O ARI não é previsão de inundação nem substitui alerta oficial.')
+st.caption(texto('AQUASENTINEL RISK INDEX · BAÍA DE GUANABARA · MVP / HACKATHON', 'AQUASENTINEL RISK INDEX · GUANABARA BAY · MVP / HACKATHON'))
+st.markdown(f'''<div class="hero"><div class="eyebrow">{texto('Prever para priorizar', 'Forecast to prioritize')}</div>
+<h2>{texto('Chuva no horizonte. Ação no lugar certo.', 'Rain ahead. Action in the right place.')}</h2>
+<p>{texto('Combine resíduos, chuva em 24 horas, condição do rio e recorrência para priorizar avaliações nos canais.', 'Combine waste, 24-hour rainfall, river conditions and recurrence to prioritize canal assessments.')}</p></div>''', unsafe_allow_html=True)
 
 try:
     registros = listar()
 except (sqlite3.Error, OSError, ValueError) as exc:
-    st.error('Não foi possível abrir o histórico local. Verifique o arquivo e as permissões da pasta dados.')
+    st.error(texto('Não foi possível abrir o histórico local. Verifique o arquivo e as permissões da pasta dados.', 'The local history could not be opened. Check the file and data-folder permissions.'))
     st.stop()
 
+foto_origem = st.session_state.get('foto_para_ari')
+if foto_origem:
+    st.info(texto(f"Foto vinculada: {foto_origem['nome']} · {foto_origem['total']} itens identificados. Confira a classe de acúmulo e a confiança da avaliação no formulário. A confiança do detector e a quantidade de objetos não são convertidas automaticamente em gravidade ambiental.", f"Linked photo: {foto_origem['nome']} · {foto_origem['total']} items identified. Check the accumulation class and assessment confidence in the form. Detector confidence and object count are not automatically converted into environmental severity."))
+    st.caption(texto(f"ID do relato: {foto_origem['id']} · Nível informado pela pessoa: {foto_origem['nivel_informado']}", f"Report ID: {foto_origem['id']} · Level reported by the person: {foto_origem['nivel_informado']}"))
+    if st.button(texto('Desvincular foto e fazer consulta manual', 'Unlink photo and run a manual assessment')):
+        for chave in ('foto_para_ari', 'resultado', 'erro', 'identidade_ocorrencia', 'ocorrencia_id'):
+            st.session_state.pop(chave, None)
+        st.rerun()
+
 with st.sidebar:
-    st.header('Consultar ocorrência')
-    st.caption('Informe o local e a pontuação de resíduos identificada pela equipe ou pelo modelo de IA.')
+    st.header(texto('Consultar ocorrência', 'Assess an occurrence'))
+    st.caption(texto('Informe o local e a pontuação de resíduos identificada pela equipe ou pelo modelo de IA.', 'Enter the location and waste score identified by the team or AI model.'))
     with st.form('consulta'):
-        nome = st.text_input('Nome do canal / ocorrência', 'Canal de demonstração · Rio', max_chars=100)
-        latitude = st.number_input('Latitude', min_value=-90.0, max_value=90.0, value=-22.9068, step=0.0001, format='%.4f')
-        longitude = st.number_input('Longitude', min_value=-180.0, max_value=180.0, value=-43.1729, step=0.0001, format='%.4f')
+        nome = st.text_input(texto('Nome do canal / ocorrência', 'Canal / occurrence name'), foto_origem['nome'] if foto_origem else texto('Canal de demonstração · Rio', 'Demo canal · River'), max_chars=100)
+        latitude = st.number_input('Latitude', min_value=-90.0, max_value=90.0, value=float(foto_origem['latitude']) if foto_origem else -22.9068, step=0.0001, format='%.6f')
+        longitude = st.number_input('Longitude', min_value=-180.0, max_value=180.0, value=float(foto_origem['longitude']) if foto_origem else -43.1729, step=0.0001, format='%.6f')
         classe = st.selectbox('Acúmulo de resíduos (W)', list(CLASSES_RESIDUOS), index=1)
         waste = CLASSES_RESIDUOS[classe]
-        confianca = st.slider('Confiança da classificação (%)', 0, 100, 85)
-        st.caption('Classe e confiança informadas manualmente para integração com a IA. Nenhum modelo de imagem é executado aqui.')
-        confirmado = st.checkbox('Confirmar avaliação humana (confiança de 60 a <80%)')
-        revisor = st.text_input('Responsável pela confirmação', max_chars=100)
+        confianca = st.slider(texto('Confiança da classificação (%)', 'Classification confidence (%)'), 0, 100, 85)
+        st.caption('Classe de acúmulo e confiança desta avaliação são informadas pela equipe. A análise de objetos da foto está em Registrar ocorrência e não comprova a gravidade ambiental.')
+        confirmado = st.checkbox(texto('Confirmar avaliação humana (confiança de 60 a <80%)', 'Confirm human assessment (confidence from 60 to <80%)'))
+        revisor = st.text_input(texto('Responsável pela confirmação', 'Person responsible for confirmation'), max_chars=100)
         condicao = st.selectbox('Condição do rio (L)', ['Indisponível'] + list(NIVEIS_RIO))
         nivel = None if condicao == 'Indisponível' else condicao
         oficial = st.checkbox('Condição transcrita de fonte oficial')
@@ -77,7 +88,7 @@ with st.sidebar:
         raio = st.number_input('Raio para recorrência (metros)', min_value=1, max_value=10000, value=500, step=100)
         st.caption('F usa registros validados dos últimos 30 dias no histórico local, dentro deste raio.')
         forcar = st.checkbox('Consultar API sem usar cache', help='Normalmente a previsão é reutilizada por até 45 minutos para as mesmas coordenadas.')
-        enviar = st.form_submit_button('Atualizar previsão', type='primary', use_container_width=True, key='atualizar')
+        enviar = st.form_submit_button(texto('Atualizar previsão', 'Update forecast'), type='primary', width="stretch", key='atualizar')
     st.caption('As coordenadas iniciais são um ponto de demonstração no Rio, sem associação a um canal cadastrado.')
     st.divider()
     st.markdown('**Como funciona**\n\n1. Localizar a ocorrência\n2. Consultar a chuva prevista\n3. Combinar chuva e resíduos')
@@ -96,7 +107,7 @@ if enviar:
         identidade = (nome.strip(), latitude, longitude)
         if st.session_state.get('identidade_ocorrencia') != identidade:
             st.session_state.identidade_ocorrencia = identidade
-            st.session_state.ocorrencia_id = str(uuid4())
+            st.session_state.ocorrencia_id = f"foto-{foto_origem['id']}" if foto_origem else str(uuid4())
         agora = datetime.now(timezone.utc)
         quantidade = contar_proximos(registros, latitude, longitude, agora, raio_m=raio,
                                      excluir_id=st.session_state.ocorrencia_id)
@@ -118,6 +129,7 @@ if enviar:
             'nome': nome.strip(), 'latitude': latitude, 'longitude': longitude,
             'waste_score': waste, 'classe_residuos': classe, 'confianca': confianca,
             'origem_residuos': 'entrada_manual', 'revisor': revisor.strip() if confirmado else '',
+            'foto_relato_id': foto_origem['id'] if foto_origem else None,
             'nivel_rio': nivel, 'nivel_oficial': oficial, 'fonte_nivel': fonte_nivel,
             'registros_anteriores': quantidade, 'raio_m': raio, 'janela_recorrencia_dias': 30,
             'rainfall_intensity_score': previsao.get('rainfall_score'),
@@ -159,7 +171,7 @@ if resultado and resultado['ari_score'] is not None:
     with cols[1]:
         cartao('Pontuação de chuva · R', str(r['rainfall_score']), 'Acumulado previsto em 24h', 'Faixas do protótipo a calibrar por bacia.', '#087F8C')
     with cols[2]:
-        cartao('Pontuação de resíduos', str(r['waste_score']), 'Informada pela equipe', 'Entrada manual; reconhecimento por IA é uma próxima integração.', '#42617B')
+        cartao('Pontuação de resíduos', str(r['waste_score']), 'Informada pela equipe', 'Classe de acúmulo avaliada pela equipe; detecções por foto disponíveis no registro.', '#42617B')
     st.caption(f"ARI normalizado: {formatar(r['ari'], 4)} · Confiança: {r['confianca']}% · Validação: {r['status_validacao']} · Registros anteriores: {r['registros_anteriores']}")
     if r['parcial']:
         st.warning('ARI parcial: nível do rio indisponível. Pesos W, R e F reajustados para somar 100%; cobertura original de 75%. Não compare como equivalente a um ARI completo.')
@@ -190,7 +202,7 @@ if resultado and resultado['ari_score'] is not None:
             y=alt.Y('precipitacao_mm:Q', title='Precipitação (mm em 1h)', scale=alt.Scale(domainMin=0)),
             tooltip=[alt.Tooltip('Intervalo:N'), alt.Tooltip('precipitacao_mm:Q', title='Precipitação (mm)', format='.2f'), alt.Tooltip('probabilidade_pct:Q', title='Probabilidade (%)')],
         ).properties(height=275)
-        st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, width="stretch")
         st.caption('Cada barra representa uma hora completa. Probabilidade é a chance horária de precipitação; o pico não representa a chance de chuva em toda a janela.')
     with metodo:
         st.code('ARI (0–1) = (0,40×W + 0,25×R + 0,25×L + 0,10×F) / 100', language=None)
@@ -199,7 +211,7 @@ if resultado and resultado['ari_score'] is not None:
         st.dataframe(pd.DataFrame([{'Componente': k, 'Score': v, 'Peso efetivo': r['pesos_efetivos'].get(k), 'Contribuição (0–100)': r['contribuicoes'].get(k)} for k,v in r['componentes'].items()]), hide_index=True)
         st.caption('Probabilidade e máximo horário são contexto. A chuva do ARI usa o acumulado de 24h. A confiança controla a aceitação do relato; não multiplica W.')
     with dados:
-        st.dataframe(df[['Intervalo', 'precipitacao_mm', 'probabilidade_pct']].rename(columns={'precipitacao_mm': 'Precipitação (mm)', 'probabilidade_pct': 'Probabilidade (%)'}), hide_index=True, use_container_width=True)
+        st.dataframe(df[['Intervalo', 'precipitacao_mm', 'probabilidade_pct']].rename(columns={'precipitacao_mm': 'Precipitação (mm)', 'probabilidade_pct': 'Probabilidade (%)'}), hide_index=True, width="stretch")
         st.download_button('Baixar resultado JSON', json.dumps(r, ensure_ascii=False, indent=2, allow_nan=False), file_name='aquasentinel-previsao.json', mime='application/json')
 elif not resultado:
     if not st.session_state.get('erro'):

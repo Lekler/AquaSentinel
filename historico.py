@@ -15,7 +15,18 @@ def distancia_m(lat1, lon1, lat2, lon2):
 
 
 def conectar():
-    caminho = Path(os.environ.get('AQUASENTINEL_DB', 'dados/ocorrencias.sqlite3'))
+    url = os.environ.get('AQUASENTINEL_DATABASE_URL', '').strip()
+    if url:
+        import psycopg
+        opcoes = {'connect_timeout': 8, 'sslmode': 'require'}
+        senha = os.environ.get('AQUASENTINEL_DATABASE_PASSWORD', '')
+        if senha:
+            opcoes['password'] = senha
+        con = psycopg.connect(url, **opcoes)
+        con.execute('CREATE TABLE IF NOT EXISTS ocorrencias (id TEXT PRIMARY KEY, conteudo TEXT NOT NULL)')
+        con.commit()
+        return con
+    caminho = Path(os.environ.get('AQUASENTINEL_DB', str(Path(__file__).resolve().parent / 'dados' / 'ocorrencias.sqlite3')))
     caminho.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(caminho, timeout=10)
     con.execute('CREATE TABLE IF NOT EXISTS ocorrencias (id TEXT PRIMARY KEY, conteudo TEXT NOT NULL)')
@@ -23,24 +34,46 @@ def conectar():
     return con
 
 
+def marcador():
+    return '%s' if os.environ.get('AQUASENTINEL_DATABASE_URL', '').strip() else '?'
+
+
 def listar():
     with conectar() as con:
-        return [json.loads(row[0]) for row in con.execute('SELECT conteudo FROM ocorrencias ORDER BY rowid DESC')]
+        registros = [json.loads(row[0]) for row in con.execute('SELECT conteudo FROM ocorrencias')]
+    return sorted(registros, key=lambda r: r.get('registrado_em', ''), reverse=True)
 
 
 def salvar(registro):
     # INSERT OR IGNORE: reexibir, baixar ou clicar novamente não duplica um relato.
     with conectar() as con:
-        cursor = con.execute('INSERT OR IGNORE INTO ocorrencias VALUES (?, ?)',
+        p = marcador()
+        cursor = con.execute(f'INSERT INTO ocorrencias (id, conteudo) VALUES ({p}, {p}) ON CONFLICT (id) DO NOTHING',
                              (registro['id'], json.dumps(registro, ensure_ascii=False, allow_nan=False)))
         return cursor.rowcount == 1
+
+
+def excluir_registros(identificadores):
+    ids = tuple(dict.fromkeys(identificadores))
+    if not ids:
+        return 0
+    with conectar() as con:
+        placeholders = ','.join(marcador() for _ in ids)
+        cursor = con.execute(f'DELETE FROM ocorrencias WHERE id IN ({placeholders})', ids)
+        return cursor.rowcount
+
+
+def excluir_todos_registros():
+    with conectar() as con:
+        cursor = con.execute('DELETE FROM ocorrencias')
+        return cursor.rowcount
 
 
 def confirmar(identificador, revisor):
     if not revisor.strip():
         raise DadosInvalidos('Informe o responsável pela confirmação.')
     with conectar() as con:
-        row = con.execute('SELECT conteudo FROM ocorrencias WHERE id=?', (identificador,)).fetchone()
+        row = con.execute(f'SELECT conteudo FROM ocorrencias WHERE id={marcador()}', (identificador,)).fetchone()
         if row is None:
             raise DadosInvalidos('Ocorrência não encontrada.')
         registro = json.loads(row[0])
@@ -49,7 +82,8 @@ def confirmar(identificador, revisor):
         registro.update(status_validacao='confirmado_humano', revisor=revisor.strip(),
                         validado_em=datetime.now(timezone.utc).isoformat())
         # O índice da consulta anterior não é recalculado com uma previsão antiga.
-        con.execute('UPDATE ocorrencias SET conteudo=? WHERE id=?',
+        p = marcador()
+        con.execute(f'UPDATE ocorrencias SET conteudo={p} WHERE id={p}',
                     (json.dumps(registro, ensure_ascii=False, allow_nan=False), identificador))
 
 

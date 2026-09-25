@@ -1,6 +1,6 @@
-# Como contribuir com o AquaSentinela
+# Como contribuir com o AquaSentinel
 
-O AquaSentinela foi iniciado por [Lekler](https://github.com/Lekler) como um MVP de hackathon. A identidade visual enviada pela Alessandra está em `Imagens/`. A base foi organizada para receber novos módulos de forma incremental.
+O AquaSentinel foi iniciado por [Lekler](https://github.com/Lekler) como um MVP de hackathon. A base foi organizada para receber novos módulos de forma incremental.
 
 ## Fluxo sugerido
 
@@ -14,19 +14,26 @@ Prefixos úteis para branches: `feat/`, `fix/`, `docs/`, `test/` e `refactor/`.
 
 ## Organização do código
 
-- `app.py`: envio de fotos, mapa público e revisão.
-- `relatos.py`: validação de dados, imagem e persistência.
-- `legacy_app.py`, `motor.py`, `previsao.py`: demonstração anterior de chuva, fora do fluxo principal.
+- `app.py`: interface Streamlit e cache.
+- `motor.py`: validação, métricas e regras de pontuação.
+- `previsao.py`: integração com Open-Meteo.
 - `tests/`: testes automatizados.
 
-Mantenha regras de pontuação e persistência fora da camada visual. Mudanças na pontuação W devem vir acompanhadas da definição acordada pela equipe, atualização do README e testes de fronteira.
+Mantenha regras meteorológicas e de negócio fora da camada visual. Mudanças em fórmulas, pesos ou faixas devem vir acompanhadas de justificativa, atualização do README e testes de fronteira.
 
 ## Novos módulos
 
-As próximas integrações são reconhecimento de resíduos, GPS com consentimento, contas individuais, revisão com trilha de auditoria e relatório PDF. Não atribua maior confiabilidade a um relato apenas porque o remetente declarou ser de um órgão. O mapa atual usa uma triagem visual provisória, não um índice validado de risco à saúde.
+Integrações com histórico hídrico, Alerta Rio, reconhecimento de resíduos, persistência, autenticação e notificações devem manter a diferença entre:
+
+- previsão meteorológica;
+- observação de chuva ou nível;
+- prioridade operacional;
+- risco hidrológico validado.
+
+Não apresente a prioridade heurística do MVP como alerta oficial ou previsão de inundação.
 
 ## Dados e credenciais
 
-Não envie chaves, tokens, arquivos `.env`, `.streamlit/secrets.toml`, fotos de usuários, dados pessoais ou bases restritas para o repositório. Documente novas variáveis no README sem valores secretos.
+Não envie chaves, tokens, arquivos `.env`, dados pessoais ou bases restritas para o repositório. Documente variáveis de ambiente necessárias em um arquivo `.env.example` sem valores secretos.
 
 Ao adicionar uma fonte, registre origem, licença, unidade, fuso, frequência de atualização e comportamento quando os dados estiverem ausentes.

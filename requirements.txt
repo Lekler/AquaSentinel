@@ -1,6 +1,9 @@
-streamlit>=1.41,<2
+streamlit>=1.64,<2
 requests>=2.32.3,<3
-pandas>=2.2,<3
+pandas>=2.2,<4
 altair>=5.5,<6
-Pillow>=11,<13
+pydeck>=0.9,<1
+ultralytics>=8.4.155,<9
+Pillow>=10.4,<13
+openpyxl>=3.1,<4
 psycopg[binary]>=3.2,<4

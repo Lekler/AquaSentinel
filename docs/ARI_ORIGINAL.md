@@ -1,6 +1,4 @@
-# 💧 AquaSentinel · protótipo anterior (ARI v2)
-
-Esta documentação descreve a experiência de chuva e ARI preservada em `legacy_app.py`. Após a 3ª reunião da equipe, a interface principal em `app.py` passou a focar em relatos de resíduos. Para executar esta versão histórica, use `python -m streamlit run legacy_app.py`.
+# 💧 AquaSentinel
 
 MVP criado por [Lekler](https://github.com/Lekler) para avaliações de canais na Baía de Guanabara. O **AquaSentinel Risk Index (ARI)** combina resíduos, previsão de chuva, condição do rio e recorrência. A versão 2 implementa o documento “AquaSentinel Risk Index”, contextualizado pela reunião da equipe.
 
