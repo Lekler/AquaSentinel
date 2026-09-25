@@ -21,7 +21,7 @@ Abra o endereço local mostrado no terminal. Para Windows, use `setup.bat` e `ru
 1. **Início** apresenta o projeto.
 2. **Registrar ocorrência** recebe uma foto, executa o detector de quatro classes de plástico, pede nome do local, coordenadas e o nível observado pela pessoa. O app solicita confirmação dos dados e autorização para publicação antes de salvar. O envio fica **pendente**.
 3. **Mapa e registros** mostra somente ocorrências **validadas por um revisor** e com autorização de publicação. A equipe acessa a fila com a senha configurada no ambiente. Relatos rejeitados permanecem no banco para auditoria, mas não aparecem no mapa.
-4. **Chuva e ARI · experimental** mantém a integração Open-Meteo e os cálculos anteriores para estudo. O ARI é separado do WPS/CS e não é um alerta de inundação.
+4. **Chuva e ARI · experimental** mantém a integração Open-Meteo e os cálculos anteriores para estudo. Consultas são públicas; salvar, confirmar e consultar o histórico exigem a senha da equipe. O ARI é separado do WPS/CS e não é um alerta de inundação.
 
 O modelo `best.pt` reconhece `other_plastic`, `plastic_bag`, `plastic_bottle` e `plastic_package`. Ele **não** classifica a gravidade do acúmulo. Contagens e confiança de detecção não são massa, obstrução ou prova de autenticidade da foto.
 

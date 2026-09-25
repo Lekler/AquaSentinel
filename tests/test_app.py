@@ -70,8 +70,19 @@ def test_nome_vazio_sem_consulta():
         consulta.assert_not_called()
 
 
-def test_triagem_e_revisao_persistente():
+def test_historico_e_confirmacao_exigem_senha_da_equipe(monkeypatch):
+    monkeypatch.setenv('AQUASENTINEL_REVIEW_PASSWORD', 'senha-teste')
+    app = AppTest.from_file(APP, default_timeout=15).run()
+    assert not app.exception
+    assert not any(b.label == 'Confirmar relato' for b in app.button)
+    assert app.checkbox[1].disabled  # fonte oficial não pode ser autodeclarada
+    app.button(key='atualizar').click().run()
+    assert not any(b.key == 'salvar' for b in app.button)
+
+
+def test_triagem_e_revisao_persistente(monkeypatch):
     from historico import listar
+    monkeypatch.setenv('AQUASENTINEL_REVIEW_PASSWORD', 'senha-teste')
     with patch('previsao.consultar_previsao', return_value=resposta()) as consulta:
         app = AppTest.from_file(APP, default_timeout=15).run()
         app.slider[0].set_value(70)
@@ -80,6 +91,7 @@ def test_triagem_e_revisao_persistente():
         assert app.session_state['resultado']['status_validacao'] == 'pendente'
         assert not app.metric
         consulta.assert_not_called()
+        app.text_input(key='senha_ari').set_value('senha-teste').run()
         app.button(key='salvar').click().run()
         app.button(key='salvar').click().run()
         assert len(listar()) == 1
@@ -96,9 +108,11 @@ def test_triagem_e_revisao_persistente():
         assert not app.exception  # inclusive mapa do histórico
 
 
-def test_transbordamento_com_api_indisponivel():
+def test_transbordamento_com_api_indisponivel(monkeypatch):
+    monkeypatch.setenv('AQUASENTINEL_REVIEW_PASSWORD', 'senha-teste')
     with patch('previsao.consultar_previsao', side_effect=ErroPrevisao('HTTP 503')):
         app = AppTest.from_file(APP, default_timeout=15).run()
+        app.text_input(key='senha_ari').set_value('senha-teste').run()
         app.selectbox[1].select('Transbordamento')
         app.checkbox[1].check()
         app.text_input[2].set_value('Fonte oficial, estação e horário de exemplo')

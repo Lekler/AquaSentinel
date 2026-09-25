@@ -1,7 +1,10 @@
 """AquaSentinel — demo de previsão e prioridade operacional."""
 from datetime import datetime, timezone
 from html import escape
+import hmac
 import json
+import logging
+import os
 import sqlite3
 from uuid import uuid4
 import altair as alt
@@ -54,8 +57,9 @@ st.markdown(f'''<div class="hero"><div class="eyebrow">{texto('Prever para prior
 
 try:
     registros = listar()
-except (sqlite3.Error, OSError, ValueError) as exc:
-    st.error(texto('Não foi possível abrir o histórico local. Verifique o arquivo e as permissões da pasta dados.', 'The local history could not be opened. Check the file and data-folder permissions.'))
+except Exception:
+    logging.exception('Falha ao abrir histórico ARI')
+    st.error(texto('Não foi possível abrir o histórico. Tente novamente ou avise a equipe.', 'The history could not be opened. Please try again or contact the team.'))
     st.stop()
 
 foto_origem = st.session_state.get('foto_para_ari')
@@ -69,7 +73,10 @@ if foto_origem:
 
 with st.sidebar:
     st.header(texto('Consultar ocorrência', 'Assess an occurrence'))
-    st.caption(texto('Informe o local e a pontuação de resíduos identificada pela equipe ou pelo modelo de IA.', 'Enter the location and waste score identified by the team or AI model.'))
+    st.caption(texto('Informe o local e uma avaliação manual de resíduos para explorar a previsão.', 'Enter the location and a manual waste assessment to explore the forecast.'))
+    senha_configurada = os.environ.get('AQUASENTINEL_REVIEW_PASSWORD', '')
+    senha_equipe = st.session_state.get('senha_ari', '')
+    autorizado = bool(senha_configurada and senha_equipe) and hmac.compare_digest(senha_equipe, senha_configurada)
     with st.form('consulta'):
         nome = st.text_input(texto('Nome do canal / ocorrência', 'Canal / occurrence name'), foto_origem['nome'] if foto_origem else texto('Canal de demonstração · Rio', 'Demo canal · River'), max_chars=100)
         latitude = st.number_input('Latitude', min_value=-90.0, max_value=90.0, value=float(foto_origem['latitude']) if foto_origem else -22.9068, step=0.0001, format='%.6f')
@@ -78,15 +85,15 @@ with st.sidebar:
         waste = CLASSES_RESIDUOS[classe]
         confianca = st.slider(texto('Confiança da classificação (%)', 'Classification confidence (%)'), 0, 100, 85)
         st.caption('Classe de acúmulo e confiança desta avaliação são informadas pela equipe. A análise de objetos da foto está em Registrar ocorrência e não comprova a gravidade ambiental.')
-        confirmado = st.checkbox(texto('Confirmar avaliação humana (confiança de 60 a <80%)', 'Confirm human assessment (confidence from 60 to <80%)'))
-        revisor = st.text_input(texto('Responsável pela confirmação', 'Person responsible for confirmation'), max_chars=100)
+        confirmado = st.checkbox(texto('Confirmar avaliação humana (confiança de 60 a <80%)', 'Confirm human assessment (confidence from 60 to <80%)'), disabled=not autorizado)
+        revisor = st.text_input(texto('Responsável pela confirmação', 'Person responsible for confirmation'), max_chars=100, disabled=not autorizado)
         condicao = st.selectbox('Condição do rio (L)', ['Indisponível'] + list(NIVEIS_RIO))
         nivel = None if condicao == 'Indisponível' else condicao
-        oficial = st.checkbox('Condição transcrita de fonte oficial')
+        oficial = st.checkbox('Condição transcrita de fonte oficial', disabled=not autorizado)
         fonte_nivel = st.text_input('Referência da fonte / estação / horário observado', max_chars=300)
         st.caption('O nível é informado manualmente. A referência permite rastrear a observação; não há consulta automática ao INEA.')
         raio = st.number_input('Raio para recorrência (metros)', min_value=1, max_value=10000, value=500, step=100)
-        st.caption('F usa registros validados dos últimos 30 dias no histórico local, dentro deste raio.')
+        st.caption('F usa registros ARI validados dos últimos 30 dias no histórico compartilhado, dentro deste raio.')
         forcar = st.checkbox('Consultar API sem usar cache', help='Normalmente a previsão é reutilizada por até 45 minutos para as mesmas coordenadas.')
         enviar = st.form_submit_button(texto('Atualizar previsão', 'Update forecast'), type='primary', width="stretch", key='atualizar')
     st.caption('As coordenadas iniciais são um ponto de demonstração no Rio, sem associação a um canal cadastrado.')
@@ -97,6 +104,8 @@ with st.sidebar:
         for chave in ('resultado', 'erro', 'identidade_ocorrencia', 'ocorrencia_id'):
             st.session_state.pop(chave, None)
     st.caption('Atualizar a previsão mantém a ocorrência atual. Use Nova ocorrência para registrar outro relato no mesmo ponto.')
+    with st.expander('Acesso da equipe ao histórico'):
+        st.text_input('Senha da equipe', type='password', key='senha_ari')
 
 if enviar:
     # Uma falha nunca deixa a pontuação da ocorrência anterior parecendo atual.
@@ -153,13 +162,14 @@ if resultado:
         st.warning('Confiança entre 60 e <80%: relato aguardando confirmação humana. Não participa do ARI ou da recorrência enquanto estiver pendente.')
     elif r['status_validacao'] == 'excluido':
         st.warning('Confiança abaixo de 60%: relato excluído do cálculo e da recorrência.')
-    if st.button('Salvar ocorrência no histórico', key='salvar'):
+    if autorizado and st.button('Salvar ocorrência no histórico', key='salvar'):
         try:
             inserido = salvar(r)
             st.success('Ocorrência salva.' if inserido else 'Esta ocorrência já foi salva. Nenhuma duplicação foi criada.')
             registros = listar()
-        except (sqlite3.Error, OSError) as exc:
-            st.error('Não foi possível salvar a ocorrência no histórico local.')
+        except Exception:
+            logging.exception('Falha ao salvar ARI')
+            st.error('Não foi possível salvar a ocorrência no histórico compartilhado.')
 
 if resultado and resultado['ari_score'] is not None:
     r = resultado
@@ -227,31 +237,34 @@ elif not resultado:
         st.subheader('03 · Priorize')
         st.write('Combine a chuva prevista com a severidade dos resíduos, em uma escala de 0 a 100.')
 
-with st.expander('Histórico local e confirmação humana'):
-    st.caption('Registros salvos persistem neste computador. A confirmação registra o responsável, mas o MVP não autentica revisores. Para uma nova avaliação, consulte novamente com previsão atualizada.')
-    pendentes = [item for item in registros if item['status_validacao'] == 'pendente']
-    if pendentes:
-        with st.form('revisao'):
-            por_id = {item['id']: item for item in pendentes}
-            escolhido = st.selectbox('Ocorrência pendente', list(por_id), format_func=lambda i: f"{por_id[i]['nome']} · {por_id[i]['registrado_em']} · {i[:8]}")
-            responsavel = st.text_input('Responsável pela revisão', max_chars=100, key='responsavel_revisao')
-            if st.form_submit_button('Confirmar relato'):
-                try:
-                    confirmar(escolhido, responsavel)
-                    st.success('Relato confirmado. Ele passa a participar da recorrência nas próximas consultas.')
-                    registros = listar()
-                except (DadosInvalidos, sqlite3.Error, OSError) as exc:
-                    st.error(str(exc))
-    if registros:
-        st.dataframe(pd.DataFrame([{'Canal': item['nome'], 'Registrado em': item['registrado_em'], 'Validação': item['status_validacao'], 'ARI na consulta': item['ari_score'], 'Condição': 'Parcial' if item['parcial'] else 'Completo', 'Ação na consulta': item['acao']} for item in registros]), hide_index=True)
-        st.download_button('Baixar histórico JSON', json.dumps(registros, ensure_ascii=False, indent=2, allow_nan=False), file_name='aquasentinel-historico.json', mime='application/json')
-        pontos = [item for item in registros if item['ari_score'] is not None or item['avaliacao_urgente']]
-        if pontos:
-            st.caption('Hotspots das avaliações salvas, com suas cores originais. São registros históricos, não alertas atualizados automaticamente.')
-            st.map(pd.DataFrame([{'latitude': item['latitude'], 'longitude': item['longitude'], 'cor': item['cor_hotspot']} for item in pontos]), color='cor')
-    else:
-        st.info('Nenhuma ocorrência salva ainda. A ausência de relatos neste histórico não significa ausência de problemas na região.')
+if autorizado:
+    with st.expander('Histórico compartilhado e confirmação humana'):
+        st.caption('Registros salvos persistem no banco do projeto. A confirmação exige acesso à área da equipe; para uma nova avaliação, consulte novamente com previsão atualizada.')
+        pendentes = [item for item in registros if item['status_validacao'] == 'pendente']
+        if pendentes:
+            with st.form('revisao'):
+                por_id = {item['id']: item for item in pendentes}
+                escolhido = st.selectbox('Ocorrência pendente', list(por_id), format_func=lambda i: f"{por_id[i]['nome']} · {por_id[i]['registrado_em']} · {i[:8]}")
+                responsavel = st.text_input('Responsável pela revisão', max_chars=100, key='responsavel_revisao')
+                if st.form_submit_button('Confirmar relato'):
+                    try:
+                        confirmar(escolhido, responsavel)
+                        st.success('Relato confirmado. Ele passa a participar da recorrência nas próximas consultas.')
+                        registros = listar()
+                    except (DadosInvalidos, sqlite3.Error, OSError) as exc:
+                        st.error(str(exc))
+        if registros:
+            st.dataframe(pd.DataFrame([{'Canal': item['nome'], 'Registrado em': item['registrado_em'], 'Validação': item['status_validacao'], 'ARI na consulta': item['ari_score'], 'Condição': 'Parcial' if item['parcial'] else 'Completo', 'Ação na consulta': item['acao']} for item in registros]), hide_index=True)
+            st.download_button('Baixar histórico JSON', json.dumps(registros, ensure_ascii=False, indent=2, allow_nan=False), file_name='aquasentinel-historico.json', mime='application/json')
+            pontos = [item for item in registros if item['ari_score'] is not None or item['avaliacao_urgente']]
+            if pontos:
+                st.caption('Hotspots das avaliações salvas, com suas cores originais. São registros históricos, não alertas atualizados automaticamente.')
+                st.map(pd.DataFrame([{'latitude': item['latitude'], 'longitude': item['longitude'], 'cor': item['cor_hotspot']} for item in pontos]), color='cor')
+        else:
+            st.info('Nenhuma ocorrência salva ainda. A ausência de relatos neste histórico não significa ausência de problemas na região.')
 
+else:
+    st.caption("Histórico e confirmação humana disponíveis apenas à equipe de revisão.")
 st.divider()
 st.caption('Protótipo de apoio à priorização. Não é previsão de inundação, alerta oficial nem orientação de segurança. Pesos e faixas de score ainda precisam de validação local.')
 st.markdown('Dados: [Open-Meteo](https://open-meteo.com/) · [Licença CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Intensidade horária legada: [Alerta Rio](https://websempre.rio.rj.gov.br/estacoes/)')
