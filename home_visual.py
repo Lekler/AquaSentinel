@@ -8,7 +8,7 @@ from i18n import alternador_html, em_ingles, idioma_query, texto
 RAIZ = Path(__file__).resolve().parent
 ASSETS = RAIZ / 'assets' / 'home'
 ENQUADRAMENTOS = {
-    'Logo.png': (125, 150, 1930, 435), 'mão e fundo.png': (20, 88, 1400, 921),
+    'Logo.png': (125, 150, 1930, 435), 'mao-e-fundo.png': (20, 88, 1400, 921),
     'F1.png': (174, 313, 906, 688), 'F2.png': (148, 255, 958, 771),
     'F3.png': (190, 252, 875, 806), 'F4.png': (114, 172, 1023, 928),
     'F1.1.png': (187, 239, 880, 888), 'F2.2.png': (132, 150, 990, 980),
@@ -21,7 +21,7 @@ ENQUADRAMENTOS = {
 def imagem(nome, classe='', descricao=''):
     x, y, w, h = ENQUADRAMENTOS[nome]
     dimensoes = ((2172, 724) if nome in ('Logo.png', 'g.png') else
-                 (1448, 1086) if nome == 'mão e fundo.png' else (1254, 1254))
+                 (1448, 1086) if nome == 'mao-e-fundo.png' else (1254, 1254))
     url = 'data:image/png;base64,' + base64.b64encode((ASSETS / nome).read_bytes()).decode('ascii')
     proporcao = 'none' if nome == 'g.png' else 'xMidYMid meet'
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x} {y} {w} {h}" '
@@ -96,7 +96,7 @@ def construir_home(base_url=''):
   </header>
   <main>
     <section class="aqua-hero" aria-labelledby="home-title">
-      <div class="hero-visual">{imagem('mão e fundo.png', 'hero-image', 'Mão segurando um celular com uma fotografia de resíduos na Baía de Guanabara. Rios vivos, cidades melhores. Juntos por águas mais limpas para todos.')}</div>
+      <div class="hero-visual">{imagem('mao-e-fundo.png', 'hero-image', 'Mão segurando um celular com uma fotografia de resíduos na Baía de Guanabara. Rios vivos, cidades melhores. Juntos por águas mais limpas para todos.')}</div>
       <div class="hero-copy">
         <div class="participation-badge">{imagem('F1.1.png', 'badge-leaf')}<span>{label_diferenca}</span></div>
         <h1 id="home-title"><span>{titulo_1}</span><span>{titulo_2}</span><span class="accent">{titulo_3}</span></h1>
