@@ -48,6 +48,10 @@ h2,h3{letter-spacing:-.5px}
 </style>''', unsafe_allow_html=True)
 st.markdown(f'<div class="ari-language">{alternador_html("/avaliacao")}</div>', unsafe_allow_html=True)
 
+base_navegacao = '/' + st.get_option('server.baseUrlPath').strip('/')
+base_navegacao = base_navegacao.rstrip('/')
+st.html(f'<nav aria-label="Navegação"><a href="{base_navegacao}/" target="_self">{texto("Início", "Home")}</a> · <a href="{base_navegacao}/mapa" target="_self">{texto("Mapa e registros", "Map and reports")}</a></nav>')
+
 st.title(texto('Chuva e ARI · experimental', 'Rain and ARI · experimental'))
 st.info('Este painel é um estudo separado. A prioridade de resíduos deste MVP usa WPS e CS no mapa. O ARI não é previsão de inundação nem substitui alerta oficial.')
 st.caption(texto('AQUASENTINEL RISK INDEX · BAÍA DE GUANABARA · MVP / HACKATHON', 'AQUASENTINEL RISK INDEX · GUANABARA BAY · MVP / HACKATHON'))

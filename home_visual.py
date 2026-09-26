@@ -13,23 +13,29 @@ ENQUADRAMENTOS = {
     'F3.png': (190, 252, 875, 806), 'F4.png': (114, 172, 1023, 928),
     'F1.1.png': (187, 239, 880, 888), 'F2.2.png': (132, 150, 990, 980),
     'F3.3.png': (181, 395, 892, 531), 'F4.4.png': (135, 227, 985, 848),
-    'g.png': (0, 458, 2172, 207),
+    'f.png': (0, 323, 2158, 242),
+    'g.png': (0, 334, 2172, 281),
 }
 
 
 @lru_cache(maxsize=16)
 def imagem(nome, classe='', descricao=''):
     x, y, w, h = ENQUADRAMENTOS[nome]
-    dimensoes = ((2172, 724) if nome in ('Logo.png', 'g.png') else
+    dimensoes = ((2172, 724) if nome in ('Logo.png', 'f.png', 'g.png') else
                  (1448, 1086) if nome == 'mao-e-fundo.png' else (1254, 1254))
     url = 'data:image/png;base64,' + base64.b64encode((ASSETS / nome).read_bytes()).decode('ascii')
-    proporcao = 'none' if nome == 'g.png' else 'xMidYMid meet'
+    proporcao = 'none' if nome in ('f.png', 'g.png') else 'xMidYMid meet'
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x} {y} {w} {h}" '
            f'preserveAspectRatio="{proporcao}"><image width="{dimensoes[0]}" '
            f'height="{dimensoes[1]}" href="{url}"/></svg>')
     # st.html permite img, mas seu sanitizador remove SVG inline.
     src = 'data:image/svg+xml;base64,' + base64.b64encode(svg.encode()).decode('ascii')
     return f'<img class="asset {classe}" src="{src}" alt="{escape(descricao, quote=True)}" draggable="false">'
+
+
+def ondas_rodape(classe):
+    return (f'<div class="{classe}" aria-hidden="true">'
+            + imagem('f.png') + imagem('g.png') + '</div>')
 
 
 CAMERA = '''<svg viewBox="0 0 48 44" aria-hidden="true"><path fill="currentColor" d="M17 3h14l4 6h7a5 5 0 0 1 5 5v24a5 5 0 0 1-5 5H6a5 5 0 0 1-5-5V14a5 5 0 0 1 5-5h7z"/><circle cx="24" cy="25" r="11" fill="#009ec0"/><circle cx="24" cy="25" r="6.8" fill="currentColor"/><circle cx="39" cy="15" r="2" fill="#009ec0"/></svg>'''
@@ -72,25 +78,17 @@ def construir_home(base_url=''):
       {imagem('Logo.png', 'brand-image', 'AquaSentinela. Rios mais limpos. Um futuro melhor.')}
     </a>
     <nav class="aqua-nav" aria-label="Navegação principal">
-      <details class="nav-disclosure nav-about"><summary>{label_sobre}</summary>
-        <div class="nav-panel"><strong>{texto('Mais olhos pelos nossos rios.', 'More eyes on our rivers.')}</strong>
-        <p>{texto('O AquaSentinela reúne relatos com foto e localização para ajudar a identificar resíduos nos rios, canais e na Baía de Guanabara.', 'AquaSentinela brings together photo and location reports to help identify waste in rivers, canals and Guanabara Bay.')}</p>
-        <p>{texto('A inteligência artificial identifica plásticos visíveis. A avaliação ambiental combina as informações do local com a previsão de chuva.', 'Artificial intelligence identifies visible plastics. Environmental assessment combines site information with the rain forecast.')}</p></div>
-      </details>
+      <a class="nav-about" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>
       <a class="nav-how" href="#como-funciona">{label_como}</a>
       <a href="{mapa}{query}" target="_self">{label_mapa}</a>
-      <details class="nav-disclosure nav-faq"><summary>{label_duvidas}</summary>
-        <div class="nav-panel"><strong>{texto('Como posso participar?', 'How can I participate?')}</strong><p>{texto('Tire uma foto ou envie uma imagem, confira a localização e informe o nível de resíduos que você observou.', 'Take a photo or upload an image, check the location and report the waste level you observed.')}</p>
-        <strong>{texto('A IA confirma se a foto é verdadeira?', 'Does AI confirm that the photo is authentic?')}</strong><p>{texto('Não. A confiança indica o reconhecimento dos objetos, sem comprovar a autenticidade da imagem.', 'No. Confidence indicates object recognition; it does not prove image authenticity.')}</p>
-        <strong>{texto('Preciso permitir a localização?', 'Do I need to allow location access?')}</strong><p>{texto('Você pode usar a localização do navegador ou informar as coordenadas manualmente.', 'You can use browser location or enter coordinates manually.')}</p></div>
-      </details>
+      <a class="nav-faq" href="{prefixo}/duvidas{query}" target="_self">{label_duvidas}</a>
       {language_switch}<details class="nav-disclosure nav-more"><summary aria-label="Mais opções"><span aria-hidden="true">•••</span></summary>
         <div class="nav-panel more-links"><a href="{registrar}{query}" target="_self">{texto('Registrar ocorrência', 'Report an occurrence')}</a>
         <a href="{mapa}{query}" target="_self">{texto('Mapa e registros', 'Map and reports')}</a>
         <a href="{ari}{query}" target="_self">{texto('Avaliação ambiental · ARI', 'Environmental assessment · ARI')}</a>
         <a class="mobile-only" href="#como-funciona">{label_como}</a>
-        <details class="mobile-only mobile-info"><summary>{label_sobre}</summary><p>{texto('Fotos e localização ajudam a identificar resíduos nos rios, canais e na Baía de Guanabara.', 'Photos and location help identify waste in rivers, canals and Guanabara Bay.')}</p></details>
-        <details class="mobile-only mobile-info"><summary>{label_duvidas}</summary><p>{texto('Você pode enviar uma foto ou usar a câmera, permitir o GPS ou informar coordenadas. A IA identifica plásticos; a confiança não comprova a autenticidade da foto.', 'You can upload a photo or use the camera, allow GPS or enter coordinates. AI identifies plastics; confidence does not prove image authenticity.')}</p></details></div>
+        <a class="mobile-only" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>
+        <a class="mobile-only" href="{prefixo}/duvidas{query}" target="_self">{label_duvidas}</a></div>
       </details>
     </nav>
   </header>
@@ -137,7 +135,7 @@ def construir_home(base_url=''):
       <div class="benefit">{imagem('F4.4.png', 'benefit-heart')}<div><h3>{texto('Tecnologia a serviço<br>do bem comum', 'Technology for<br>the common good')}</h3></div></div>
     </section>
   </main>
-  <footer class="aqua-footer">{imagem('g.png', 'footer-waves')}
+  <footer class="aqua-footer">{ondas_rodape('footer-waves')}
     <span class="footer-signature">{texto('Água limpa move vidas', 'Clean water moves lives')} {icone(ONDA, '#46b2cb', 'traco-onda')}</span>
   </footer>
 </div></div>'''

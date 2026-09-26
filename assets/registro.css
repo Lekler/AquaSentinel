@@ -34,3 +34,9 @@ body:has(.registro-header) [data-testid="stMetric"] {background:#f5fbfe;border:1
 .st-key-mapa-registros button,.st-key-mapa-avaliacoes button {border-radius:24px}.st-key-mapa-registros button[kind="primary"] {background:linear-gradient(110deg,#008ac7,#00babb);border:0;color:white}
 @media(max-width:800px){body:has(.registro-header) .block-container{padding:16px}.registro-header{padding:0 0 20px}.registro-header>a{width:215px}.registro-header nav{gap:12px;font-size:13px}.registro-title{padding:20px 0;display:block}.registro-title h1{font-size:34px}.registro-title p{font-size:16px}.registro-steps{margin-top:20px;gap:16px;font-size:13px}.st-key-photo-card,.st-key-location-card{padding:16px}.foto-pair figure{height:210px}}
 @media(max-width:800px){.st-key-mapa-resumo,.st-key-mapa-pontos,.st-key-mapa-registros,.st-key-mapa-avaliacoes,.st-key-mapa-gerenciar{padding:16px}.mapa-section-heading h2{font-size:22px}.st-key-mapa-resumo [data-testid="stMetricValue"]{font-size:23px}}
+
+/* A largura do rodape acompanha a area visivel, fora do limite do conteudo. */
+[data-testid="stMain"]:has(.registro-header) {container-type:inline-size;}
+.registro-waves {display:flex;gap:0;width:100cqw;margin-left:calc(50% - 50cqw);height:clamp(65px,6.4cqw,130px);overflow:hidden;}
+.registro-waves > img {display:block;width:50%;min-width:0;height:100%;object-fit:fill;}
+@media(max-width:800px){body:has(.registro-header) .block-container{padding-bottom:0;}}

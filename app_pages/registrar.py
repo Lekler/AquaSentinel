@@ -2,7 +2,7 @@ from hashlib import sha256
 import logging
 import math
 import streamlit as st
-from interface_fotos import carregar_detector, mostrar_analise, downloads, abrir_ari
+from interface_fotos import carregar_detector, mostrar_analise, downloads
 from localizacao import obter_localizacao
 from relatos import NIVEIS, criar_registro, salvar_foto, obter_foto
 from registro_visual import cabecalho, titulo, fotos, rodape
@@ -43,6 +43,7 @@ esquerda, direita = st.columns(2, gap='small')
 with esquerda, st.container(key='photo-card'):
     titulo('1', texto('Adicione uma foto', 'Add a photo'), texto('Registre o lixo ou resíduo no rio, canal ou na Baía.', 'Report waste or debris in a river, canal or the bay.'))
     imagens = st.empty()
+    progresso_foto = st.empty()
     with st.container(key='photo-actions'):
         camera, upload = st.columns(2)
         if camera.button(texto('Abrir câmera', 'Open camera'), icon=':material/photo_camera:', type='primary', width='stretch'):
@@ -66,12 +67,17 @@ if arquivo is not None:
         limpar_foto()
         st.session_state.assinatura_foto = assinatura
         st.session_state.foto_para_repetir = (conteudo, origem)
+        progresso = progresso_foto.progress(0, text=texto('Etapa 1 de 3 · Preparando sua foto…', 'Step 1 of 3 · Preparing your photo…'))
         try:
             # Valida o arquivo antes de carregar o modelo.
-            from visao import preparar_imagem
-            preparar_imagem(conteudo)
-            with st.spinner(texto('Identificando resíduos e removendo caixas duplicadas…', 'Identifying waste and removing duplicate boxes…')):
-                analise, foto, anotada = carregar_detector().analisar(conteudo)
+            from visao import preparar_imagem, jpeg
+            previa, _, _ = preparar_imagem(conteudo)
+            with imagens.container():
+                fotos({'foto': jpeg(previa), 'anotada': None}, analisando=True)
+            progresso.progress(33, text=texto('Etapa 2 de 3 · Carregando o modelo de IA…', 'Step 2 of 3 · Loading the AI model…'))
+            detector = carregar_detector()
+            progresso.progress(66, text=texto('Etapa 3 de 3 · Identificando resíduos na foto…', 'Step 3 of 3 · Identifying waste in the photo…'))
+            analise, foto, anotada = detector.analisar(conteudo)
             st.session_state.rascunho_foto = {'analise': analise, 'foto': foto, 'anotada': anotada,
                                              'origem': 'camera' if origem == 'Abrir câmera' else 'upload'}
         except (ValueError, FileNotFoundError) as exc:
@@ -79,6 +85,8 @@ if arquivo is not None:
         except Exception:
             logging.exception('Falha ao executar o modelo de detecção')
             st.session_state.erro_foto = texto('Não foi possível executar o modelo. Confira a instalação e tente novamente.', 'The model could not be run. Check the installation and try again.')
+        finally:
+            progresso_foto.empty()
 
 if st.session_state.get('erro_foto'):
     st.error(st.session_state.erro_foto)
@@ -169,8 +177,8 @@ if st.session_state.get('foto_salva_id'):
         st.write(f"**Local salvo:** {salvo['nome']} · **ID:** {salvo['id']}")
         st.caption(f"Coordenadas salvas: {salvo['latitude']:.6f}, {salvo['longitude']:.6f} · Nível informado: {salvo['nivel_informado']}")
         downloads(salvo, foto, anotada, 'registro')
-        if st.button('Abrir esta ocorrência na avaliação ambiental', key='foto_abrir_ari'):
-            abrir_ari(salvo)
+        if st.button(texto('Ir para o mapa', 'Go to the map'), key='foto_abrir_mapa', icon=':material/map:', type='primary'):
+            st.switch_page('app_pages/mapa.py')
     except (ValueError, OSError) as exc:
         st.error(f'Não foi possível abrir o registro: {exc}')
 st.caption(texto('Fotos e localização são guardadas no banco do projeto. O mapa carrega recursos externos.', 'Photos and location are stored in the project database. The map loads external resources.'))
