@@ -1,8 +1,8 @@
 """Condição declarada e cobertura temporal, independentes do WPS.
 
 Agrupos usam o primeiro registro público como âncora (200 m), sem encadear
-pontos distantes. O nome normalizado precisa coincidir para evitar juntar
-corpos hídricos diferentes. Datas sem fuso legadas são interpretadas em UTC.
+pontos distantes. Exige código de corpo hídrico confirmado pela equipe.
+Registros sem código confirmado ficam separados até vinculação humana.
 """
 from collections import Counter
 from datetime import datetime, timedelta, timezone
@@ -61,15 +61,17 @@ def agrupar_locais(registros):
         except (KeyError, TypeError, ValueError):
             continue
     for r in sorted(validos, key=lambda r: (data_registro(r), r['id'])):
-        nome = nome_normalizado(r['nome'])
+        nome = r.get('waterbody_id') if r.get('waterbody_confirmado') else None
+        chave = nome or f'sem-identificacao:{r["id"]}'
         candidatos = [(distancia_m(float(r['latitude']), float(r['longitude']),
                                    g['latitude'], g['longitude']), g)
-                      for g in grupos if g['nome_normalizado'] == nome]
+                      for g in grupos if g['chave_corpo'] == chave]
         candidatos = [(d, g) for d, g in candidatos if d <= RAIO_LOCAL_M]
         if candidatos:
             grupo = min(candidatos, key=lambda par: (par[0], par[1]['id']))[1]
         else:
-            grupo = {'id': r['id'], 'nome': r['nome'], 'nome_normalizado': nome,
+            grupo = {'id': r['id'], 'nome': (r.get('waterbody_nome') or r['nome']) if nome else r['nome'],
+                     'waterbody_id': nome, 'chave_corpo': chave,
                      'latitude': float(r['latitude']), 'longitude': float(r['longitude']),
                      'registros': []}
             grupos.append(grupo)

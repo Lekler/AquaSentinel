@@ -7,6 +7,8 @@ from localizacao import obter_localizacao
 from relatos import NIVEIS, criar_registro, salvar_foto, obter_foto
 from registro_visual import cabecalho, titulo, fotos, rodape
 from i18n import texto
+from corpos_hidricos import listar_corpos, obter_corpo
+from evidencia_visual import mostrar_evidencia
 
 
 def limpar_foto():
@@ -78,6 +80,11 @@ if arquivo is not None:
             detector = carregar_detector()
             progresso.progress(66, text=texto('Etapa 3 de 3 · Identificando resíduos na foto…', 'Step 3 of 3 · Identifying waste in the photo…'))
             analise, foto, anotada = detector.analisar(conteudo)
+            from similaridade import assinatura, comparar, data_captura_exif
+            from relatos import listar_fotos
+            analise.update(imagem_valida=True, phash=assinatura(foto),
+                           captura_exif=data_captura_exif(conteudo))
+            analise['similaridade'] = comparar(analise, listar_fotos())
             st.session_state.rascunho_foto = {'analise': analise, 'foto': foto, 'anotada': anotada,
                                              'origem': 'camera' if origem == 'Abrir câmera' else 'upload'}
         except (ValueError, FileNotFoundError) as exc:
@@ -123,6 +130,10 @@ with direita, st.container(key='location-card'):
             st.warning('Localização inválida. Informe as coordenadas abaixo.')
     nome = st.text_input(texto('Nome do local, endereço ou ponto de referência', 'Location name, address or landmark'), max_chars=100,
                          placeholder='Ex.: Canal do Fundão, próximo à ponte', key='foto_nome', persist_state='session')
+    catalogo = {c['id']: c for c in listar_corpos()}
+    waterbody_id = st.selectbox('Corpo hídrico cadastrado', [None, *catalogo], key='foto-waterbody',
+        format_func=lambda i: f"{i} · {catalogo[i]['nome']}" if i else 'Não identificado — equipe fará a vinculação')
+    st.caption('O nome livre descreve o ponto. O agrupamento usa o código do corpo hídrico confirmado pela equipe.')
     col1, col2 = st.columns(2)
     lat = col1.number_input('Latitude', min_value=-90., max_value=90., value=None, format='%.6f',
                             key='foto_lat', persist_state='session')
@@ -156,6 +167,9 @@ if enviar:
             raise ValueError('Autorize a publicação no mapa para enviar o relato.')
         registro = criar_registro(rascunho['analise'], nome, lat, lon, nivel, observacoes, rascunho['origem'])
         registro['consentimento_publicacao'] = True
+        if waterbody_id:
+            corpo = obter_corpo(waterbody_id)
+            registro.update(waterbody_id=corpo['id'], waterbody_nome=corpo['nome'], waterbody_confirmado=False)
         gps = st.session_state.get('foto_gps')
         if gps and lat == gps['latitude'] and lon == gps['longitude']:
             registro['origem_localizacao'] = 'geolocalizacao_navegador_confirmada'
@@ -176,6 +190,7 @@ if st.session_state.get('foto_salva_id'):
             st.success('Ocorrência salva e enviada para revisão. Após validação, ela aparecerá no mapa público.')
         st.write(f"**Local salvo:** {salvo['nome']} · **ID:** {salvo['id']}")
         st.caption(f"Coordenadas salvas: {salvo['latitude']:.6f}, {salvo['longitude']:.6f} · Nível informado: {salvo['nivel_informado']}")
+        mostrar_evidencia(salvo)
         downloads(salvo, foto, anotada, 'registro')
         if st.button(texto('Ir para o mapa', 'Go to the map'), key='foto_abrir_mapa', icon=':material/map:', type='primary'):
             st.switch_page('app_pages/mapa.py')

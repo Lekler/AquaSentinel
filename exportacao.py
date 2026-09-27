@@ -19,12 +19,20 @@ def texto_seguro(valor):
 
 
 def gerar_excel(registro):
+    from aquaverify import avaliar, explicar
+    qualidade = avaliar(registro)
     wb = Workbook()
     resumo = wb.active
     resumo.title = 'Resumo'
     resumo.append(['AquaSentinela — análise de fotografia', 'Valor'])
     dados = [
         ('ID da ocorrência', registro['id']), ('Local', registro['nome']),
+        ('Corpo hídrico (código interno)', registro.get('waterbody_id') or 'Não identificado'),
+        ('Corpo hídrico confirmado', 'Sim' if registro.get('waterbody_confirmado') else 'Não'),
+        ('AquaVerify — qualidade da evidência', f"{qualidade['indice']}/100 — {qualidade['faixa']}"),
+        ('AquaVerify — interpretação', 'Qualidade documental; não é probabilidade de denúncia verdadeira.'),
+        ('pHash — método', (registro.get('phash') or {}).get('versao', 'Não disponível')),
+        ('pHash — principal', (registro.get('phash') or {}).get('principal', 'Não informativo')),
         ('Latitude', registro['latitude']), ('Longitude', registro['longitude']),
         ('Registro (UTC)', registro['registrado_em']), ('Origem da foto', registro['origem_foto']),
         ('Nível informado pela pessoa', registro['nivel_informado']),
@@ -44,6 +52,16 @@ def gerar_excel(registro):
     ]
     for linha in dados:
         resumo.append([texto_seguro(v) for v in linha])
+    evidencia = wb.create_sheet('AquaVerify')
+    evidencia.append(['Critério', 'Pontos', 'Máximo', 'Motivo'])
+    for criterio in qualidade['criterios']:
+        evidencia.append([texto_seguro(criterio[k]) for k in ('Critério', 'Pontos', 'Máximo', 'Motivo')])
+    evidencia.column_dimensions['A'].width = 30
+    evidencia.column_dimensions['D'].width = 100
+    frase, motivos = explicar(registro)
+    evidencia.append(['Explicação', None, None, texto_seguro(frase)])
+    for motivo in motivos:
+        evidencia.append(['Revisão', None, None, texto_seguro(motivo)])
     resumo.append([])
     resumo.append(['Classe detectada', 'Quantidade'])
     for classe, quantidade in registro['por_classe'].items():

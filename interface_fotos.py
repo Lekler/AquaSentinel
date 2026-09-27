@@ -47,6 +47,13 @@ def mostrar_analise(analise, anotada, exibir_imagem=True):
                        texto('Confiança (%)', 'Confidence (%)'): d['confidence_pct']} for d in analise['itens']]),
                      hide_index=True, width='stretch')
     with st.container():
+        from aquaverify import explicar
+        explicacao, motivos = explicar(analise)
+        st.write(explicacao)
+        for motivo in motivos:
+            st.caption(motivo)
+        if (analise.get('similaridade') or {}).get('quantidade'):
+            st.warning('A imagem parece semelhante a uma anterior. Isso exige conferência humana e não comprova fraude.')
         st.write(texto('O modelo reconhece sacolas, garrafas, embalagens e outros plásticos. Caixas muito sobrepostas são reduzidas a uma identificação, mantendo a mais confiante. Objetos próximos ainda podem se confundir; esta é uma estimativa dos itens visíveis.', 'The model recognizes bags, bottles, packaging and other plastics. Heavily overlapping boxes are reduced to one identification, keeping the most confident one. Nearby objects may still be confused; this is an estimate of visible items.'))
         st.write(texto(f"O modelo retornou {analise['deteccoes_modelo']} detecções após seu filtro interno; {analise['duplicadas_removidas']} caixas foram removidas na deduplicação adicional.", f"The model returned {analise['deteccoes_modelo']} detections after its internal filter; {analise['duplicadas_removidas']} boxes were removed by additional deduplication."))
         st.caption(texto('Média aritmética das confianças dos itens mantidos: abaixo de 60% → baixa; 60 a menos de 80% → intermediária; a partir de 80% → alta. Essas faixas organizam a revisão e não validam a autenticidade ou a gravidade ambiental.', 'Arithmetic mean of retained item confidence: below 60% → low; 60 to below 80% → intermediate; 80% and above → high. These ranges organize review and do not validate authenticity or environmental severity.'))

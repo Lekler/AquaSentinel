@@ -6,6 +6,7 @@ from relatos import listar_fotos
 from observacao import agrupar_locais, publicos, resumo_local
 from mapa_visual import AVISO_COBERTURA, resumo_grupo, nivel_html, historico_local
 from registro_visual import cabecalho, rodape
+from evidencia_visual import mostrar_hotspot
 
 cabecalho('Histórico do local', 'Observações ao longo do tempo.', False,
           'Location history', 'Observations over time.', '/local')
@@ -25,6 +26,8 @@ if not resumo:
     st.info('Local não encontrado ou sem observações públicas. Escolha um ponto no mapa.')
 else:
     st.subheader(grupo['nome'])
+    st.caption(f"Corpo hídrico: {grupo.get('waterbody_id') or 'Não identificado — aguardando vinculação'}")
+    mostrar_hotspot(grupo['registros'])
     st.caption(f"Trecho aproximado de até 200 m da primeira observação · "
                f"{grupo['latitude']:.5f}, {grupo['longitude']:.5f} · Todo o período")
     st.info(AVISO_COBERTURA)

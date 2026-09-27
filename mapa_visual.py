@@ -77,13 +77,18 @@ def detalhes_ocorrencia(registro, revisados, chave):
     confianca = registro.get('confianca_media')
     b.metric('Confiança média da IA', 'Sem detecções' if confianca is None else f'{confianca:.1f}%')
     st.caption('WPS = 70% do nível declarado (W) + 30% da frequência de fotos distintas (F), '
-               'em 200 m e nos 30 dias anteriores ao registro. A fórmula experimental foi mantida; '
+               'no mesmo corpo hídrico confirmado, em 200 m e nos 30 dias anteriores ao registro. '
+               'Similaridades pendentes/reutilizadas não ampliam F. A fórmula experimental foi mantida; '
                'F pode aumentar com mais fotos e não comprova mais poluição. '
                'CS = confiança média × 0,8; não é probabilidade calibrada de acerto.')
     if foto:
         st.image(foto, caption='Foto da observação', width='stretch')
         if st.checkbox('Mostrar foto com detecções', key=f'anotada-{chave}-{registro["id"]}'):
             st.image(anotada, caption='Objetos identificados pelo modelo', width='stretch')
+    from evidencia_visual import mostrar_evidencia
+    st.caption(f"Corpo hídrico: {registro.get('waterbody_id') or 'Não identificado'} · "
+               f"{registro.get('waterbody_nome') or 'Aguardando vinculação pela equipe'}")
+    mostrar_evidencia(registro)
 
 
 def historico_local(resumo, revisados, chave):

@@ -7,3 +7,4 @@ ultralytics>=8.4.155,<9
 Pillow>=10.4,<13
 openpyxl>=3.1,<4
 psycopg[binary]>=3.2,<4
+numpy>=1.26,<3

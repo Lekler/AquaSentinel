@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/mapa-cobertura-historico-locais`, mantendo `main` intacta.
+`feat/aquaverify-hotspots-corpos-hidricos`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -69,9 +69,9 @@ No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
 arquivos locais usados na primeira implantação em `~/AquaSentinel`.
 
 ```sh
-git clone --branch feat/mapa-cobertura-historico-locais --single-branch \
-  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-mapa
-cd ~/AquaSentinel-mapa
+git clone --branch feat/aquaverify-hotspots-corpos-hidricos --single-branch \
+  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-aquaverify
+cd ~/AquaSentinel-aquaverify
 git log -1 --oneline
 gcloud run deploy aquasentinel \
   --project=aquasentinel-509900 \
@@ -90,3 +90,9 @@ e configure persistência. O Git não transfere registros ou fotos do banco.
 
 Depois da publicação, recarregue o navegador e verifique: Bloqueando em preto,
 legenda, duas camadas, filtros, clique no ponto e página de histórico do local.
+
+Na área da equipe, cadastre os corpos hídricos para gerar os códigos WB-BG,
+vincule os relatos existentes e use a indexação de fotos antigas em lotes.
+Novas fotos recebem pHash ao salvar. Confira [AQUAVERIFY.md](AQUAVERIFY.md)
+antes de interpretar os índices e o selo de persistência. Nenhuma foto antiga é
+automaticamente agrupada por nome ou declarada falsa por similaridade.

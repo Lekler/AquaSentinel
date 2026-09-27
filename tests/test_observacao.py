@@ -11,6 +11,7 @@ def registro(ident, data='2026-09-27T15:00:00+00:00', **extras):
             'longitude': -43.24, 'registrado_em': data, 'image_hash': ident,
             'nivel_informado': 'Moderado', 'confianca_media': 90, 'total': 2,
             'por_classe': {'Garrafa plástica': 2}, 'revisao': 'validado',
+            'waterbody_id': 'WB-BG-001', 'waterbody_nome': 'Canal do Fundão', 'waterbody_confirmado': True,
             'consentimento_publicacao': True, **extras}
 
 
@@ -36,11 +37,11 @@ def test_periodos_incluem_hoje_limite_local_e_excluem_futuro():
     assert len(filtrar_periodo(rs, None, AGORA)) == 2
 
 
-def test_grupos_normalizam_nomes_e_nao_encadeiam_pontos_distantes():
+def test_grupos_usam_codigo_confirmado_e_nao_encadeiam_pontos_distantes():
     rs = [registro('a', latitude=0, longitude=0),
-          registro('b', nome=' CANAL DO FUNDAO ', latitude=0, longitude=.0015),
+          registro('b', nome='Outra descrição livre', latitude=0, longitude=.0015),
           registro('c', latitude=0, longitude=.003),
-          registro('d', nome='Outro rio', latitude=0, longitude=0)]
+          registro('d', waterbody_id='WB-BG-002', latitude=0, longitude=0)]
     grupos = agrupar_locais(list(reversed(rs)))
     assert [[r['id'] for r in g['registros']] for g in grupos] == [['a', 'b'], ['c'], ['d']]
     assert [g['id'] for g in grupos] == [g['id'] for g in agrupar_locais(rs)]
