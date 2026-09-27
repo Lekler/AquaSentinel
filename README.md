@@ -19,9 +19,14 @@ Abra o endereço local mostrado no terminal. Para Windows, use `setup.bat` e `ru
 ## Fluxo
 
 1. **Início** apresenta o projeto.
-2. **Registrar ocorrência** recebe uma foto, executa o detector de quatro classes de plástico, pede nome do local, coordenadas e o nível observado pela pessoa. O app solicita confirmação dos dados e autorização para publicação antes de salvar. O envio fica **pendente**.
+2. **Registrar ocorrência** recebe uma foto, executa o detector de quatro classes de plástico, pede nome do local, coordenadas e o nível observado pela pessoa. O app solicita confirmação dos dados e autorização para publicação antes de salvar. A barra abaixo da foto acompanha a preparação, o carregamento do modelo e a identificação. O envio fica **pendente**; na confirmação, **Ir para o mapa** abre os registros públicos.
 3. **Mapa e registros** mostra somente ocorrências **validadas por um revisor** e com autorização de publicação. A equipe acessa a fila com a senha configurada no ambiente. Relatos rejeitados permanecem no banco para auditoria, mas não aparecem no mapa.
 4. **Chuva e ARI · experimental** mantém a integração Open-Meteo e os cálculos anteriores para estudo. Consultas são públicas; salvar, confirmar e consultar o histórico exigem a senha da equipe. O ARI é separado do WPS/CS e não é um alerta de inundação.
+
+5. **Sobre** apresenta o projeto, seu funcionamento e os limites da análise.
+6. **Dúvidas** reúne orientações sobre fotos, carregamento, localização, revisão e downloads.
+
+O cabeçalho personalizado dá acesso às páginas sem exibir o menu padrão durante a navegação. O rodapé usa `assets/home/f.png` e `assets/home/g.png` em toda a largura.
 
 O modelo `best.pt` reconhece `other_plastic`, `plastic_bag`, `plastic_bottle` e `plastic_package`. Ele **não** classifica a gravidade do acúmulo. Contagens e confiança de detecção não são massa, obstrução ou prova de autenticidade da foto.
 
@@ -46,6 +51,9 @@ Exemplo: W=100, F=75 e confiança média=94% produzem WPS=92,5 e CS=75,2%.
 
 ```text
 app.py → Streamlit multipágina
+app_pages/sobre.py e app_pages/duvidas.py → informações e ajuda
+home_visual.py e registro_visual.py → cabeçalhos, fotos e rodapé
+assets/ → imagens, estilos e recursos do mapa
 app_pages/registrar.py → visao.py (YOLO) → relatos.py → SQLite/PostgreSQL
 app_pages/mapa.py → revisão humana + wps.py → mapa público
 painel_ari.py → previsao.py (Open-Meteo) + ari.py/motor.py → historico.py

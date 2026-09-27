@@ -30,7 +30,7 @@ def submit(app):
     next(b for b in app.button if b.label == 'Enviar ocorrência').click().run()
 
 
-def test_fluxo_upload_salvar_reabrir_e_ari():
+def test_fluxo_upload_salvar_revisar_e_abrir_mapa():
     r, foto, anotada = amostra()
     with patch('interface_fotos.carregar_detector') as carregar:
         carregar.return_value.analisar.return_value = (r, foto, anotada)
@@ -51,13 +51,8 @@ def test_fluxo_upload_salvar_reabrir_e_ari():
         assert carregar.return_value.analisar.call_count == 1
         from relatos import revisar_foto
         revisar_foto(listar_fotos()[0]['id'], 'validado', 'Teste')
-        app.switch_page('app_pages/mapa.py').run()
+        app.button(key='foto_abrir_mapa').click().run()
         assert not app.exception and any('Canal real' in e.label for e in app.get('expander'))
-        app.switch_page('app_pages/registrar.py').run()
-        app.button(key='foto_abrir_ari').click().run()
-        assert not app.exception
-        assert app.text_input[0].value == 'Canal real'
-        assert app.number_input[0].value == -22.9
 
 
 def test_captura_confirmada_substitui_upload_e_preserva_origem():
@@ -121,7 +116,7 @@ def test_validacao_local_e_zero_deteccoes():
 
 def test_navegacao_sem_dados():
     app = AppTest.from_file(APP, default_timeout=15).run()
-    for page in ('app_pages/mapa.py','painel_ari.py','app_pages/registrar.py','app_pages/inicio.py'):
+    for page in ('app_pages/mapa.py','painel_ari.py','app_pages/registrar.py','app_pages/inicio.py','app_pages/sobre.py','app_pages/duvidas.py'):
         app.switch_page(page).run()
         assert not app.exception
 

@@ -16,3 +16,9 @@ dados/
 *.sqlite3-*
 validacao_local/
 *.log
+
+# Exportações locais e arquivos de ferramentas
+imagens_exportadas/
+.agents/
+.codex/
+.claude/

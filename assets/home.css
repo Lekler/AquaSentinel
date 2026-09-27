@@ -5,7 +5,7 @@
 [data-testid="stAppViewContainer"]:has(.aqua-page) [data-testid="stSidebar"] {display:none!important;}
 [data-testid="stMainBlockContainer"]:has(.aqua-page) {padding:0!important;max-width:none!important;}
 [data-testid="stMainBlockContainer"]:has(.aqua-page) > [data-testid="stVerticalBlock"] {gap:0;}
-.aqua-page {container-type:inline-size;width:100%;max-width:1800px;margin:0 auto;background:#fff;}
+.aqua-page {container-type:inline-size;width:100%;margin:0 auto;background:#fff;}
 .aqua-home {--ink:#062c43;--body:#3d566b;color:var(--ink);font-family:"Arial",sans-serif;position:relative;overflow:hidden;background:linear-gradient(170deg,#fff 45%,#f9fdfe 100%);-webkit-font-smoothing:antialiased;}
 .aqua-home * {box-sizing:border-box;}
 .aqua-home a {color:inherit;text-decoration:none;}
@@ -160,3 +160,7 @@
   .benefits {margin-left:21px;margin-right:21px;}.benefit {padding:12px 5px;gap:8px;}.benefit .asset,.benefit .benefit-leaf {width:29px;height:32px;}.benefit .benefit-water {width:32px;}
   .benefit h3 {font-size:12px;}.benefit p {font-size:10px;}
 }
+
+/* Duas metades da onda, alinhadas na base e sem intervalo. */
+.footer-waves {display:flex;gap:0;overflow:hidden;}
+.footer-waves > img {display:block;width:50%;min-width:0;height:100%;object-fit:fill;}
