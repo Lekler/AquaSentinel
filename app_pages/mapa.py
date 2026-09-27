@@ -28,6 +28,11 @@ revisados = publicos(todos)
 periodo = st.selectbox('Período de observação', list(PERIODOS), index=2, key='mapa-periodo')
 camada = st.segmented_control('Camada do mapa', ['Condição ambiental', 'Cobertura de observação'],
                               default='Condição ambiental', key='mapa-camada') or 'Condição ambiental'
+st.page_link('app_pages/lacunas.py', label='Consultar trechos com lacunas de monitoramento')
+modo = st.selectbox('Tipo de observação', ['Todos', 'Oportunístico', 'Monitoramento estruturado'], key='mapa-modo')
+if modo != 'Todos':
+    revisados = [r for r in revisados if r.get('modo', 'oportunistico') == ('estruturado' if modo == 'Monitoramento estruturado' else 'oportunistico')]
+mostrar_sem_residuos = st.checkbox('Mostrar também locais observados sem resíduos', value=True)
 st.info(AVISO_COBERTURA)
 st.caption('Agrupamento aproximado: mesmo código de corpo hídrico confirmado pela equipe, '
            'a até 200 m da primeira observação. Registros sem código confirmado ficam separados. '
@@ -42,6 +47,8 @@ for grupo in agrupar_locais(revisados):
 somente_hotspots = st.checkbox('Mostrar somente hotspots persistentes · avaliação dos últimos 90 dias', key='mapa-hotspots')
 if somente_hotspots:
     grupos = [g for g in grupos if g['hotspot']['persistente']]
+if not mostrar_sem_residuos and camada == 'Condição ambiental':
+    grupos = [g for g in grupos if g['resumo']['recente']['nivel_informado'] != 'Sem resíduos']
 a, b, c = st.columns(3)
 a.metric('Observações no período', sum(g['resumo']['total'] for g in grupos))
 b.metric('Locais observados', len(grupos))
@@ -117,6 +124,8 @@ with st.expander('Área da equipe de revisão'):
             st.error('Senha incorreta.')
         if autorizado:
             gestao_catalogo(todos)
+            from acompanhamento_visual import equipe_acompanhamento
+            equipe_acompanhamento(todos)
             pendentes = [r for r in todos if r.get('revisao') == 'nao_revisado']
             st.write(f'{len(pendentes)} relato(s) aguardando revisão.')
             if pendentes:

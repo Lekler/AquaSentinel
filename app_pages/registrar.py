@@ -1,6 +1,7 @@
 from hashlib import sha256
 import logging
 import math
+import secrets
 import streamlit as st
 from interface_fotos import carregar_detector, mostrar_analise, downloads
 from localizacao import obter_localizacao
@@ -13,7 +14,7 @@ from evidencia_visual import mostrar_evidencia
 
 def limpar_foto():
     for chave in ('rascunho_foto', 'erro_foto', 'assinatura_foto', 'foto_salva_id', 'pacote_foto',
-                  'foto_confirmacao', 'foto_publicacao', 'foto_nivel', 'foto_obs', 'foto_duplicada', 'foto_para_repetir'):
+                  'foto_confirmacao', 'foto_publicacao', 'foto_nivel', 'foto_obs', 'foto_duplicada', 'foto_para_repetir', 'foto_recibo', 'foto_posicao_salva'):
         st.session_state.pop(chave, None)
 
 
@@ -40,6 +41,20 @@ def abrir_camera():
 
 
 cabecalho(titulo_ingles='Report an occurrence', descricao_ingles='One photo helps care for our waters.')
+modo_registro = st.selectbox('Modo do registro', ['Oportunístico', 'Monitoramento estruturado'],
+    index=1 if st.session_state.get('monitor_id') else 0, key='foto-modo')
+sessao_ativa = None
+if modo_registro == 'Monitoramento estruturado':
+    from monitoramento import sessao_autorizada
+    try:
+        sessao_ativa = sessao_autorizada(st.session_state.get('monitor_id'), st.session_state.get('monitor_chave'))
+        if sessao_ativa['status'] != 'em andamento':
+            raise ValueError('A sessão já foi encerrada.')
+        st.info(f"Sessão: {sessao_ativa['trecho_nome']} · {sessao_ativa['waterbody_id']}")
+    except ValueError:
+        st.warning('Inicie ou retome uma sessão em Monitoramento estruturado antes de salvar neste modo.')
+        st.page_link('app_pages/monitoramento.py', label='Iniciar / retomar sessão')
+        sessao_ativa = None
 st.session_state.setdefault('foto_epoch', 0)
 esquerda, direita = st.columns(2, gap='small')
 with esquerda, st.container(key='photo-card'):
@@ -132,6 +147,7 @@ with direita, st.container(key='location-card'):
                          placeholder='Ex.: Canal do Fundão, próximo à ponte', key='foto_nome', persist_state='session')
     catalogo = {c['id']: c for c in listar_corpos()}
     waterbody_id = st.selectbox('Corpo hídrico cadastrado', [None, *catalogo], key='foto-waterbody',
+        disabled=bool(sessao_ativa),
         format_func=lambda i: f"{i} · {catalogo[i]['nome']}" if i else 'Não identificado — equipe fará a vinculação')
     st.caption('O nome livre descreve o ponto. O agrupamento usa o código do corpo hídrico confirmado pela equipe.')
     col1, col2 = st.columns(2)
@@ -165,7 +181,12 @@ if enviar:
             raise ValueError('Confirme a foto e a localização antes de enviar.')
         if not publicacao_autorizada:
             raise ValueError('Autorize a publicação no mapa para enviar o relato.')
+        if modo_registro == 'Monitoramento estruturado' and not sessao_ativa:
+            raise ValueError('Inicie uma sessão de monitoramento antes de salvar.')
         registro = criar_registro(rascunho['analise'], nome, lat, lon, nivel, observacoes, rascunho['origem'])
+        from ciclo import hash_chave
+        recibo = secrets.token_urlsafe(24)
+        registro['recibo_hash'] = hash_chave(recibo)
         registro['consentimento_publicacao'] = True
         if waterbody_id:
             corpo = obter_corpo(waterbody_id)
@@ -174,8 +195,13 @@ if enviar:
         if gps and lat == gps['latitude'] and lon == gps['longitude']:
             registro['origem_localizacao'] = 'geolocalizacao_navegador_confirmada'
             registro['gps'] = gps
-        salvo, novo = salvar_foto(registro, rascunho['foto'], rascunho['anotada'])
+        salvo, novo = salvar_foto(registro, rascunho['foto'], rascunho['anotada'],
+            sessao_id=sessao_ativa['id'] if sessao_ativa else None,
+            sessao_chave=st.session_state.get('monitor_chave') if sessao_ativa else None)
+        if novo:
+            st.session_state.foto_recibo = recibo
         st.session_state.foto_salva_id = salvo['id']
+        st.session_state.foto_posicao_salva = {'latitude': salvo['latitude'], 'longitude': salvo['longitude']}
         st.session_state.foto_duplicada = not novo
         st.rerun()
     except (ValueError, OSError) as exc:
@@ -191,6 +217,18 @@ if st.session_state.get('foto_salva_id'):
         st.write(f"**Local salvo:** {salvo['nome']} · **ID:** {salvo['id']}")
         st.caption(f"Coordenadas salvas: {salvo['latitude']:.6f}, {salvo['longitude']:.6f} · Nível informado: {salvo['nivel_informado']}")
         mostrar_evidencia(salvo)
+        if st.session_state.get('foto_recibo'):
+            st.download_button('Guardar recibo de acompanhamento',
+                f"ID: {salvo['id']}\nCódigo privado: {st.session_state.foto_recibo}\nConsulte em Acompanhar meu registro.\n",
+                file_name=f"recibo-{salvo['id'][:8]}.txt", mime='text/plain')
+            st.caption('Guarde o recibo antes de enviar outra foto. O código permite consultar seu registro mesmo antes da publicação.')
+        st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro')
+        from ciclo import feedback
+        from relatos import listar_fotos
+        for mensagem in feedback(salvo, listar_fotos()):
+            st.info(mensagem)
+        if salvo.get('modo') == 'estruturado':
+            st.page_link('app_pages/monitoramento.py', label='Voltar à sessão para adicionar fotos ou encerrar')
         downloads(salvo, foto, anotada, 'registro')
         if st.button(texto('Ir para o mapa', 'Go to the map'), key='foto_abrir_mapa', icon=':material/map:', type='primary'):
             st.switch_page('app_pages/mapa.py')

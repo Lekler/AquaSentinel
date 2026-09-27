@@ -146,4 +146,6 @@ class Detector:
                       dimensoes=list(imagem.size), dimensoes_originais=list(tamanho_original),
                       parametros=dict(LIMITES), metodo='foto-nms-1',
                       classes_modelo=list(self.modelo.names.values()))
+        from importlib.metadata import version
+        resumo.update(modelo_arquivo=self.caminho.name, modelo_runtime='ultralytics ' + version('ultralytics'))
         return resumo, jpeg(imagem), anotar(imagem, resumo['itens'])

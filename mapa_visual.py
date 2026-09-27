@@ -89,6 +89,8 @@ def detalhes_ocorrencia(registro, revisados, chave):
     st.caption(f"Corpo hídrico: {registro.get('waterbody_id') or 'Não identificado'} · "
                f"{registro.get('waterbody_nome') or 'Aguardando vinculação pela equipe'}")
     mostrar_evidencia(registro)
+    from acompanhamento_visual import rastreabilidade
+    rastreabilidade(registro)
 
 
 def historico_local(resumo, revisados, chave):

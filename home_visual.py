@@ -85,6 +85,10 @@ def construir_home(base_url=''):
       {language_switch}<details class="nav-disclosure nav-more"><summary aria-label="Mais opções"><span aria-hidden="true">•••</span></summary>
         <div class="nav-panel more-links"><a href="{registrar}{query}" target="_self">{texto('Registrar ocorrência', 'Report an occurrence')}</a>
         <a href="{mapa}{query}" target="_self">{texto('Mapa e registros', 'Map and reports')}</a>
+        <a href="{prefixo}/transparencia{query}" target="_self">Transparência</a>
+        <a href="{prefixo}/monitoramento{query}" target="_self">Monitoramento estruturado</a>
+        <a href="{prefixo}/lacunas{query}" target="_self">Lacunas de monitoramento</a>
+        <a href="{prefixo}/acompanhamento{query}" target="_self">Acompanhar meu registro</a>
         <a href="{ari}{query}" target="_self">{texto('Avaliação ambiental · ARI', 'Environmental assessment · ARI')}</a>
         <a class="mobile-only" href="#como-funciona">{label_como}</a>
         <a class="mobile-only" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>

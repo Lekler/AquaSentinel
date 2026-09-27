@@ -18,6 +18,11 @@ def cabecalho(titulo_pagina='Registrar ocorrência', descricao='Uma foto ajuda a
     query = idioma_query()
     st.html(f'<style>{css}</style><header class="registro-header"><a href="{base}/{query}" target="_self">{imagem("Logo.png",descricao="AquaSentinela")}</a><nav>{alternador_html(base + caminho or "/")}<a href="{base}/sobre{query}" target="_self">{sobre}</a><a href="{base}/mapa{query}" target="_self">{mapa}</a><a href="{base}/duvidas{query}" target="_self">{duvidas}</a></nav></header>')
     st.html(f'<div class="registro-title"><div><h1>{texto(titulo_pagina, titulo_ingles)}</h1><p>{texto(descricao, descricao_ingles)}</p></div>{etapas}</div>')
+    with st.popover(texto('Explorar e acompanhar', 'Explore and track')):
+        st.page_link('app_pages/transparencia.py', label='Transparência')
+        st.page_link('app_pages/monitoramento.py', label='Monitoramento estruturado')
+        st.page_link('app_pages/lacunas.py', label='Lacunas de monitoramento')
+        st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro')
 
 
 def titulo(numero,texto,descricao):

@@ -49,6 +49,15 @@ Exemplo: W=100, F=75 e confiança média=94% produzem WPS=92,5 e CS=75,2%.
 
 ## Arquitetura e dados
 
+### Transparência e acompanhamento
+
+A versão `2026.09-transparencia-v1` inclui página de Transparência com indicadores,
+rastreabilidade por registro, recibos privados para feedback, sessões estruturadas,
+mapa de lacunas sobre trechos planejados, ações e comparação antes/depois. O cadastro
+de trechos e as atualizações de ciclo de vida ficam na área autenticada da equipe.
+Veja [o guia de monitoramento](docs/TRANSPARENCIA_MONITORAMENTO.md) para taxas,
+observações sem resíduos, códigos de acompanhamento e limites de interpretação.
+
 Veja [AquaVerify e hotspots persistentes](docs/AQUAVERIFY.md) para regras,
 pesos, limiares e limitações da nova versão. Na área autenticada de revisão,
 cadastre os corpos hídricos, vincule os registros antigos e indexe fotos legadas

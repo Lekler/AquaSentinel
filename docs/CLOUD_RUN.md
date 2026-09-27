@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/aquaverify-hotspots-corpos-hidricos`, mantendo `main` intacta.
+`feat/transparencia-monitoramento-acompanhamento`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -69,9 +69,9 @@ No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
 arquivos locais usados na primeira implantação em `~/AquaSentinel`.
 
 ```sh
-git clone --branch feat/aquaverify-hotspots-corpos-hidricos --single-branch \
-  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-aquaverify
-cd ~/AquaSentinel-aquaverify
+git clone --branch feat/transparencia-monitoramento-acompanhamento --single-branch \
+  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-monitoramento
+cd ~/AquaSentinel-monitoramento
 git log -1 --oneline
 gcloud run deploy aquasentinel \
   --project=aquasentinel-509900 \
@@ -96,3 +96,8 @@ vincule os relatos existentes e use a indexação de fotos antigas em lotes.
 Novas fotos recebem pHash ao salvar. Confira [AQUAVERIFY.md](AQUAVERIFY.md)
 antes de interpretar os índices e o selo de persistência. Nenhuma foto antiga é
 automaticamente agrupada por nome ou declarada falsa por similaridade.
+
+Esta versão inclui Transparência, Monitoramento, Lacunas e Acompanhamento. Cadastre
+trechos planejados na área da equipe do mapa, inclusive os nunca observados, para
+popular o mapa de lacunas. Veja [o fluxo e suas limitações](TRANSPARENCIA_MONITORAMENTO.md).
+As tabelas novas são criadas no banco configurado, sem exclusão do histórico existente.

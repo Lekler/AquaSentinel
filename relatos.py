@@ -16,6 +16,9 @@ def conexao():
     con.execute(f'''CREATE TABLE IF NOT EXISTS relatos_foto (
         id TEXT PRIMARY KEY, image_hash TEXT NOT NULL UNIQUE,
         conteudo TEXT NOT NULL, foto {tipo_blob} NOT NULL, anotada {tipo_blob} NOT NULL)''')
+    con.execute('CREATE TABLE IF NOT EXISTS aqua_entidades (id TEXT PRIMARY KEY, tipo TEXT NOT NULL, conteudo TEXT NOT NULL)')
+    con.execute('CREATE TABLE IF NOT EXISTS aqua_eventos (id TEXT PRIMARY KEY, registro_id TEXT NOT NULL, conteudo TEXT NOT NULL)')
+    con.execute('CREATE INDEX IF NOT EXISTS aqua_eventos_registro ON aqua_eventos (registro_id)')
     con.commit()
     try:
         with con:
@@ -25,6 +28,7 @@ def conexao():
 
 
 def criar_registro(analise, nome, latitude, longitude, nivel, observacoes='', origem='upload'):
+    from versoes import APP, METODOLOGIA
     if not isinstance(nome, str) or not nome.strip() or len(nome.strip()) > 100:
         raise ValueError('Informe o nome do local (até 100 caracteres).')
     if latitude is None or longitude is None:
@@ -37,10 +41,11 @@ def criar_registro(analise, nome, latitude, longitude, nivel, observacoes='', or
             'nome': nome.strip(), 'latitude': latitude, 'longitude': longitude,
             'nivel_informado': nivel, 'observacoes': observacoes.strip(), 'origem_foto': origem,
             'origem_localizacao': 'informada_pelo_usuario', 'revisao': 'nao_revisado',
-            'consentimento_publicacao': False}
+            'consentimento_publicacao': False, 'modo': 'oportunistico',
+            'versao_app': APP, 'versao_metodologia': METODOLOGIA, 'etapa': 'aguardando revisão'}
 
 
-def salvar_foto(registro, foto, anotada):
+def salvar_foto(registro, foto, anotada, sessao_id=None, sessao_chave=None):
     from similaridade import assinatura, comparar
     from visao import preparar_imagem
     from aquaverify import avaliar
@@ -54,12 +59,24 @@ def salvar_foto(registro, foto, anotada):
             con.execute('SELECT pg_advisory_xact_lock(73401921)')
         else:
             con.execute('BEGIN IMMEDIATE')
+        if sessao_id:
+            from monitoramento import sessao_autorizada
+            sessao = sessao_autorizada(sessao_id, sessao_chave, con=con)
+            if sessao['status'] != 'em andamento':
+                raise ValueError('A sessão já foi encerrada. Inicie outra sessão ou use registro oportunístico.')
+            registro.update(modo='estruturado', sessao_id=sessao_id, trecho_id=sessao['trecho_id'],
+                            waterbody_id=sessao['waterbody_id'], waterbody_nome=sessao['waterbody_nome'],
+                            waterbody_confirmado=False)
         anteriores = [json.loads(row[0]) for row in con.execute('SELECT conteudo FROM relatos_foto')]
         registro['similaridade'] = comparar(registro, anteriores)
         registro['aquaverify'] = avaliar(registro)
         cursor = con.execute(f'INSERT INTO relatos_foto (id, image_hash, conteudo, foto, anotada) VALUES ({p}, {p}, {p}, {p}, {p}) ON CONFLICT DO NOTHING',
             (registro['id'], registro['image_hash'], json.dumps(registro, ensure_ascii=False, allow_nan=False),
              foto, anotada))
+        if cursor.rowcount == 1:
+            from ciclo import registrar_evento
+            registrar_evento(con, registro['id'], 'recebida', 'Sistema', data=registro['registrado_em'])
+            registrar_evento(con, registro['id'], 'aguardando revisão', 'Sistema')
         row = con.execute(f'SELECT conteudo FROM relatos_foto WHERE image_hash={p}',
                           (registro['image_hash'],)).fetchone()
         if row is None:
@@ -94,7 +111,8 @@ def revisar_foto(identificador, decisao, revisor, waterbody_id=None,
         if registro.get('revisao', 'nao_revisado') != 'nao_revisado':
             raise ValueError('Este relato já foi revisado.')
         registro.update(revisao=decisao, revisor=revisor.strip()[:100],
-                        validado_em=datetime.now(timezone.utc).isoformat())
+                        validado_em=datetime.now(timezone.utc).isoformat(),
+                        etapa='validada' if decisao == 'validado' else 'rejeitada')
         if waterbody_id:
             from corpos_hidricos import obter_corpo
             corpo = obter_corpo(waterbody_id)
@@ -108,6 +126,8 @@ def revisar_foto(identificador, decisao, revisor, waterbody_id=None,
         registro['aquaverify'] = avaliar(registro)
         con.execute(f'UPDATE relatos_foto SET conteudo={p} WHERE id={p}',
                     (json.dumps(registro, ensure_ascii=False, allow_nan=False), identificador))
+        from ciclo import registrar_evento
+        registrar_evento(con, identificador, registro['etapa'], revisor.strip())
     return registro
 
 

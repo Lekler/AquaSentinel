@@ -53,4 +53,6 @@ else:
     else:
         st.info('Não há objetos identificados pelo modelo nas observações deste local.')
     historico_local(resumo, revisados, f'local-{grupo["id"]}')
+    from acompanhamento_visual import antes_depois
+    antes_depois(grupo, revisados)
 rodape()
