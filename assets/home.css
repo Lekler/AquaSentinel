@@ -80,10 +80,10 @@
 .level-badges {position:absolute;left:.65cqw;right:.65cqw;bottom:1.45cqw;display:flex;justify-content:center;gap:.22cqw;}
 .level-badges span {display:flex;align-items:center;gap:.25cqw;border-radius:.85cqw;padding:.67cqw .43cqw;font-size:.73cqw;white-space:nowrap;color:#203b4c;}
 .level-badges i {width:.8cqw;height:.8cqw;border-radius:50%;display:block;flex-shrink:0;}
-.level-badges .low {background:#eaf7f2;}.low i {background:#36bd69;}
-.level-badges .medium {background:#fcf7e7;}.medium i {background:#f3c517;}
-.level-badges .high {background:#fff0e5;}.high i {background:#fb9234;}
-.level-badges .blocked {background:#fcebef;}.blocked i {background:#e3243e;}
+.level-badges .low {background:#eaf7f2;}.low i {background:#22a55b;}
+.level-badges .medium {background:#fcf7e7;}.medium i {background:#facc15;}
+.level-badges .high {background:#fff0e5;}.high i {background:#f97316;}
+.level-badges .blocked {background:#f1f1f1;color:#000;}.blocked i {background:#000000;}
 .community-card {border-color:transparent;background:linear-gradient(140deg,#e7f8f9 0%,#eaf8fa 60%,#d0f2f8 100%);box-shadow:none;padding-top:1cqw;overflow:hidden;}
 .community-art {display:flex;justify-content:center;height:5.6cqw;}
 .step-community {width:6.2cqw;height:5.6cqw;}

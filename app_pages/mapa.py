@@ -1,22 +1,20 @@
-"""Mapa público de pontos revisados e fila privada de revisão."""
+"""Mapa de condição observada e cobertura, com revisão privada preservada."""
 import hmac
 import logging
 import os
 
-import pandas as pd
 import pydeck as pdk
 import streamlit as st
 
 from interface_fotos import mostrar_analise
 from relatos import listar_fotos, obter_foto, revisar_foto
 from registro_visual import cabecalho, rodape
-from wps import pontuar
+from observacao import (CORES_NIVEIS, PERIODOS, agrupar_locais, publicos,
+                        filtrar_periodo, resumo_local, cor_cobertura, rgb, ultima_descricao)
+from mapa_visual import (AVISO_COBERTURA, legenda, resumo_grupo, historico_local, link_local)
 
-CORES = {'Baixa': [54, 166, 113], 'Moderada': [239, 184, 47],
-         'Alta': [240, 113, 51], 'Crítica': [206, 55, 54]}
-
-cabecalho('Mapa e registros', 'Pontos revisados e prioridade experimental de resíduos.',
-          False, 'Map and reports', 'Reviewed points and experimental waste priority.', '/mapa')
+cabecalho('Mapa e registros', 'Condição observada e cobertura de observação.',
+          False, 'Map and reports', 'Observed condition and observation coverage.', '/mapa')
 try:
     todos = listar_fotos()
 except Exception:
@@ -24,46 +22,78 @@ except Exception:
     st.error('Não foi possível carregar os relatos. Tente novamente ou avise a equipe.')
     st.stop()
 
-revisados = [r for r in todos if r.get('revisao') == 'validado' and r.get('consentimento_publicacao')]
-ativos = [r for r in revisados if r.get('nivel_informado') != 'Sem resíduos']
-pontuados = [(r, pontuar(r, revisados)) for r in ativos]
+revisados = publicos(todos)
+periodo = st.selectbox('Período de observação', list(PERIODOS), index=2, key='mapa-periodo')
+camada = st.segmented_control('Camada do mapa', ['Condição ambiental', 'Cobertura de observação'],
+                              default='Condição ambiental', key='mapa-camada') or 'Condição ambiental'
+st.info(AVISO_COBERTURA)
+st.caption('Agrupamento aproximado: mesmo nome de local, ignorando acentos e maiúsculas, '
+           'a até 200 m da primeira observação. Nomes diferentes permanecem separados. '
+           'O período inclui hoje e usa dias de calendário no horário de Brasília.')
 
-st.subheader('Pontos monitorados')
+# Agrupa o histórico completo antes de filtrar para preservar os IDs e âncoras dos locais.
+grupos = []
+for grupo in agrupar_locais(revisados):
+    resumo = resumo_local(filtrar_periodo(grupo['registros'], PERIODOS[periodo]))
+    if resumo:
+        grupos.append({**grupo, 'resumo': resumo})
 a, b, c = st.columns(3)
-a.metric('Ocorrências revisadas', len(revisados))
-b.metric('Pontos ativos', len(ativos))
-c.metric('Aguardando revisão', len([r for r in todos if r.get('revisao') == 'nao_revisado']))
-st.caption('Cor e tamanho do ponto representam o WPS. O CS indica a confiança das detecções combinada com a confiabilidade da fonte. Os índices são experimentais.')
+a.metric('Observações no período', sum(g['resumo']['total'] for g in grupos))
+b.metric('Locais observados', len(grupos))
+c.metric('Dias diferentes · todo o mapa',
+         (resumo_local([r for g in grupos for r in g['resumo']['registros']]) or {}).get('dias', 0))
 
-if pontuados:
-    pontos = [{'latitude': float(r['latitude']), 'longitude': float(r['longitude']),
-               'cor': CORES[s['faixa_wps']], 'raio': 90 + s['wps'] * 3,
-               'local': r['nome'], 'wps': s['wps'], 'cs': s['cs']}
-              for r, s in pontuados]
-    df = pd.DataFrame(pontos)
-    camada = pdk.Layer('ScatterplotLayer', data=df, get_position='[longitude, latitude]',
-                       get_fill_color='cor', get_radius='raio', radius_min_pixels=6,
-                       radius_max_pixels=26, pickable=True, opacity=.85)
-    vista = pdk.ViewState(latitude=float(df.latitude.mean()), longitude=float(df.longitude.mean()), zoom=10)
-    st.pydeck_chart(pdk.Deck(map_style=None, initial_view_state=vista, layers=[camada],
-                             tooltip={'html': '<b>{local}</b><br/>WPS {wps} · CS {cs}%',
-                                      'style': {'backgroundColor': '#07345c', 'color': 'white'}}),
-                    width='stretch')
-    for r, s in sorted(pontuados, key=lambda item: item[1]['wps'], reverse=True):
-        with st.expander(f"{r['nome']} · WPS {s['wps']:.1f} ({s['faixa_wps']}) · CS {s['cs']:.1f}% ({s['faixa_cs']})"):
-            st.write(f"**W:** {s['w']} · **F:** {s['f']} · **Recorrências revisadas:** {s['recorrencias']} · **Confiança da IA:** {r.get('confianca_media') or 0}% · **Fonte comunitária:** 0,8")
-            st.caption('W vem do nível informado e confirmado na revisão humana; a IA identifica classes de plástico, não mede gravidade. F usa fotos distintas no mesmo local, em 200 m e 30 dias. Sem cadastro de autores, independência entre pessoas não é verificável. CS não é probabilidade calibrada de acerto.')
-            st.write(f"**Revisado por:** {r.get('revisor', '—')} · **Data:** {r.get('validado_em', '—')[:16]}")
-            try:
-                _, foto, anotada = obter_foto(r['id'])
-                st.image(anotada, caption='Detecções do modelo')
-            except Exception:
-                logging.exception('Falha ao carregar evidência')
-                st.warning('A evidência desta ocorrência está indisponível.')
-else:
-    st.info('Ainda não há pontos ativos revisados. Novos relatos aparecem aqui após validação pela equipe.')
+with st.container(key='mapa-pontos'):
+    st.subheader(camada)
+    if grupos:
+        pontos = []
+        for g in grupos:
+            resumo = g['resumo']
+            nivel = resumo['recente']['nivel_informado']
+            cor = (CORES_NIVEIS.get(nivel, '#94a3b8') if camada == 'Condição ambiental'
+                   else cor_cobertura(resumo['dias']))
+            pontos.append({'id': g['id'], 'latitude': g['latitude'], 'longitude': g['longitude'],
+                           'cor': rgb(cor), 'local': g['nome'], 'nivel': nivel,
+                           'ocorrencias': resumo['total'], 'dias': resumo['dias'],
+                           'ultima': ultima_descricao(resumo['dias_desde_ultima'])})
+        layer = pdk.Layer('ScatterplotLayer', id='locais', data=pontos,
+                          get_position='[longitude, latitude]', get_fill_color='cor',
+                          get_radius=10, radius_units='pixels', radius_min_pixels=10,
+                          radius_max_pixels=10, stroked=True, get_line_color=[255, 255, 255],
+                          line_width_min_pixels=2, pickable=True, opacity=1)
+        vista = pdk.ViewState(latitude=sum(p['latitude'] for p in pontos)/len(pontos),
+                             longitude=sum(p['longitude'] for p in pontos)/len(pontos), zoom=10)
+        evento = st.pydeck_chart(pdk.Deck(map_style=None, initial_view_state=vista, layers=[layer],
+            tooltip={'text': '{local}\nNível mais recente: {nivel}\n{ocorrencias} ocorrências neste local\n{dias} dias diferentes de observação\n{ultima}\nClique para foto, WPS, CS e histórico.'}),
+            on_select='rerun', selection_mode='single-object', key=f'mapa-{periodo}-{camada}')
+        legenda(camada)
+        # Nunca usa metadados enviados pelo cliente para recuperar fotos: só IDs da lista pública atual.
+        objetos = evento.selection.get('objects', {}).get('locais', [])
+        por_id = {g['id']: g for g in grupos}
+        ident = objetos[0].get('id') if objetos else None
+        if ident in por_id:
+            g = por_id[ident]
+            st.subheader(g['nome'])
+            resumo_grupo(g['resumo'])
+            st.link_button('Abrir página deste local / corpo hídrico', link_local(g['id']))
+            historico_local(g['resumo'], revisados, f'mapa-{g["id"]}-{periodo}')
+    else:
+        st.info('Nenhuma observação pública revisada neste período. Experimente Todo o período.')
+        legenda(camada)
 
-st.caption('A ausência de pontos não significa ausência de resíduos. A localização é informada ou confirmada pelo usuário; o app não comprova onde ou quando a foto foi tirada.')
+st.caption('Ausência de observações não significa ausência de resíduos. A cor mostra a última '
+           'condição declarada dentro do período, não garante a condição atual do local.')
+if grupos:
+    st.subheader('Locais e histórico')
+    st.caption('Você também pode abrir um local pela lista abaixo. O histórico completo fica na página individual.')
+    for g in sorted(grupos, key=lambda g: g['nome'].casefold()):
+        with st.expander(f"{g['nome']} · {g['resumo']['total']} ocorrências · {g['resumo']['dias']} dias observados"):
+            resumo_grupo(g['resumo'])
+            st.link_button('Ver histórico completo do local', link_local(g['id']))
+            if st.button('Ver observações deste período', key=f'abrir-{g["id"]}'):
+                st.session_state['mapa-local-aberto'] = g['id']
+            if st.session_state.get('mapa-local-aberto') == g['id']:
+                historico_local(g['resumo'], revisados, f'lista-{g["id"]}-{periodo}')
 
 senha_configurada = os.environ.get('AQUASENTINEL_REVIEW_PASSWORD', '')
 with st.expander('Área da equipe de revisão'):

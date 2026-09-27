@@ -29,6 +29,8 @@ def pontuar(registro, revisados, agora=None):
     recorrência e não comprova relatos independentes.
     """
     agora = agora or datetime.now(timezone.utc)
+    if agora.tzinfo is None:
+        agora = agora.replace(tzinfo=timezone.utc)
     data_minima = agora - timedelta(days=JANELA_DIAS)
     hashes = set()
     for item in revisados:
@@ -36,6 +38,8 @@ def pontuar(registro, revisados, agora=None):
             continue
         try:
             data = datetime.fromisoformat(item['registrado_em'])
+            if data.tzinfo is None:
+                data = data.replace(tzinfo=timezone.utc)
             mesmo_local = item['nome'].strip().casefold() == registro['nome'].strip().casefold()
             proximo = distancia_m(float(item['latitude']), float(item['longitude']),
                                   float(registro['latitude']), float(registro['longitude'])) <= RAIO_M

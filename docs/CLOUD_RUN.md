@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/interface-registro-sobre-duvidas`, mantendo `main` intacta.
+`feat/mapa-cobertura-historico-locais`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -28,7 +28,7 @@ gcloud run deploy aquasentinel-teste \
   --port=8080 \
   --memory=2Gi \
   --cpu=1 \
-  --concurrency=4 \
+  --concurrency=80 \
   --min-instances=0 \
   --max-instances=1 \
   --timeout=3600 \
@@ -62,3 +62,31 @@ pode reconectar e perder o rascunho da sessão. Relatos persistidos no PostgreSQ
 continuam disponíveis. A afinidade de sessão é de melhor esforço.
 
 Esta configuração ainda precisa de validação por build e execução no Cloud Run.
+
+## Atualizar o serviço existente com esta versão
+
+No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
+arquivos locais usados na primeira implantação em `~/AquaSentinel`.
+
+```sh
+git clone --branch feat/mapa-cobertura-historico-locais --single-branch \
+  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-mapa
+cd ~/AquaSentinel-mapa
+git log -1 --oneline
+gcloud run deploy aquasentinel \
+  --project=aquasentinel-509900 \
+  --source=. \
+  --region=southamerica-east1 \
+  --concurrency=80
+```
+
+Se a pasta já existir com esta branch, use `git pull --ff-only` dentro dela.
+O deploy atualiza o serviço existente e preserva suas demais configurações.
+O limite anterior de 8 requisições concorrentes com uma instância produziu
+respostas 429 nos arquivos da interface; esta versão usa 80.
+
+Antes de substituir uma instância com dados reais em SQLite, preserve os dados
+e configure persistência. O Git não transfere registros ou fotos do banco.
+
+Depois da publicação, recarregue o navegador e verifique: Bloqueando em preto,
+legenda, duas camadas, filtros, clique no ponto e página de histórico do local.

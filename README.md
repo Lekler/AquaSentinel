@@ -49,6 +49,36 @@ Exemplo: W=100, F=75 e confiança média=94% produzem WPS=92,5 e CS=75,2%.
 
 ## Arquitetura e dados
 
+### Mapa, cobertura e histórico por local
+
+- **Condição ambiental:** a cor representa o nível declarado na última observação
+  do período: cinza = sem resíduos, verde = pouco, amarelo = moderado,
+  laranja = muito poluído, preto = bloqueando. A legenda fica sempre visível
+  junto ao mapa. Todos os marcadores têm raio fixo de 10 pixels.
+- **Cobertura de observação:** uma camada independente em tons de azul representa
+  dias distintos (1, 2–3, 4–7, 8+), não gravidade. Mais ocorrências não significam
+  automaticamente mais poluição nem autores independentes.
+- Filtros: 7, 15, 30, 90 dias e todo o período. Os limites são dias de calendário,
+  incluindo hoje, no fuso `America/Sao_Paulo`; datas são as de registro, não uma
+  comprovação do momento de captura. Datas futuras são excluídas dos resumos.
+- Observações validadas e autorizadas são agrupadas por nome normalizado
+  (acentos, espaços e maiúsculas) em até 200 m da primeira observação. Não há
+  encadeamento espacial; nomes diferentes não são unidos automaticamente.
+  Isso identifica trechos aproximados, não delimita todo um corpo hídrico.
+- Clique no ponto para foto, nível, data, objetos, confiança média, revisão,
+  WPS e CS. A lista abaixo oferece o mesmo acesso ao histórico.
+- `/local?id=<id-de-observacao-publica>` abre a página individual: totais,
+  dias observados, primeira/última observação, nível recente e anteriores,
+  principais resíduos e recorrência (dias com resíduos declarados / dias
+  observados). O histórico completo independe do filtro do mapa.
+- WPS aparece como número e barra separados da condição observada. A fórmula
+  original foi mantida; em detalhes históricos é recalculada na data do registro,
+  usando as fotos atualmente validadas dos 30 dias anteriores. Não é um snapshot
+  de decisões passadas de revisão. CS mantém confiança média × 0,8.
+- A quantidade total identificada soma detecções nas fotos: não deduplica objetos
+  entre fotos. Dados pendentes, rejeitados e sem autorização ficam fora de todos
+  os resumos e páginas públicas.
+
 ```text
 app.py → Streamlit multipágina
 app_pages/sobre.py e app_pages/duvidas.py → informações e ajuda

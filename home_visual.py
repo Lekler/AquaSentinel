@@ -120,7 +120,7 @@ def construir_home(base_url=''):
         <article class="step-card level-card"><span class="step-number" aria-label="Etapa 3">3</span>
           <div class="step-art">{imagem('F3.png', 'step-level')}</div>
           <h3>{texto('Informe o nível', 'Report the level')}</h3><p>{texto('Diga o quanto de resíduo<br>há no local.', 'Tell us how much waste<br>is at the location.')}</p>
-          <div class="level-badges" aria-label="{texto('Níveis de resíduos', 'Waste levels')}"><span class="low"><i></i>{texto('Pouco', 'Low')}</span><span class="medium"><i></i>{texto('Moderado', 'Moderate')}</span><span class="high"><i></i>{texto('Muito', 'High')}</span><span class="blocked"><i></i>{texto('Bloqueando', 'Blocking')}</span></div>
+          <div class="level-badges" aria-label="{texto('Níveis de resíduos', 'Waste levels')}"><span class="low"><i></i>{texto('Pouco', 'Low')}</span><span class="medium"><i></i>{texto('Moderado', 'Moderate')}</span><span class="high"><i></i>{texto('Muito poluído', 'Very polluted')}</span><span class="blocked"><i></i>{texto('Bloqueando', 'Blocking')}</span></div>
         </article>
         <article class="community-card">
           <div class="community-art">{imagem('F4.png', 'step-community')}</div>
