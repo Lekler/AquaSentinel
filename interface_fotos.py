@@ -60,20 +60,22 @@ def mostrar_analise(analise, anotada, exibir_imagem=True):
 
 
 def downloads(registro, foto, anotada, prefixo):
-    st.download_button(texto('Baixar foto identificada', 'Download identified photo'), anotada,
-        file_name=f"aquasentinela-{registro['id'][:8]}-identificada.jpg",
-        mime='image/jpeg', key=f'{prefixo}_imagem')
-    st.download_button(texto('Baixar Excel', 'Download Excel'), gerar_excel(registro),
-        file_name=f"aquasentinela-{registro['id'][:8]}.xlsx",
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        icon=':material/table_view:', key=f'{prefixo}_excel')
-    if st.button(texto('Preparar pacote com fotos e recortes', 'Prepare photo and crop package'), key=f'{prefixo}_preparar'):
-        with st.spinner(texto('Preparando evidências…', 'Preparing evidence…')):
-            st.session_state.pacote_foto = (registro['id'], gerar_pacote(registro, foto, anotada))
-    pacote = st.session_state.get('pacote_foto')
-    if pacote and pacote[0] == registro['id']:
-        st.download_button(texto('Baixar pacote ZIP', 'Download ZIP package'), pacote[1], file_name=f"aquasentinela-{registro['id'][:8]}.zip",
-                           mime='application/zip', key=f'{prefixo}_zip')
+    with st.container(horizontal=True, horizontal_alignment='right'):
+        st.download_button(texto('Baixar foto identificada', 'Download identified photo'), anotada,
+            file_name=f"aquasentinela-{registro['id'][:8]}-identificada.jpg",
+            mime='image/jpeg', icon=':material/image:', key=f'{prefixo}_imagem')
+        st.download_button(texto('Baixar Excel', 'Download Excel'), gerar_excel(registro),
+            file_name=f"aquasentinela-{registro['id'][:8]}.xlsx",
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            icon=':material/table_view:', key=f'{prefixo}_excel')
+    with st.expander(texto('Outros arquivos · pacote completo', 'Other files · complete package')):
+        if st.button(texto('Preparar pacote com fotos e recortes', 'Prepare photo and crop package'), key=f'{prefixo}_preparar'):
+            with st.spinner(texto('Preparando evidências…', 'Preparing evidence…')):
+                st.session_state.pacote_foto = (registro['id'], gerar_pacote(registro, foto, anotada))
+        pacote = st.session_state.get('pacote_foto')
+        if pacote and pacote[0] == registro['id']:
+            st.download_button(texto('Baixar pacote ZIP', 'Download ZIP package'), pacote[1], file_name=f"aquasentinela-{registro['id'][:8]}.zip",
+                               mime='application/zip', key=f'{prefixo}_zip')
 
 
 def abrir_ari(registro):

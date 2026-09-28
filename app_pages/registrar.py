@@ -165,13 +165,10 @@ with direita, st.container(key='location-card'):
 titulo('3', texto('Nível do local', 'Site level'), texto('Qual a quantidade de lixo ou resíduo no local?', 'How much waste or debris is at the location?'))
 with st.form('enviar_foto'):
     niveis_exibicao = [texto(nivel, {'Sem resíduos': 'No visible waste', 'Pouco': 'Low', 'Moderado': 'Moderate', 'Muito poluído': 'Very polluted', 'Bloqueando': 'Blocking'}[nivel]) for nivel in NIVEIS]
-    from ambiente import SIMBOLOS
     nivel_exibido = st.segmented_control(texto('Como está o local?', 'What is the site like?'), niveis_exibicao,
-        format_func=lambda n: SIMBOLOS[NIVEIS[niveis_exibicao.index(n)]] + ' ' + n, key='foto_nivel', width='stretch')
+        key='foto_nivel', width='stretch')
     nivel = NIVEIS[niveis_exibicao.index(nivel_exibido)] if nivel_exibido else None
     st.caption(texto('Este nível é informado por você. A IA conta objetos visíveis; não determina se o canal está bloqueado.', 'You provide this level. AI counts visible objects; it does not determine whether the canal is blocked.'))
-    from mapa_visual import legenda
-    legenda('Condição ambiental')
     from ambiente import SINAIS, validar_contexto
     sinais = st.multiselect('One Health · sinais ambientais (opcional)', SINAIS, key='foto-sinais')
     detalhe_ambiental = st.text_area('Detalhe ambiental (opcional)', max_chars=500, key='foto-ambiente')
@@ -224,25 +221,36 @@ if st.session_state.get('foto_salva_id'):
         salvo, foto, anotada = obter_foto(st.session_state.foto_salva_id)
         if st.session_state.get('foto_duplicada'):
             st.warning('Esta imagem já foi registrada. Mostramos o registro original; nada foi duplicado ou sobrescrito.')
-        else:
-            st.success('Ocorrência salva e enviada para revisão. Após validação, ela aparecerá no mapa público.')
-        st.write(f"**Local salvo:** {salvo['nome']} · **ID:** {salvo['id']}")
-        st.caption(f"Coordenadas salvas: {salvo['latitude']:.6f}, {salvo['longitude']:.6f} · Nível informado: {salvo['nivel_informado']}")
+        from resultado_visual import resumo_salvo
+        resumo_salvo(salvo)
         mostrar_evidencia(salvo)
         if st.session_state.get('foto_recibo'):
-            st.download_button('Guardar recibo de acompanhamento',
-                f"ID: {salvo['id']}\nCódigo privado: {st.session_state.foto_recibo}\nConsulte em Acompanhar meu registro.\n",
-                file_name=f"recibo-{salvo['id'][:8]}.txt", mime='text/plain')
-            st.caption('Guarde o recibo antes de enviar outra foto. O código permite consultar seu registro mesmo antes da publicação.')
-        st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro')
-        st.page_link('app_pages/dados.py', label='Exportar meus dados em CSV, Excel, JSON ou GeoJSON')
+            with st.container(border=True, key='resultado-recibo'):
+                info, acao = st.columns([2.2, 1], vertical_alignment='center')
+                with info:
+                    st.subheader('Recibo de acompanhamento', icon=':material/receipt_long:')
+                    st.caption('Guarde o recibo antes de enviar outra foto. O código permite consultar seu registro mesmo antes da publicação.')
+                with acao:
+                    st.download_button('Guardar recibo de acompanhamento',
+                        f"ID: {salvo['id']}\nCódigo privado: {st.session_state.foto_recibo}\nConsulte em Acompanhar meu registro.\n",
+                        file_name=f"recibo-{salvo['id'][:8]}.txt", mime='text/plain',
+                        type='primary', icon=':material/receipt_long:', width='stretch')
+        with st.container(border=True, key='resultado-acoes'):
+            st.subheader('Outras ações', icon=':material/link:')
+            st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro', icon=':material/description:')
+            st.page_link('app_pages/dados.py', label='Exportar meus dados em CSV, Excel, JSON ou GeoJSON', icon=':material/download:')
         from ciclo import feedback
         from relatos import listar_fotos
-        for mensagem in feedback(salvo, listar_fotos()):
-            st.info(mensagem)
+        with st.container(key='resultado-status'):
+            for mensagem in feedback(salvo, listar_fotos()):
+                st.info(f'**{mensagem}**', icon=':material/check_circle:')
         if salvo.get('modo') == 'estruturado':
             st.page_link('app_pages/monitoramento.py', label='Voltar à sessão para adicionar fotos ou encerrar')
-        downloads(salvo, foto, anotada, 'registro')
+        with st.container(border=True, key='resultado-downloads'):
+            titulo_downloads, botoes_downloads = st.columns([1, 3], vertical_alignment='top')
+            titulo_downloads.subheader('Downloads', icon=':material/download:')
+            with botoes_downloads:
+                downloads(salvo, foto, anotada, 'registro')
         if st.button(texto('Ir para o mapa', 'Go to the map'), key='foto_abrir_mapa', icon=':material/map:', type='primary'):
             st.switch_page('app_pages/mapa.py')
     except (ValueError, OSError) as exc:

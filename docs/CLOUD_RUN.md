@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/ciencia-aberta-layout-one-health`, mantendo `main` intacta.
+`fix/resultado-foto-layout`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -69,9 +69,9 @@ No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
 arquivos locais usados na primeira implantação em `~/AquaSentinel`.
 
 ```sh
-git clone --branch feat/ciencia-aberta-layout-one-health --single-branch \
-  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-ciencia-aberta
-cd ~/AquaSentinel-ciencia-aberta
+git clone --branch fix/resultado-foto-layout --single-branch \
+  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-resultado
+cd ~/AquaSentinel-resultado
 git log -1 --oneline
 gcloud run deploy aquasentinel \
   --project=aquasentinel-509900 \

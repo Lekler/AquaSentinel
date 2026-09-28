@@ -19,3 +19,9 @@
 
 - Códigos de corpos hídricos, AquaVerify v1, SHA-256 e pHash.
 - Hotspots persistentes, histórico por local e separação entre condição e cobertura.
+### 2026.09 · Ajuste visual do resultado fotográfico
+
+- Seletor de nível restaurado: bolinhas coloridas e texto, sem símbolos extras ou legenda duplicada no formulário.
+- Resultado com cartão do local, selo do nível, AquaVerify com barra e tabela de critérios com desempenho.
+- Explicação organizada em cartão, recibo destacado, ações e downloads agrupados.
+- Valores e regras de avaliação preservados; textos dinâmicos escapados e tabela navegável horizontalmente no celular.

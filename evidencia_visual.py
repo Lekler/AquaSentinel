@@ -5,20 +5,8 @@ from hotspots import avaliar_hotspot
 
 
 def mostrar_evidencia(registro):
-    q = avaliar(registro)
-    st.markdown('#### AquaVerify / Qualidade da Evidência')
-    st.write(f"**Qualidade da evidência {q['faixa']} · {q['indice']:.1f}/100**")
-    st.caption(AVISO)
-    st.dataframe(q['criterios'], hide_index=True, width='stretch')
-    st.caption('Rubrica experimental v1: alta ≥ 75, média ≥ 45, baixa < 45. '
-               'Pesos e limiares não foram calibrados como probabilidade.')
-    texto, motivos = explicar(registro)
-    st.write(texto)
-    for motivo in motivos:
-        st.write('• ' + motivo)
-    if (registro.get('similaridade') or {}).get('quantidade'):
-        st.warning('Esta imagem parece semelhante a uma anterior. A equipe deve verificar se é '
-                   'uma nova observação, reutilização ou falso positivo. Isso não comprova fraude.')
+    from resultado_visual import evidencia
+    evidencia(registro)
 
 
 def mostrar_hotspot(registros):

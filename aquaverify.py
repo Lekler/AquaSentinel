@@ -83,4 +83,6 @@ def explicar(r):
         motivos.append('Localização manual/ajustada: conferir se corresponde ao local informado.')
     motivos.append('Todos os relatos exigem revisão humana antes da publicação, mesmo com confiança alta.')
     estado = 'Revisão humana concluída.' if r.get('revisao') == 'validado' else 'Relato encaminhado para revisão humana ao salvar.'
-    return f'Foram identificados {total} objetos. A confiança média foi de {conf:.1f}%. {estado}', motivos
+    contagem = 'Foi identificado 1 objeto' if total == 1 else f'Foram identificados {total} objetos'
+    confianca = f'A confiança média foi de {conf:.1f}%.' if total else 'Não há confiança média sem detecções.'
+    return f'{contagem}. {confianca} {estado}', motivos
