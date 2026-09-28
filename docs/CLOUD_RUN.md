@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`fix/resultado-foto-layout`, mantendo `main` intacta.
+`feat/navegacao-mapa-idiomas`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;

@@ -1,6 +1,6 @@
 """Página compartilhável de um trecho/local, com todo o histórico público."""
 import logging
-import streamlit as st
+from interface_idioma import st
 
 from relatos import listar_fotos
 from observacao import agrupar_locais, publicos, resumo_local

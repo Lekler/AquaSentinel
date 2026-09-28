@@ -2,7 +2,7 @@ from hashlib import sha256
 import logging
 import math
 import secrets
-import streamlit as st
+from interface_idioma import st
 from interface_fotos import carregar_detector, mostrar_analise, downloads
 from localizacao import obter_localizacao
 from relatos import NIVEIS, criar_registro, salvar_foto, obter_foto

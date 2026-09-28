@@ -3,7 +3,7 @@ from html import escape
 import logging
 from urllib.parse import urlencode
 
-import streamlit as st
+from interface_idioma import st
 
 from observacao import CORES_NIVEIS, FUSO, data_registro, ultima_descricao
 from relatos import obter_foto
@@ -14,10 +14,9 @@ AVISO_COBERTURA = ('Mais ocorrências não significam automaticamente mais polui
 
 
 def nivel_html(nivel):
-    from ambiente import SIMBOLOS
     cor = CORES_NIVEIS.get(nivel, '#94a3b8')
     return (f'<span class="nivel-observado"><i style="background:{cor}"></i>'
-            f'<span class="nivel-simbolo" aria-hidden="true">{SIMBOLOS.get(nivel, "?")}</span>{escape(nivel)}</span>')
+            f'{escape(nivel)}</span>')
 
 
 def legenda(camada):
@@ -35,8 +34,9 @@ def legenda(camada):
 
 
 def link_local(identificador):
+    from i18n import em_ingles
     base = st.get_option('server.baseUrlPath').strip('/')
-    return ('/' + base if base else '') + '/local?' + urlencode({'id': identificador})
+    return ('/' + base if base else '') + '/local?' + urlencode({'id': identificador, 'lang': 'en' if em_ingles() else 'pt'})
 
 
 def resumo_grupo(resumo):

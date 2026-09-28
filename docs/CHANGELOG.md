@@ -1,3 +1,13 @@
+### 2026.09 · Navegação, mapa e idiomas
+
+- Resumo de locais sem contagens repetidas; explicação de persistência recolhida.
+- Um responsável da equipe compartilhado entre revisão, cadastro e ações.
+- Marcadores e legenda com uma bolinha por nível, sem símbolo adicional.
+- Idioma mantido entre páginas; tradução de formulários, resultados, tabelas e mensagens.
+- Tutorial ilustrado em Como funciona; contato reunido em Dúvidas.
+- Menu superior direito com Dados e Ciência e Transparência; três atalhos de acompanhamento.
+- Mais espaço na página inicial e botões menores.
+
 ### 2026.09 · Ciência aberta e páginas internas
 
 - Sobre reestruturado, galeria com espaços reservados e tutorial em Como funciona.

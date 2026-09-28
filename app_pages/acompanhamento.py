@@ -1,4 +1,4 @@
-import streamlit as st
+from interface_idioma import st
 from ciclo import consultar_recibo, feedback
 from acompanhamento_visual import rastreabilidade
 from relatos import listar_fotos

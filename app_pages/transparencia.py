@@ -1,6 +1,6 @@
 from pathlib import Path
 from hashlib import sha256
-import streamlit as st
+from interface_idioma import st
 from registro_visual import cabecalho, rodape
 from relatos import listar_fotos
 from evolucao import indicadores
@@ -65,7 +65,8 @@ if modelo.is_file():
     st.code(sha256(modelo.read_bytes()).hexdigest())
 st.caption('Registros legados sem versão gravada são identificados como legados; não recebem retroativamente a versão atual.')
 with st.expander('Critérios detalhados de AquaVerify, pHash e hotspots'):
-    st.markdown((Path(__file__).resolve().parents[1]/'docs'/'AQUAVERIFY.md').read_text(encoding='utf-8'))
+    from i18n import em_ingles
+    st.markdown((Path(__file__).resolve().parents[1]/'docs'/('AQUAVERIFY.en.md' if em_ingles() else 'AQUAVERIFY.md')).read_text(encoding='utf-8'))
 st.page_link('app_pages/lacunas.py', label='Ver lacunas de monitoramento')
 st.page_link('app_pages/dados.py', label='Consultar dados, dicionário e changelog')
 rodape()

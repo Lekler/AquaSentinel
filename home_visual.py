@@ -79,20 +79,12 @@ def construir_home(base_url=''):
     </a>
     <nav class="aqua-nav" aria-label="Navegação principal">
       <a class="nav-about" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>
-      <a class="nav-how" href="#como-funciona">{label_como}</a>
+      <a class="nav-how" href="{prefixo}/como-funciona{query}" target="_self">{label_como}</a>
       <a href="{mapa}{query}" target="_self">{label_mapa}</a>
       <a class="nav-faq" href="{prefixo}/duvidas{query}" target="_self">{label_duvidas}</a>
-      {language_switch}<details class="nav-disclosure nav-more"><summary aria-label="Mais opções"><span aria-hidden="true">•••</span></summary>
-        <div class="nav-panel more-links"><a href="{registrar}{query}" target="_self">{texto('Registrar ocorrência', 'Report an occurrence')}</a>
-        <a href="{mapa}{query}" target="_self">{texto('Mapa e registros', 'Map and reports')}</a>
-        <a href="{prefixo}/transparencia{query}" target="_self">Transparência</a>
-        <a href="{prefixo}/monitoramento{query}" target="_self">Monitoramento estruturado</a>
-        <a href="{prefixo}/lacunas{query}" target="_self">Lacunas de monitoramento</a>
-        <a href="{prefixo}/acompanhamento{query}" target="_self">Acompanhar meu registro</a>
-        <a href="{ari}{query}" target="_self">{texto('Avaliação ambiental · ARI', 'Environmental assessment · ARI')}</a>
-        <a class="mobile-only" href="#como-funciona">{label_como}</a>
-        <a class="mobile-only" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>
-        <a class="mobile-only" href="{prefixo}/duvidas{query}" target="_self">{label_duvidas}</a></div>
+      {language_switch}<details class="nav-disclosure nav-more"><summary aria-label="{texto('Dados e ciência', 'Data and science')}"><span aria-hidden="true">☰</span></summary>
+        <div class="nav-panel more-links"><a href="{prefixo}/dados{query}" target="_self">{texto('Dados e ciência', 'Data and science')}</a>
+        <a href="{prefixo}/transparencia{query}" target="_self">{texto('Transparência', 'Transparency')}</a></div>
       </details>
     </nav>
   </header>
@@ -109,7 +101,24 @@ def construir_home(base_url=''):
         </div>
       </div>
     </section>
-    <section class="how-section" id="como-funciona" aria-labelledby="how-title">
+    <section class="home-how-link" id="como-funciona"><a href="{prefixo}/como-funciona{query}" target="_self">{texto('Veja como funciona, passo a passo', 'See how it works, step by step')} →</a></section>
+    <section class="benefits" aria-label="{texto('Nossa contribuição', 'Our contribution')}">
+      <div class="benefit">{imagem('F1.1.png', 'benefit-leaf')}<div><h3>{texto('Cidadãos engajados', 'Engaged citizens')}</h3><p>{texto('Mais olhos pelos nossos rios', 'More eyes on our rivers')}</p></div></div>
+      <div class="benefit">{imagem('F2.2.png', 'benefit-target')}<div><h3>{texto('Ações mais rápidas', 'Faster action')}</h3><p>{texto('Informações que viram impacto', 'Information that drives impact')}</p></div></div>
+      <div class="benefit">{imagem('F3.3.png', 'benefit-water')}<div><h3>{texto('Rios e Baía mais limpos', 'Cleaner rivers and bay')}</h3><p>{texto('Um futuro melhor pra todos', 'A better future for everyone')}</p></div></div>
+      <div class="benefit">{imagem('F4.4.png', 'benefit-heart')}<div><h3>{texto('Tecnologia a serviço<br>do bem comum', 'Technology for<br>the common good')}</h3></div></div>
+    </section>
+  </main>
+  <footer class="aqua-footer">{ondas_rodape('footer-waves')}
+    <span class="footer-signature">{texto('Água limpa move vidas', 'Clean water moves lives')} {icone(ONDA, '#46b2cb', 'traco-onda')}</span>
+  </footer>
+</div></div>'''
+
+
+def tutorial_ilustrado():
+    simples = texto('É muito simples', 'It is very simple')
+    simples_desc = texto('Uma observação segura começa com estes passos.', 'A safe observation starts with these steps.')
+    return f'''<div class="tutorial-ilustrado">    <section class="how-section" id="como-funciona" aria-labelledby="how-title">
       <h2 id="how-title">{simples}</h2>
       <p class="how-intro">{simples_desc}</p>
       <div class="step-grid">
@@ -132,14 +141,4 @@ def construir_home(base_url=''):
         </article>
       </div>
     </section>
-    <section class="benefits" aria-label="{texto('Nossa contribuição', 'Our contribution')}">
-      <div class="benefit">{imagem('F1.1.png', 'benefit-leaf')}<div><h3>{texto('Cidadãos engajados', 'Engaged citizens')}</h3><p>{texto('Mais olhos pelos nossos rios', 'More eyes on our rivers')}</p></div></div>
-      <div class="benefit">{imagem('F2.2.png', 'benefit-target')}<div><h3>{texto('Ações mais rápidas', 'Faster action')}</h3><p>{texto('Informações que viram impacto', 'Information that drives impact')}</p></div></div>
-      <div class="benefit">{imagem('F3.3.png', 'benefit-water')}<div><h3>{texto('Rios e Baía mais limpos', 'Cleaner rivers and bay')}</h3><p>{texto('Um futuro melhor pra todos', 'A better future for everyone')}</p></div></div>
-      <div class="benefit">{imagem('F4.4.png', 'benefit-heart')}<div><h3>{texto('Tecnologia a serviço<br>do bem comum', 'Technology for<br>the common good')}</h3></div></div>
-    </section>
-  </main>
-  <footer class="aqua-footer">{ondas_rodape('footer-waves')}
-    <span class="footer-signature">{texto('Água limpa move vidas', 'Clean water moves lives')} {icone(ONDA, '#46b2cb', 'traco-onda')}</span>
-  </footer>
-</div></div>'''
+</div>'''

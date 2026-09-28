@@ -1,7 +1,7 @@
 from datetime import date
 from pathlib import Path
 import json
-import streamlit as st
+from interface_idioma import st
 from registro_visual import cabecalho, rodape
 from relatos import listar_fotos
 from observacao import publicos, data_registro, FUSO
@@ -96,5 +96,6 @@ with st.expander('Estrutura interna e versões dos índices'):
                'como indisponíveis. WPS e CS exportados são retratos armazenados na gravação/revisão; '
                'reavaliações dinâmicas no mapa podem diferir se o histórico mudar.')
 with st.expander('Changelog técnico'):
-    st.markdown((Path(__file__).resolve().parents[1]/'docs'/'CHANGELOG.md').read_text(encoding='utf-8'))
+    from i18n import em_ingles
+    st.markdown((Path(__file__).resolve().parents[1]/'docs'/('CHANGELOG.en.md' if em_ingles() else 'CHANGELOG.md')).read_text(encoding='utf-8'))
 rodape()

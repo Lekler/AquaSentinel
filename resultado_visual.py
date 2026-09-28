@@ -1,7 +1,7 @@
 """Cartões e tabela de evidências com valores reais e HTML escapado."""
 from html import escape
 from pathlib import Path
-import streamlit as st
+from interface_idioma import st
 from aquaverify import avaliar, explicar, AVISO
 
 

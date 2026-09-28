@@ -9,7 +9,7 @@ import sqlite3
 from uuid import uuid4
 import altair as alt
 import pandas as pd
-import streamlit as st
+from interface_idioma import st
 from motor import DadosInvalidos, analisar_previsao, validar_entrada
 from ari import CLASSES_RESIDUOS, NIVEIS_RIO, calcular_ari, triar_confianca
 from historico import listar, salvar, confirmar, contar_proximos
@@ -212,9 +212,9 @@ if resultado and resultado['ari_score'] is not None:
         df = pd.DataFrame(r['horas'])
         df['Intervalo'] = [f"{datetime.fromisoformat(a):%d/%m %H:%M}–{datetime.fromisoformat(b):%H:%M}" for a, b in zip(df.inicio, df.fim)]
         chart = alt.Chart(df).mark_bar(color='#138A97', cornerRadiusTopLeft=3, cornerRadiusTopRight=3).encode(
-            x=alt.X('Intervalo:N', sort=None, title='Intervalo no horário local', axis=alt.Axis(labelAngle=-55)),
-            y=alt.Y('precipitacao_mm:Q', title='Precipitação (mm em 1h)', scale=alt.Scale(domainMin=0)),
-            tooltip=[alt.Tooltip('Intervalo:N'), alt.Tooltip('precipitacao_mm:Q', title='Precipitação (mm)', format='.2f'), alt.Tooltip('probabilidade_pct:Q', title='Probabilidade (%)')],
+            x=alt.X('Intervalo:N', sort=None, title=texto('Intervalo no horário local', 'Local time interval'), axis=alt.Axis(labelAngle=-55)),
+            y=alt.Y('precipitacao_mm:Q', title=texto('Precipitação (mm em 1h)', 'Precipitation (mm in 1h)'), scale=alt.Scale(domainMin=0)),
+            tooltip=[alt.Tooltip('Intervalo:N', title=texto('Intervalo', 'Interval')), alt.Tooltip('precipitacao_mm:Q', title=texto('Precipitação (mm)', 'Precipitation (mm)'), format='.2f'), alt.Tooltip('probabilidade_pct:Q', title=texto('Probabilidade (%)', 'Probability (%)'))],
         ).properties(height=275)
         st.altair_chart(chart, width="stretch")
         st.caption('Cada barra representa uma hora completa. Probabilidade é a chance horária de precipitação; o pico não representa a chance de chuva em toda a janela.')

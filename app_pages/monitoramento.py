@@ -1,5 +1,5 @@
 """Sessões estruturadas com recibo privado; listagem pública somente após revisão."""
-import streamlit as st
+from interface_idioma import st
 from monitoramento import (listar_entidades, iniciar_sessao, sessao_autorizada,
                            encerrar_sessao, metricas_sessao)
 from relatos import listar_fotos

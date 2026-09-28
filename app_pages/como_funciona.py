@@ -1,8 +1,11 @@
-import streamlit as st
+from interface_idioma import st
 from registro_visual import cabecalho, rodape
 
 cabecalho('Como funciona', 'Da observação segura ao acompanhamento de ações.', False,
           'How it works', 'From safe observation to action follow-up.', '/como-funciona')
+from home_visual import tutorial_ilustrado
+st.html(tutorial_ilustrado())
+
 etapas = [
     ('Foto', 'Tire uma foto de um ponto seguro ou envie JPG, PNG ou WEBP de até 12 MB.'),
     ('IA', 'Confira os objetos detectados, a quantidade e a confiança. A IA pode errar.'),

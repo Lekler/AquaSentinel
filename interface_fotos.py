@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-import streamlit as st
+from interface_idioma import st
 from exportacao import gerar_excel, gerar_pacote
 from visao import Detector
 from i18n import em_ingles, texto

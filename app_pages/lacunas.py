@@ -1,9 +1,10 @@
-import streamlit as st
+from interface_idioma import st
 import pydeck as pdk
 from monitoramento import listar_entidades, lacunas
 from relatos import listar_fotos
 from registro_visual import cabecalho, rodape
 from observacao import rgb
+from interface_idioma import traduzir
 
 cabecalho('Lacunas de monitoramento', 'Onde já observamos e onde precisamos voltar.', False,
           'Monitoring gaps', 'Where observations exist and where to return.', '/lacunas')
@@ -17,6 +18,8 @@ if dados:
     for t in dados:
         t['cor'] = rgb(cores[t['classe']])
         t['ultima'] = 'Nunca observado' if t['ultima_dias'] is None else f"Última observação há {t['ultima_dias']} dias."
+        for campo in ('classe', 'ultima', 'estado', 'chamada'):
+            t[campo] = traduzir(t[campo])
     layer = pdk.Layer('ScatterplotLayer', id='lacunas', data=dados, get_position='[longitude,latitude]',
         get_fill_color='cor', get_radius=10, radius_units='pixels', pickable=True)
     st.pydeck_chart(pdk.Deck(map_style=None, layers=[layer], initial_view_state=pdk.ViewState(

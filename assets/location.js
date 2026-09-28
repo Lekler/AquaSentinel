@@ -1,6 +1,8 @@
 
 export default function({parentElement, data, setTriggerValue}) {
   const root=parentElement.querySelector('.location-map'), button=parentElement.querySelector('button'), status=parentElement.querySelector('[role=status]');
+  const text=(pt,en)=>data.language==='en'?en:pt;
+  button.textContent=text('◎ Usar minha localização','◎ Use my location');
   // CCv2 can render again on the same DOM before calling the previous cleanup.
   // Dispose explicitly and give Leaflet its own fresh container on every mount.
   root.aquaDispose?.();
@@ -22,24 +24,24 @@ export default function({parentElement, data, setTriggerValue}) {
     if(saved)return;
     const measured=Number.isFinite(accuracy)&&accuracy>0;
     accuracyCircle=window.L.circle(point,{radius:measured?accuracy:25,color:'#008fa7',weight:1,fillColor:'#00aabb',fillOpacity:.15,interactive:false}).addTo(map);
-    status.textContent=measured?`Precisão estimada do GPS: ${Math.round(accuracy)} m. Confira o ponto.`:'Círculo de referência de 25 m; não representa precisão de GPS.';
+    status.textContent=measured?text(`Precisão estimada do GPS: ${Math.round(accuracy)} m. Confira o ponto.`,`Estimated GPS accuracy: ${Math.round(accuracy)} m. Check the point.`):text('Círculo de referência de 25 m; não representa precisão de GPS.','25 m reference circle; it does not represent GPS accuracy.');
   }
   function emit(point) {if(saved)return;place(point);circle(point,null);setTriggerValue('position',{latitude:point.lat,longitude:point.lng,source:'map'});}
   if(valid) place([data.latitude,data.longitude]);
   if(!saved)map.on('click',e=>emit(e.latlng));
-  status.textContent=valid?'Confira o ponto. Clique no mapa ou arraste o marcador para ajustar.':'Use sua localização ou clique no mapa para marcar o local da foto.';
+  status.textContent=valid?text('Confira o ponto. Clique no mapa ou arraste o marcador para ajustar.','Check the point. Click the map or drag the marker to adjust.'):text('Use sua localização ou clique no mapa para marcar o local da foto.','Use your location or click the map to mark the photo location.');
   if(valid&&!saved)circle([data.latitude,data.longitude],data.accuracy);
   button.disabled=saved;button.hidden=saved;
-  if(saved)status.textContent='Localização salva. Apenas o marcador é exibido.';
+  if(saved)status.textContent=text('Localização salva. Apenas o marcador é exibido.','Location saved. Only the marker is shown.');
   const locate=()=>{
     if(saved)return;
-    if(!window.isSecureContext||!navigator.geolocation){status.textContent='O GPS precisa de HTTPS ou localhost. Você também pode marcar o ponto no mapa.';return;}
-    button.disabled=true;status.textContent='Aguardando permissão e localização…';
+    if(!window.isSecureContext||!navigator.geolocation){status.textContent=text('O GPS precisa de HTTPS ou localhost. Você também pode marcar o ponto no mapa.','GPS requires HTTPS or localhost. You can also mark the point on the map.');return;}
+    button.disabled=true;status.textContent=text('Aguardando permissão e localização…','Waiting for permission and location…');
     navigator.geolocation.getCurrentPosition(pos=>{
       if(!active)return;button.disabled=false;
       place([pos.coords.latitude,pos.coords.longitude]);circle([pos.coords.latitude,pos.coords.longitude],pos.coords.accuracy);
       setTriggerValue('position',{latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy,timestamp:pos.timestamp,source:'gps'});
-    },err=>{if(!active)return;button.disabled=false;status.textContent=err.code===1?'Permissão negada. Marque o ponto no mapa.':'GPS indisponível. Tente novamente ou marque o ponto no mapa.';},
+    },err=>{if(!active)return;button.disabled=false;status.textContent=err.code===1?text('Permissão negada. Marque o ponto no mapa.','Permission denied. Mark the point on the map.'):text('GPS indisponível. Tente novamente ou marque o ponto no mapa.','GPS unavailable. Try again or mark the point on the map.');},
     {enableHighAccuracy:true,timeout:15000,maximumAge:0});
   };
   button.onclick=locate;

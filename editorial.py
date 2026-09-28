@@ -1,5 +1,5 @@
 from html import escape
-import streamlit as st
+from interface_idioma import st
 
 
 def espaco_foto(titulo, legenda):

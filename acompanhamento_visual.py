@@ -1,6 +1,6 @@
 """Rastreabilidade, antes/depois e ferramentas autenticadas de acompanhamento."""
 from datetime import datetime, timezone
-import streamlit as st
+from interface_idioma import st
 from ciclo import historico_eventos, mudar_etapa, TRANSICOES
 from monitoramento import listar_entidades, cadastrar_trecho, metricas_sessao, revisar_sessao
 from evolucao import registrar_acao, comparar_acao, TIPOS_ACAO
@@ -66,10 +66,11 @@ def antes_depois(grupo, registros):
                        'o resultado; a comparação não demonstra que a ação causou a mudança.')
 
 
-def equipe_acompanhamento(todos):
+def equipe_acompanhamento(todos, responsavel=None):
     from corpos_hidricos import listar_corpos
     st.markdown('#### Planejamento de trechos e acompanhamento')
-    responsavel = st.text_input('Responsável pelas operações', key='operacao-responsavel', max_chars=100)
+    if responsavel is None:
+        responsavel = st.text_input('Responsável da equipe', key='operacao-responsavel', max_chars=100)
     corpos = {c['id']: c for c in listar_corpos()}
     with st.expander('Cadastrar trecho no plano de monitoramento'):
         st.caption('Cadastre também trechos sem observações para que apareçam como lacunas. '

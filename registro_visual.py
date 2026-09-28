@@ -3,7 +3,7 @@ import base64
 from pathlib import Path
 from home_visual import imagem, icone, CAMERA_REGISTRO, ondas_rodape
 from i18n import alternador_html, em_ingles, idioma_query, texto
-import streamlit as st
+from interface_idioma import st
 
 
 def cabecalho(titulo_pagina='Registrar ocorrência', descricao='Uma foto ajuda a cuidar das nossas águas.', mostrar_etapas=True, titulo_ingles='Register an occurrence', descricao_ingles='One photo helps care for our waters.', caminho='/registrar'):
@@ -17,16 +17,12 @@ def cabecalho(titulo_pagina='Registrar ocorrência', descricao='Uma foto ajuda a
     etapas = ('<div class="registro-steps"><span>① Photo</span><span>② Location</span><span>③ Level</span><span>④ Send</span></div>' if em_ingles() else
                '<div class="registro-steps"><span>① Foto</span><span>② Localização</span><span>③ Nível</span><span>④ Enviar</span></div>') if mostrar_etapas else ''
     query = idioma_query()
-    st.html(f'<style>{css}</style><header class="registro-header"><a href="{base}/{query}" target="_self">{imagem("Logo.png",descricao="AquaSentinela")}</a><nav>{alternador_html(base + caminho or "/")}<a href="{base}/sobre{query}" target="_self">{sobre}</a><a href="{base}/mapa{query}" target="_self">{mapa}</a><a href="{base}/duvidas{query}" target="_self">{duvidas}</a></nav></header>')
+    st.html(f'<style>{css}</style><header class="registro-header"><a href="{base}/{query}" target="_self">{imagem("Logo.png",descricao="AquaSentinela")}</a><nav>{alternador_html(base + caminho or "/")}<a href="{base}/sobre{query}" target="_self">{sobre}</a><a href="{base}/como-funciona{query}" target="_self">{texto("Como funciona", "How it works")}</a><a href="{base}/mapa{query}" target="_self">{mapa}</a><a href="{base}/duvidas{query}" target="_self">{duvidas}</a><details class="menu-ciencia"><summary aria-label="{texto("Dados e ciência", "Data and science")}">☰</summary><div><a href="{base}/dados{query}" target="_self">{texto("Dados e ciência", "Data and science")}</a><a href="{base}/transparencia{query}" target="_self">{texto("Transparência", "Transparency")}</a></div></details></nav></header>')
     st.html(f'<div class="registro-title"><div><h1>{texto(titulo_pagina, titulo_ingles)}</h1><p>{texto(descricao, descricao_ingles)}</p></div>{etapas}</div>')
-    with st.popover(texto('Explorar e acompanhar', 'Explore and track')):
-        st.page_link('app_pages/como_funciona.py', label='Como funciona')
-        st.page_link('app_pages/dados.py', label='Dados e Ciência Aberta')
-        st.page_link('app_pages/contato.py', label='Fale Conosco')
-        st.page_link('app_pages/transparencia.py', label='Transparência')
-        st.page_link('app_pages/monitoramento.py', label='Monitoramento estruturado')
-        st.page_link('app_pages/lacunas.py', label='Lacunas de monitoramento')
-        st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro')
+    with st.container(horizontal=True, key='atalhos-acompanhamento'):
+        st.page_link('app_pages/monitoramento.py', label=texto('Monitoramento', 'Monitoring'))
+        st.page_link('app_pages/lacunas.py', label=texto('Lacunas', 'Coverage gaps'))
+        st.page_link('app_pages/acompanhamento.py', label=texto('Acompanhar', 'Track a report'))
 
 
 def titulo(numero,texto,descricao):

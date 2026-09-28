@@ -1,4 +1,4 @@
-import streamlit as st
+from interface_idioma import st
 from registro_visual import cabecalho, rodape
 from editorial import espaco_foto
 

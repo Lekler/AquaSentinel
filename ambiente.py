@@ -12,7 +12,7 @@ def validar_contexto(sinais, detalhe=''):
 
 
 def mostrar_contexto(registro):
-    import streamlit as st
+    from interface_idioma import st
     contexto = registro.get('contexto_ambiental') or {}
     sinais = contexto.get('sinais', [])
     with st.expander('One Health · observações ambientais'):

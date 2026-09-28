@@ -32,8 +32,8 @@ def test_mapa_camadas_periodos_detalhes_e_pagina(tmp_path, monkeypatch):
     layer = spec['layers'][0]
     assert layer['radiusMinPixels'] == layer['radiusMaxPixels'] == 10
     assert layer['data'][0]['cor'] == [0, 0, 0]
-    assert layer['data'][0]['simbolo'] == '■'
-    assert spec['layers'][1]['@@type'] == 'TextLayer'
+    assert 'simbolo' not in layer['data'][0]
+    assert len(spec['layers']) == 1
     app.button_group(key='mapa-camada').set_value('Cobertura de observação').run()
     assert not app.exception
     spec = json.loads(app.get('deck_gl_json_chart')[0].proto.json)

@@ -1,5 +1,5 @@
 """Explicações de evidência e persistência, com critérios sempre consultáveis."""
-import streamlit as st
+from interface_idioma import st
 from aquaverify import avaliar, explicar, AVISO
 from hotspots import avaliar_hotspot
 
@@ -9,15 +9,16 @@ def mostrar_evidencia(registro):
     evidencia(registro)
 
 
-def mostrar_hotspot(registros):
+def mostrar_hotspot(registros, compacto=False):
     h = avaliar_hotspot(registros)
-    st.markdown('#### Hotspot persistente' if h['persistente'] else '#### Persistência em acompanhamento')
+    if not compacto:
+        st.markdown('#### Hotspot persistente' if h['persistente'] else '#### Ainda sem persistência confirmada')
     ultima = ('hoje' if h['ultima_dias'] == 0 else f"há {h['ultima_dias']} dias") if h['ultima_dias'] is not None else 'indisponível'
-    st.write(f"**{h['ocorrencias']} ocorrências · {h['dias']} dias diferentes · última observação {ultima}**")
-    st.caption('Janela própria de 90 dias, independente do filtro do mapa. '
-               'Classificação experimental de persistência observada; não é previsão nem alerta ambiental. '
-               'Mais uploads não significam mais poluição. Ausência do selo não comprova ausência de problema.')
-    with st.expander('Por que recebeu ou não o selo de persistência?'):
+    with st.expander('Entender a persistência'):
+        st.write('A persistência procura sinais repetidos ao longo do tempo. Uma foto isolada não é suficiente.')
+        st.caption('Avaliação dos últimos 90 dias. Mais envios não significam mais poluição; '
+                   'a ausência de selo não garante ausência de resíduos.')
+        st.write(f"Observações consideradas: {h['ocorrencias']} · Dias observados: {h['dias']} · Última observação: {ultima}")
         st.write(f"Evidências elegíveis: {h['elegiveis']} · dias com resíduos: {h['dias_residuos']} · "
                  f"intervalo: {h['amplitude_dias']} dias · recorrência: {h['recorrencia']}% · "
                  f"WPS mediano: {h['wps_mediano']} · AquaVerify mediano: {h['qualidade_mediana']}")
@@ -28,14 +29,15 @@ def mostrar_hotspot(registros):
                    'fotos idênticas/reutilizadas não ampliam a persistência. Os limiares são heurísticos.')
 
 
-def gestao_catalogo(todos):
+def gestao_catalogo(todos, responsavel=None):
     """Chamado exclusivamente após autenticação da equipe de revisão."""
     from corpos_hidricos import listar_corpos, cadastrar_corpo
     from relatos import vincular_corpo, indexar_fotos_antigas, resolver_similaridade, obter_foto
-    st.markdown('#### Cadastro de corpos hídricos e evidências antigas')
+    st.caption('Corpo hídrico é o rio, canal ou Baía, não o resíduo. Ex.: Canal do Fundão — Rio de Janeiro. O nome do ponto descreve o trecho; o código reúne suas observações.')
     st.caption('Códigos WB-BG são internos ao projeto, não identificadores oficiais. '
                'Inclua município/trecho no nome para distinguir corpos hídricos homônimos.')
-    responsavel = st.text_input('Responsável pelo cadastro/vinculação', key='cadastro-responsavel', max_chars=100)
+    if responsavel is None:
+        responsavel = st.text_input('Responsável da equipe', key='cadastro-responsavel', max_chars=100)
     nome = st.text_input('Nome padronizado do corpo hídrico', key='cadastro-corpo', max_chars=100)
     if st.button('Cadastrar corpo hídrico'):
         try:
@@ -78,13 +80,14 @@ def gestao_catalogo(todos):
                     st.rerun()
                 except ValueError as exc:
                     st.error(str(exc))
-    faltantes = sum(not r.get('phash') for r in todos)
-    st.caption(f'{faltantes} foto(s) antigas sem pHash. A indexação consulta apenas fotos já no banco.')
-    if st.button('Indexar / reavaliar similaridade das fotos antigas'):
-        try:
-            total = indexar_fotos_antigas()
-            st.success(f'{total} foto(s) indexadas neste lote (até 100). Atualize a página; repita se houver pendências.')
-        except Exception:
-            import logging
-            logging.exception('Falha ao indexar fotos antigas')
-            st.error('Não foi possível concluir a indexação. Nenhuma alteração deste lote foi salva.')
+    with st.expander('Ferramentas avançadas de imagens antigas'):
+        faltantes = sum(not r.get('phash') for r in todos)
+        st.caption(f'{faltantes} foto(s) antigas sem pHash. A indexação consulta apenas fotos já no banco.')
+        if st.button('Indexar / reavaliar similaridade das fotos antigas'):
+            try:
+                total = indexar_fotos_antigas()
+                st.success(f'{total} foto(s) indexadas neste lote (até 100). Atualize a página; repita se houver pendências.')
+            except Exception:
+                import logging
+                logging.exception('Falha ao indexar fotos antigas')
+                st.error('Não foi possível concluir a indexação. Nenhuma alteração deste lote foi salva.')

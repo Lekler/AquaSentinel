@@ -1,5 +1,5 @@
 """Entrada única do AquaSentinela: participação por foto e painel ambiental."""
-import streamlit as st
+from interface_idioma import st
 from pathlib import Path
 from i18n import texto
 

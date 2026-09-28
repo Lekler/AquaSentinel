@@ -1,4 +1,4 @@
-import streamlit as st
+from interface_idioma import st
 from i18n import texto
 from registro_visual import cabecalho, rodape
 
@@ -48,7 +48,8 @@ for pergunta, resposta in [
 with st.container(horizontal=True):
     st.page_link('app_pages/como_funciona.py', label='Como funciona')
     st.page_link('app_pages/dados.py', label='Dados e Ciência Aberta')
-    st.page_link('app_pages/contato.py', label='Fale Conosco')
 if st.button(texto('Registrar ocorrência', 'Report an occurrence'), type='primary'):
     st.switch_page('app_pages/registrar.py')
+from contato_visual import mostrar_contato
+mostrar_contato()
 rodape()

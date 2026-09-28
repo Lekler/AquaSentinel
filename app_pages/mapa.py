@@ -4,7 +4,7 @@ import logging
 import os
 
 import pydeck as pdk
-import streamlit as st
+from interface_idioma import st
 
 from interface_fotos import mostrar_analise
 from relatos import listar_fotos, obter_foto, revisar_foto
@@ -14,6 +14,8 @@ from observacao import (CORES_NIVEIS, PERIODOS, agrupar_locais, publicos,
 from mapa_visual import (AVISO_COBERTURA, legenda, resumo_grupo, historico_local, link_local)
 from evidencia_visual import mostrar_hotspot, mostrar_evidencia, gestao_catalogo
 from hotspots import avaliar_hotspot
+from interface_idioma import traduzir
+from i18n import texto
 
 cabecalho('Mapa e registros', 'Condição observada e cobertura de observação.',
           False, 'Map and reports', 'Observed condition and observation coverage.', '/mapa')
@@ -61,21 +63,17 @@ with st.container(key='mapa-pontos'):
     if grupos:
         pontos = []
         for g in grupos:
-            from ambiente import SIMBOLOS
             resumo = g['resumo']
             hotspot = g['hotspot']
             nivel = resumo['recente']['nivel_informado']
             cor = (CORES_NIVEIS.get(nivel, '#94a3b8') if camada == 'Condição ambiental'
                    else cor_cobertura(resumo['dias']))
             pontos.append({'id': g['id'], 'latitude': g['latitude'], 'longitude': g['longitude'],
-                           'cor': rgb(cor), 'local': g['nome'], 'nivel': nivel,
-                           'simbolo': SIMBOLOS.get(nivel, '?') if camada == 'Condição ambiental' else str(resumo['dias']),
-                           'cor_texto': [255,255,255] if (nivel == 'Bloqueando' and camada == 'Condição ambiental')
-                                or (camada != 'Condição ambiental' and resumo['dias'] > 3) else [10,30,40],
+                           'cor': rgb(cor), 'local': g['nome'], 'nivel': traduzir(nivel),
                            'ocorrencias': resumo['total'], 'dias': resumo['dias'],
-                           'corpo': g.get('waterbody_id') or 'Não identificado',
-                           'hotspot': 'Hotspot persistente' if hotspot['persistente'] else 'Persistência em acompanhamento',
-                           'ultima': ultima_descricao(resumo['dias_desde_ultima'])})
+                           'corpo': g.get('waterbody_id') or traduzir('Não identificado'),
+                           'hotspot': traduzir('Hotspot persistente' if hotspot['persistente'] else 'Persistência em acompanhamento'),
+                           'ultima': traduzir(ultima_descricao(resumo['dias_desde_ultima']))})
         layer = pdk.Layer('ScatterplotLayer', id='locais', data=pontos,
                           get_position='[longitude, latitude]', get_fill_color='cor',
                           get_radius=10, radius_units='pixels', radius_min_pixels=10,
@@ -83,12 +81,8 @@ with st.container(key='mapa-pontos'):
                           line_width_min_pixels=2, pickable=True, opacity=1)
         vista = pdk.ViewState(latitude=sum(p['latitude'] for p in pontos)/len(pontos),
                              longitude=sum(p['longitude'] for p in pontos)/len(pontos), zoom=10)
-        simbolos = pdk.Layer('TextLayer', id='simbolos', data=pontos, get_position='[longitude, latitude]',
-                             get_text='simbolo', get_size=14, size_units='pixels', get_color='cor_texto',
-                             get_text_anchor='middle', get_alignment_baseline='center', pickable=False,
-                             character_set='auto', font_family='Arial')
-        evento = st.pydeck_chart(pdk.Deck(map_style=None, initial_view_state=vista, layers=[layer, simbolos],
-            tooltip={'text': '{local} · {corpo}\nNível mais recente: {nivel}\n{ocorrencias} ocorrências neste local\n{dias} dias diferentes de observação\n{ultima}\n{hotspot} (janela de 90 dias)\nClique para foto, WPS, CS e histórico.'}),
+        evento = st.pydeck_chart(pdk.Deck(map_style=None, initial_view_state=vista, layers=[layer],
+            tooltip={'text': texto('{local} · {corpo}\nNível mais recente: {nivel}\n{ocorrencias} ocorrências neste local\n{dias} dias diferentes de observação\n{ultima}\nClique para foto e histórico.', '{local} · {corpo}\nLatest level: {nivel}\n{ocorrencias} reports at this location\n{dias} distinct observation days\n{ultima}\nClick for photos and history.')}),
             on_select='rerun', selection_mode='single-object', key=f'mapa-{periodo}-{camada}')
         legenda(camada)
         # Nunca usa metadados enviados pelo cliente para recuperar fotos: só IDs da lista pública atual.
@@ -99,7 +93,7 @@ with st.container(key='mapa-pontos'):
             g = por_id[ident]
             st.subheader(g['nome'])
             resumo_grupo(g['resumo'])
-            mostrar_hotspot(g['registros'])
+            mostrar_hotspot(g['registros'], compacto=True)
             st.link_button('Abrir página deste local / corpo hídrico', link_local(g['id']))
             historico_local(g['resumo'], revisados, f'mapa-{g["id"]}-{periodo}')
     else:
@@ -110,14 +104,14 @@ st.caption('Ausência de observações não significa ausência de resíduos. A 
            'condição declarada dentro do período, não garante a condição atual do local.')
 if grupos:
     st.subheader('Locais e histórico')
-    st.caption('Você também pode abrir um local pela lista abaixo. O histórico completo fica na página individual.')
+    st.caption('Escolha um local para consultar as fotos e a evolução das observações.')
     for g in sorted(grupos, key=lambda g: g['nome'].casefold()):
         selo = ' · Hotspot persistente' if g['hotspot']['persistente'] else ''
         ocorrencias = 'ocorrência' if g['resumo']['total'] == 1 else 'ocorrências'
         dias = 'dia observado' if g['resumo']['dias'] == 1 else 'dias observados'
-        with st.expander(f"{g['nome']} · {g['resumo']['total']} {ocorrencias} · {g['resumo']['dias']} {dias} · {g['resumo']['recente']['nivel_informado']}{selo}"):
+        with st.expander(f"{g['nome']} · {g['resumo']['recente']['nivel_informado']}{selo}"):
             resumo_grupo(g['resumo'])
-            mostrar_hotspot(g['registros'])
+            mostrar_hotspot(g['registros'], compacto=True)
             st.link_button('Ver histórico completo do local', link_local(g['id']))
             if st.button('Ver observações deste período', key=f'abrir-{g["id"]}'):
                 st.session_state['mapa-local-aberto'] = g['id']
@@ -134,52 +128,58 @@ with st.expander('Área da equipe de revisão'):
         if senha and not autorizado:
             st.error('Senha incorreta.')
         if autorizado:
-            gestao_catalogo(todos)
+            responsavel = st.text_input('Responsável da equipe', key='equipe-responsavel', max_chars=100)
+            with st.expander('1 · Revisar novos registros', expanded=True):
+                pendentes = [r for r in todos if r.get('revisao') == 'nao_revisado']
+                st.write(f'{len(pendentes)} relato(s) aguardando revisão.')
+                if pendentes:
+                    por_id = {r['id']: r for r in pendentes}
+                    escolhido = st.selectbox('Relato', list(por_id),
+                        format_func=lambda ident: f"{por_id[ident]['nome']} · {por_id[ident]['registrado_em'][:16]}")
+                    registro, foto, anotada = obter_foto(escolhido)
+                    st.write(f"**Local:** {registro['nome']} · **Coordenadas:** {registro['latitude']}, {registro['longitude']} · **Nível declarado:** {registro['nivel_informado']}")
+                    st.write(f"**Observações:** {registro.get('observacoes') or '—'}")
+                    mostrar_analise(registro, anotada)
+                    mostrar_evidencia(registro)
+                    st.image(foto, caption='Foto enviada')
+                    revisor = responsavel
+                    from corpos_hidricos import listar_corpos
+                    corpos = {c['id']: c for c in listar_corpos()}
+                    opcoes = [None, *corpos]
+                    sugerido = registro.get('waterbody_id')
+                    corpo_id = st.selectbox('Confirmar corpo hídrico do relato', opcoes,
+                        index=opcoes.index(sugerido) if sugerido in opcoes else 0,
+                        format_func=lambda i: f"{i} · {corpos[i]['nome']}" if i else 'Ainda não identificado',
+                        key=f'revisao-corpo-{escolhido}')
+                    sim_decisao, justificativa = None, ''
+                    if (registro.get('similaridade') or {}).get('quantidade'):
+                        st.warning('Compare as imagens antes de considerar esta foto uma observação independente.')
+                        for candidata in registro['similaridade'].get('candidatas', []):
+                            if st.checkbox(f"Ver evidência anterior {candidata['id'][:8]}", key=f"comparar-{escolhido}-{candidata['id']}"):
+                                try:
+                                    anterior, foto_anterior, _ = obter_foto(candidata['id'])
+                                    st.image(foto_anterior, caption=f"Registro anterior: {anterior['registrado_em'][:16]}")
+                                except ValueError:
+                                    st.info('Evidência anterior indisponível.')
+                        sim_decisao = st.selectbox('Decisão sobre similaridade', [None, 'independente', 'reutilizada'],
+                            format_func=lambda i: {None: 'Não resolvida', 'independente': 'Nova observação / falso positivo',
+                                                   'reutilizada': 'Imagem reutilizada'}[i], key=f'sim-decisao-{escolhido}')
+                        justificativa = st.text_input('Justificativa da decisão de similaridade', max_chars=500, key=f'sim-just-{escolhido}')
+                    col1, col2 = st.columns(2)
+                    decisao = 'validado' if col1.button('Validar relato', type='primary') else 'rejeitado' if col2.button('Rejeitar relato') else None
+                    if decisao:
+                        try:
+                            revisar_foto(escolhido, decisao, revisor, corpo_id, sim_decisao, justificativa)
+                            st.success('Revisão salva.')
+                            st.rerun()
+                        except Exception as exc:
+                            logging.exception('Falha ao revisar relato')
+                            st.error(f'Não foi possível salvar a revisão: {exc}')
+
+            with st.expander('2 · Cadastrar ou vincular corpos hídricos'):
+                gestao_catalogo(todos, responsavel)
             from acompanhamento_visual import equipe_acompanhamento
-            equipe_acompanhamento(todos)
-            pendentes = [r for r in todos if r.get('revisao') == 'nao_revisado']
-            st.write(f'{len(pendentes)} relato(s) aguardando revisão.')
-            if pendentes:
-                por_id = {r['id']: r for r in pendentes}
-                escolhido = st.selectbox('Relato', list(por_id),
-                    format_func=lambda ident: f"{por_id[ident]['nome']} · {por_id[ident]['registrado_em'][:16]}")
-                registro, foto, anotada = obter_foto(escolhido)
-                st.write(f"**Local:** {registro['nome']} · **Coordenadas:** {registro['latitude']}, {registro['longitude']} · **Nível declarado:** {registro['nivel_informado']}")
-                st.write(f"**Observações:** {registro.get('observacoes') or '—'}")
-                mostrar_analise(registro, anotada)
-                mostrar_evidencia(registro)
-                st.image(foto, caption='Foto enviada')
-                revisor = st.text_input('Nome do revisor', max_chars=100)
-                from corpos_hidricos import listar_corpos
-                corpos = {c['id']: c for c in listar_corpos()}
-                opcoes = [None, *corpos]
-                sugerido = registro.get('waterbody_id')
-                corpo_id = st.selectbox('Confirmar corpo hídrico do relato', opcoes,
-                    index=opcoes.index(sugerido) if sugerido in opcoes else 0,
-                    format_func=lambda i: f"{i} · {corpos[i]['nome']}" if i else 'Ainda não identificado',
-                    key=f'revisao-corpo-{escolhido}')
-                sim_decisao, justificativa = None, ''
-                if (registro.get('similaridade') or {}).get('quantidade'):
-                    st.warning('Compare as imagens antes de considerar esta foto uma observação independente.')
-                    for candidata in registro['similaridade'].get('candidatas', []):
-                        if st.checkbox(f"Ver evidência anterior {candidata['id'][:8]}", key=f"comparar-{escolhido}-{candidata['id']}"):
-                            try:
-                                anterior, foto_anterior, _ = obter_foto(candidata['id'])
-                                st.image(foto_anterior, caption=f"Registro anterior: {anterior['registrado_em'][:16]}")
-                            except ValueError:
-                                st.info('Evidência anterior indisponível.')
-                    sim_decisao = st.selectbox('Decisão sobre similaridade', [None, 'independente', 'reutilizada'],
-                        format_func=lambda i: {None: 'Não resolvida', 'independente': 'Nova observação / falso positivo',
-                                               'reutilizada': 'Imagem reutilizada'}[i], key=f'sim-decisao-{escolhido}')
-                    justificativa = st.text_input('Justificativa da decisão de similaridade', max_chars=500, key=f'sim-just-{escolhido}')
-                col1, col2 = st.columns(2)
-                decisao = 'validado' if col1.button('Validar relato', type='primary') else 'rejeitado' if col2.button('Rejeitar relato') else None
-                if decisao:
-                    try:
-                        revisar_foto(escolhido, decisao, revisor, corpo_id, sim_decisao, justificativa)
-                        st.success('Revisão salva.')
-                        st.rerun()
-                    except Exception as exc:
-                        logging.exception('Falha ao revisar relato')
-                        st.error(f'Não foi possível salvar a revisão: {exc}')
+            with st.expander('3 · Planejar monitoramento ou registrar ações'):
+                equipe_acompanhamento(todos, responsavel)
+
 rodape()
