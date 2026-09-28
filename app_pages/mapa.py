@@ -25,18 +25,20 @@ except Exception:
     st.stop()
 
 revisados = publicos(todos)
-periodo = st.selectbox('Período de observação', list(PERIODOS), index=2, key='mapa-periodo')
-camada = st.segmented_control('Camada do mapa', ['Condição ambiental', 'Cobertura de observação'],
-                              default='Condição ambiental', key='mapa-camada') or 'Condição ambiental'
-st.page_link('app_pages/lacunas.py', label='Consultar trechos com lacunas de monitoramento')
-modo = st.selectbox('Tipo de observação', ['Todos', 'Oportunístico', 'Monitoramento estruturado'], key='mapa-modo')
+with st.container(key='mapa-filtros'):
+    periodo = st.selectbox('Período de observação', list(PERIODOS), index=2, key='mapa-periodo')
+    camada = st.segmented_control('Camada do mapa', ['Condição ambiental', 'Cobertura de observação'],
+                                  default='Condição ambiental', key='mapa-camada') or 'Condição ambiental'
+    modo = st.selectbox('Tipo de observação', ['Todos', 'Oportunístico', 'Monitoramento estruturado'], key='mapa-modo')
+    st.info(AVISO_COBERTURA)
+    st.caption('Agrupamento aproximado: mesmo código de corpo hídrico confirmado pela equipe, '
+               'a até 200 m da primeira observação. Registros sem código confirmado ficam separados. '
+               'O período inclui hoje e usa dias de calendário no horário de Brasília.')
+    mostrar_sem_residuos = st.checkbox('Mostrar também locais observados sem resíduos', value=True)
+    somente_hotspots = st.checkbox('Mostrar somente hotspots persistentes · avaliação dos últimos 90 dias', key='mapa-hotspots')
+    st.page_link('app_pages/lacunas.py', label='Consultar trechos com lacunas de monitoramento')
 if modo != 'Todos':
     revisados = [r for r in revisados if r.get('modo', 'oportunistico') == ('estruturado' if modo == 'Monitoramento estruturado' else 'oportunistico')]
-mostrar_sem_residuos = st.checkbox('Mostrar também locais observados sem resíduos', value=True)
-st.info(AVISO_COBERTURA)
-st.caption('Agrupamento aproximado: mesmo código de corpo hídrico confirmado pela equipe, '
-           'a até 200 m da primeira observação. Registros sem código confirmado ficam separados. '
-           'O período inclui hoje e usa dias de calendário no horário de Brasília.')
 
 # Agrupa o histórico completo antes de filtrar para preservar os IDs e âncoras dos locais.
 grupos = []
@@ -44,7 +46,6 @@ for grupo in agrupar_locais(revisados):
     resumo = resumo_local(filtrar_periodo(grupo['registros'], PERIODOS[periodo]))
     if resumo:
         grupos.append({**grupo, 'resumo': resumo, 'hotspot': avaliar_hotspot(grupo['registros'])})
-somente_hotspots = st.checkbox('Mostrar somente hotspots persistentes · avaliação dos últimos 90 dias', key='mapa-hotspots')
 if somente_hotspots:
     grupos = [g for g in grupos if g['hotspot']['persistente']]
 if not mostrar_sem_residuos and camada == 'Condição ambiental':
@@ -60,6 +61,7 @@ with st.container(key='mapa-pontos'):
     if grupos:
         pontos = []
         for g in grupos:
+            from ambiente import SIMBOLOS
             resumo = g['resumo']
             hotspot = g['hotspot']
             nivel = resumo['recente']['nivel_informado']
@@ -67,6 +69,9 @@ with st.container(key='mapa-pontos'):
                    else cor_cobertura(resumo['dias']))
             pontos.append({'id': g['id'], 'latitude': g['latitude'], 'longitude': g['longitude'],
                            'cor': rgb(cor), 'local': g['nome'], 'nivel': nivel,
+                           'simbolo': SIMBOLOS.get(nivel, '?') if camada == 'Condição ambiental' else str(resumo['dias']),
+                           'cor_texto': [255,255,255] if (nivel == 'Bloqueando' and camada == 'Condição ambiental')
+                                or (camada != 'Condição ambiental' and resumo['dias'] > 3) else [10,30,40],
                            'ocorrencias': resumo['total'], 'dias': resumo['dias'],
                            'corpo': g.get('waterbody_id') or 'Não identificado',
                            'hotspot': 'Hotspot persistente' if hotspot['persistente'] else 'Persistência em acompanhamento',
@@ -78,7 +83,11 @@ with st.container(key='mapa-pontos'):
                           line_width_min_pixels=2, pickable=True, opacity=1)
         vista = pdk.ViewState(latitude=sum(p['latitude'] for p in pontos)/len(pontos),
                              longitude=sum(p['longitude'] for p in pontos)/len(pontos), zoom=10)
-        evento = st.pydeck_chart(pdk.Deck(map_style=None, initial_view_state=vista, layers=[layer],
+        simbolos = pdk.Layer('TextLayer', id='simbolos', data=pontos, get_position='[longitude, latitude]',
+                             get_text='simbolo', get_size=14, size_units='pixels', get_color='cor_texto',
+                             get_text_anchor='middle', get_alignment_baseline='center', pickable=False,
+                             character_set='auto', font_family='Arial')
+        evento = st.pydeck_chart(pdk.Deck(map_style=None, initial_view_state=vista, layers=[layer, simbolos],
             tooltip={'text': '{local} · {corpo}\nNível mais recente: {nivel}\n{ocorrencias} ocorrências neste local\n{dias} dias diferentes de observação\n{ultima}\n{hotspot} (janela de 90 dias)\nClique para foto, WPS, CS e histórico.'}),
             on_select='rerun', selection_mode='single-object', key=f'mapa-{periodo}-{camada}')
         legenda(camada)
@@ -104,7 +113,9 @@ if grupos:
     st.caption('Você também pode abrir um local pela lista abaixo. O histórico completo fica na página individual.')
     for g in sorted(grupos, key=lambda g: g['nome'].casefold()):
         selo = ' · Hotspot persistente' if g['hotspot']['persistente'] else ''
-        with st.expander(f"{g['nome']} · {g['resumo']['total']} ocorrências · {g['resumo']['dias']} dias observados{selo}"):
+        ocorrencias = 'ocorrência' if g['resumo']['total'] == 1 else 'ocorrências'
+        dias = 'dia observado' if g['resumo']['dias'] == 1 else 'dias observados'
+        with st.expander(f"{g['nome']} · {g['resumo']['total']} {ocorrencias} · {g['resumo']['dias']} {dias} · {g['resumo']['recente']['nivel_informado']}{selo}"):
             resumo_grupo(g['resumo'])
             mostrar_hotspot(g['registros'])
             st.link_button('Ver histórico completo do local', link_local(g['id']))

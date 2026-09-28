@@ -16,6 +16,9 @@ if consultar:
         for mensagem in feedback(r, listar_fotos()):
             st.info(mensagem)
         rastreabilidade(r)
+        from ambiente import mostrar_contexto
+        mostrar_contexto(r)
+        st.page_link('app_pages/dados.py', label='Exportar meus registros com o recibo')
     except ValueError as exc:
         st.error(str(exc))
 st.caption('O recibo é fornecido ao salvar um novo registro. Registros antigos sem código não podem ser '

@@ -4,7 +4,7 @@ import streamlit as st
 from registro_visual import cabecalho, rodape
 from relatos import listar_fotos
 from evolucao import indicadores
-from versoes import APP, METODOLOGIA, MONITORAMENTO
+from versoes import APP, METODOLOGIA, MONITORAMENTO, WPS, CS, AQUAVERIFY
 from monitoramento import listar_entidades
 
 cabecalho('Transparência', 'Como os dados são produzidos, revisados e interpretados.', False,
@@ -55,7 +55,8 @@ st.write('Todos os relatos aguardam revisão antes da publicação. A equipe con
 st.caption('A área da equipe usa senha compartilhada e nome informado pelo revisor; não há autenticação individual de revisores.')
 st.subheader('Versões')
 st.dataframe([{'Componente':'Aplicativo','Versão':APP}, {'Componente':'Metodologia WPS','Versão':METODOLOGIA},
-              {'Componente':'Monitoramento','Versão':MONITORAMENTO}, {'Componente':'AquaVerify','Versão':'aquaverify-v1'},
+              {'Componente':'Monitoramento','Versão':MONITORAMENTO}, {'Componente':'AquaVerify','Versão':AQUAVERIFY},
+              {'Componente':'WPS','Versão':WPS}, {'Componente':'CS','Versão':CS},
               {'Componente':'Hotspot','Versão':'hotspot-persistente-v1'},
               {'Componente':'Similaridade','Versão':'phash-dct-recortes-v1'}], hide_index=True)
 modelo = Path(__file__).resolve().parents[1]/'models'/'best.pt'
@@ -66,4 +67,5 @@ st.caption('Registros legados sem versão gravada são identificados como legado
 with st.expander('Critérios detalhados de AquaVerify, pHash e hotspots'):
     st.markdown((Path(__file__).resolve().parents[1]/'docs'/'AQUAVERIFY.md').read_text(encoding='utf-8'))
 st.page_link('app_pages/lacunas.py', label='Ver lacunas de monitoramento')
+st.page_link('app_pages/dados.py', label='Consultar dados, dicionário e changelog')
 rodape()

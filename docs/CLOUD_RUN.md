@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/transparencia-monitoramento-acompanhamento`, mantendo `main` intacta.
+`feat/ciencia-aberta-layout-one-health`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -69,9 +69,9 @@ No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
 arquivos locais usados na primeira implantação em `~/AquaSentinel`.
 
 ```sh
-git clone --branch feat/transparencia-monitoramento-acompanhamento --single-branch \
-  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-monitoramento
-cd ~/AquaSentinel-monitoramento
+git clone --branch feat/ciencia-aberta-layout-one-health --single-branch \
+  https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-ciencia-aberta
+cd ~/AquaSentinel-ciencia-aberta
 git log -1 --oneline
 gcloud run deploy aquasentinel \
   --project=aquasentinel-509900 \
@@ -101,3 +101,9 @@ Esta versão inclui Transparência, Monitoramento, Lacunas e Acompanhamento. Cad
 trechos planejados na área da equipe do mapa, inclusive os nunca observados, para
 popular o mapa de lacunas. Veja [o fluxo e suas limitações](TRANSPARENCIA_MONITORAMENTO.md).
 As tabelas novas são criadas no banco configurado, sem exclusão do histórico existente.
+
+As páginas internas agora incluem Sobre, Como funciona, Fale Conosco e Dados e Ciência
+Aberta. A inicial mantém seus arquivos e aparência. Configure os canais efetivamente
+mantidos em `AQUASENTINEL_CONTACT_EMAIL` e/ou `AQUASENTINEL_CONTACT_URL` (HTTPS).
+Sem essas variáveis, a página informa que os canais ainda estão sendo definidos.
+Não há envio de mensagens pelo servidor. Consulte [CIENCIA_ABERTA.md](CIENCIA_ABERTA.md).

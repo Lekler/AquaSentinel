@@ -18,6 +18,7 @@ def rastreabilidade(r):
         ('SHA-256 do modelo', r.get('model_hash', 'Não registrado')),
         ('Versão do aplicativo', r.get('versao_app', 'Legada · não registrada')),
         ('Versão da metodologia', r.get('versao_metodologia', 'Legada · não registrada')),
+        ('Versões dos índices', r.get('versoes_indices', 'Legadas · não registradas')),
         ('Método pHash', (r.get('phash') or {}).get('versao', 'Não registrado')),
         ('Data da revisão', r.get('validado_em', 'Aguardando revisão')),
         ('Modo', r.get('modo', 'oportunistico')), ('Sessão', r.get('sessao_id', 'Não se aplica')),

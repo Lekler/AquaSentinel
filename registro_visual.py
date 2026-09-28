@@ -8,6 +8,7 @@ import streamlit as st
 
 def cabecalho(titulo_pagina='Registrar ocorrência', descricao='Uma foto ajuda a cuidar das nossas águas.', mostrar_etapas=True, titulo_ingles='Register an occurrence', descricao_ingles='One photo helps care for our waters.', caminho='/registrar'):
     css=(Path(__file__).parent/'assets'/'registro.css').read_text(encoding='utf-8')
+    css += (Path(__file__).parent/'assets'/'internas.css').read_text(encoding='utf-8')
     base=st.get_option('server.baseUrlPath').strip('/')
     base='/' + base if base else ''
     sobre = texto('Sobre', 'About')
@@ -19,6 +20,9 @@ def cabecalho(titulo_pagina='Registrar ocorrência', descricao='Uma foto ajuda a
     st.html(f'<style>{css}</style><header class="registro-header"><a href="{base}/{query}" target="_self">{imagem("Logo.png",descricao="AquaSentinela")}</a><nav>{alternador_html(base + caminho or "/")}<a href="{base}/sobre{query}" target="_self">{sobre}</a><a href="{base}/mapa{query}" target="_self">{mapa}</a><a href="{base}/duvidas{query}" target="_self">{duvidas}</a></nav></header>')
     st.html(f'<div class="registro-title"><div><h1>{texto(titulo_pagina, titulo_ingles)}</h1><p>{texto(descricao, descricao_ingles)}</p></div>{etapas}</div>')
     with st.popover(texto('Explorar e acompanhar', 'Explore and track')):
+        st.page_link('app_pages/como_funciona.py', label='Como funciona')
+        st.page_link('app_pages/dados.py', label='Dados e Ciência Aberta')
+        st.page_link('app_pages/contato.py', label='Fale Conosco')
         st.page_link('app_pages/transparencia.py', label='Transparência')
         st.page_link('app_pages/monitoramento.py', label='Monitoramento estruturado')
         st.page_link('app_pages/lacunas.py', label='Lacunas de monitoramento')

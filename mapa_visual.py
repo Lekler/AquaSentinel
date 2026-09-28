@@ -14,9 +14,10 @@ AVISO_COBERTURA = ('Mais ocorrências não significam automaticamente mais polui
 
 
 def nivel_html(nivel):
+    from ambiente import SIMBOLOS
     cor = CORES_NIVEIS.get(nivel, '#94a3b8')
     return (f'<span class="nivel-observado"><i style="background:{cor}"></i>'
-            f'{escape(nivel)}</span>')
+            f'<span class="nivel-simbolo" aria-hidden="true">{SIMBOLOS.get(nivel, "?")}</span>{escape(nivel)}</span>')
 
 
 def legenda(camada):
@@ -91,6 +92,8 @@ def detalhes_ocorrencia(registro, revisados, chave):
     mostrar_evidencia(registro)
     from acompanhamento_visual import rastreabilidade
     rastreabilidade(registro)
+    from ambiente import mostrar_contexto
+    mostrar_contexto(registro)
 
 
 def historico_local(resumo, revisados, chave):

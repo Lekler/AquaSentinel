@@ -16,6 +16,9 @@ st.html('<style>' + (assets / 'home.css').read_text(encoding='utf-8')
           '{visibility:hidden;pointer-events:none;}\n</style>')
 
 pagina = st.navigation([
+    st.Page('app_pages/como_funciona.py', title='Como funciona', icon=':material/route:', url_path='como-funciona'),
+    st.Page('app_pages/dados.py', title='Dados e Ciência Aberta', icon=':material/database:', url_path='dados'),
+    st.Page('app_pages/contato.py', title='Fale Conosco', icon=':material/mail:', url_path='contato'),
     st.Page('app_pages/inicio.py', title=texto('Início', 'Home'), icon=':material/home:', default=True),
     st.Page('app_pages/registrar.py', title=texto('Registrar ocorrência', 'Report an occurrence'), icon=':material/photo_camera:', url_path='registrar'),
     st.Page('app_pages/mapa.py', title=texto('Mapa e registros', 'Map and reports'), icon=':material/map:', url_path='mapa'),

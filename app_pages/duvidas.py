@@ -36,6 +36,19 @@ for indice, (pt, en, resposta_pt, resposta_en) in enumerate(perguntas):
     with st.expander(texto(pt, en), expanded=indice == 0):
         st.write(texto(resposta_pt, resposta_en))
 
+for pergunta, resposta in [
+    ('Por que meu registro não apareceu?', 'O mapa publica somente registros validados pela equipe e com autorização de publicação. Confira também o período, a camada e os filtros. Use seu recibo em Acompanhar meu registro para consultar a etapa.'),
+    ('Como a IA funciona?', 'O modelo procura padrões visuais de objetos na foto. As caixas representam detecções, não objetos únicos em todo o território. Confiança baixa, similaridade e outras limitações exigem conferência humana. Veja a metodologia em Transparência.'),
+    ('O GPS fica público?', 'Sim. As coordenadas confirmadas, a foto e o local ficam públicos após autorização e validação. A precisão disponível também integra os metadados. Não envie a localização de sua casa nem fotografe pessoas identificáveis sem autorização.'),
+    ('Como corrigir um registro?', 'Não há edição direta pelo participante nesta versão. Guarde o ID e use um canal oficial em Fale Conosco quando disponível. A equipe precisa avaliar a correção; não envie outra foto idêntica para substituir o registro.'),
+    ('Como usar os dados?', 'Abra Dados e Ciência Aberta, escolha a origem e aplique os filtros. Leia o dicionário e as limitações antes de analisar. Registros públicos podem ser exportados; os seus registros pendentes exigem recibo privado. A licença de reutilização ainda depende de definição pela equipe.'),
+    ('Como colaborar?', 'Contribua com observações seguras, inclusive sem resíduos, ou participe de um monitoramento estruturado. Propostas de parceria podem ser encaminhadas pelos canais oficiais em Fale Conosco. Não há ranking por quantidade de envios.')]:
+    with st.expander(pergunta):
+        st.write(resposta)
+with st.container(horizontal=True):
+    st.page_link('app_pages/como_funciona.py', label='Como funciona')
+    st.page_link('app_pages/dados.py', label='Dados e Ciência Aberta')
+    st.page_link('app_pages/contato.py', label='Fale Conosco')
 if st.button(texto('Registrar ocorrência', 'Report an occurrence'), type='primary'):
     st.switch_page('app_pages/registrar.py')
 rodape()

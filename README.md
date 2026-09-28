@@ -134,3 +134,9 @@ Não coloque valores reais no Git. A conexão usa TLS. Se a senha de revisão n�
 ```
 
 Veja [CONTRIBUTING.md](CONTRIBUTING.md). Não envie bancos locais, fotografias de usuários, senhas ou arquivos `.env` ao repositório. O modelo fornecido pela equipe está em `models/best.pt`; confirme a licença dos pesos antes de redistribuir o repositório publicamente.
+# Páginas internas e ciência aberta
+
+Sobre, Como funciona, Dúvidas, Fale Conosco e Dados e Ciência Aberta compartilham
+o novo layout interno. A inicial foi preservada. Consulte
+[CIENCIA_ABERTA.md](docs/CIENCIA_ABERTA.md) para exportação, recibos, contexto
+ambiental, contatos e versões; [CHANGELOG.md](docs/CHANGELOG.md) registra as mudanças.

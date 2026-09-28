@@ -28,7 +28,7 @@ def conexao():
 
 
 def criar_registro(analise, nome, latitude, longitude, nivel, observacoes='', origem='upload'):
-    from versoes import APP, METODOLOGIA
+    from versoes import APP, METODOLOGIA, WPS, CS, AQUAVERIFY
     if not isinstance(nome, str) or not nome.strip() or len(nome.strip()) > 100:
         raise ValueError('Informe o nome do local (até 100 caracteres).')
     if latitude is None or longitude is None:
@@ -42,7 +42,8 @@ def criar_registro(analise, nome, latitude, longitude, nivel, observacoes='', or
             'nivel_informado': nivel, 'observacoes': observacoes.strip(), 'origem_foto': origem,
             'origem_localizacao': 'informada_pelo_usuario', 'revisao': 'nao_revisado',
             'consentimento_publicacao': False, 'modo': 'oportunistico',
-            'versao_app': APP, 'versao_metodologia': METODOLOGIA, 'etapa': 'aguardando revisão'}
+            'versao_app': APP, 'versao_metodologia': METODOLOGIA, 'etapa': 'aguardando revisão',
+            'versoes_indices': {'wps': WPS, 'cs': CS, 'aquaverify': AQUAVERIFY}}
 
 
 def salvar_foto(registro, foto, anotada, sessao_id=None, sessao_chave=None):
@@ -70,6 +71,8 @@ def salvar_foto(registro, foto, anotada, sessao_id=None, sessao_chave=None):
         anteriores = [json.loads(row[0]) for row in con.execute('SELECT conteudo FROM relatos_foto')]
         registro['similaridade'] = comparar(registro, anteriores)
         registro['aquaverify'] = avaliar(registro)
+        from dados_abertos import registrar_indices
+        registrar_indices(registro, anteriores)
         cursor = con.execute(f'INSERT INTO relatos_foto (id, image_hash, conteudo, foto, anotada) VALUES ({p}, {p}, {p}, {p}, {p}) ON CONFLICT DO NOTHING',
             (registro['id'], registro['image_hash'], json.dumps(registro, ensure_ascii=False, allow_nan=False),
              foto, anotada))
@@ -124,6 +127,9 @@ def revisar_foto(identificador, decisao, revisor, waterbody_id=None,
                             similaridade_justificativa=justificativa.strip()[:500])
         from aquaverify import avaliar
         registro['aquaverify'] = avaliar(registro)
+        from dados_abertos import registrar_indices
+        anteriores = [json.loads(row[0]) for row in con.execute('SELECT conteudo FROM relatos_foto')]
+        registrar_indices(registro, [r for r in anteriores if r['id'] != registro['id']] + [registro])
         con.execute(f'UPDATE relatos_foto SET conteudo={p} WHERE id={p}',
                     (json.dumps(registro, ensure_ascii=False, allow_nan=False), identificador))
         from ciclo import registrar_evento

@@ -41,11 +41,14 @@ def test_fluxo_upload_salvar_revisar_e_abrir_mapa():
         app.number_input(key='foto_lat').set_value(-22.9)
         app.number_input(key='foto_lon').set_value(-43.1)
         app.button_group(key='foto_nivel').set_value('Moderado')
+        app.multiselect(key='foto-sinais').select('Aves')
+        app.text_area(key='foto-ambiente').set_value('Aves próximas à margem.')
         app.checkbox(key='foto_confirmacao').check()
         app.checkbox(key='foto_publicacao').check()
         submit(app)
         assert not app.exception
         assert len(listar_fotos()) == 1
+        assert listar_fotos()[0]['contexto_ambiental']['sinais'] == ['Aves']
         assert any(b.label == 'Baixar Excel' for b in app.get('download_button'))
         assert any(b.label == 'Baixar foto identificada' for b in app.get('download_button'))
         assert carregar.return_value.analisar.call_count == 1

@@ -14,7 +14,7 @@ from evidencia_visual import mostrar_evidencia
 
 def limpar_foto():
     for chave in ('rascunho_foto', 'erro_foto', 'assinatura_foto', 'foto_salva_id', 'pacote_foto',
-                  'foto_confirmacao', 'foto_publicacao', 'foto_nivel', 'foto_obs', 'foto_duplicada', 'foto_para_repetir', 'foto_recibo', 'foto_posicao_salva'):
+                  'foto_confirmacao', 'foto_publicacao', 'foto_nivel', 'foto_obs', 'foto_duplicada', 'foto_para_repetir', 'foto_recibo', 'foto_posicao_salva', 'foto-sinais', 'foto-ambiente'):
         st.session_state.pop(chave, None)
 
 
@@ -41,6 +41,8 @@ def abrir_camera():
 
 
 cabecalho(titulo_ingles='Report an occurrence', descricao_ingles='One photo helps care for our waters.')
+st.warning('Observe com segurança: não entre na água, não toque em resíduos, não se aproxime de margem '
+           'instável e não arrisque sua segurança para tirar uma foto.', icon=':material/health_and_safety:')
 modo_registro = st.selectbox('Modo do registro', ['Oportunístico', 'Monitoramento estruturado'],
     index=1 if st.session_state.get('monitor_id') else 0, key='foto-modo')
 sessao_ativa = None
@@ -163,9 +165,18 @@ with direita, st.container(key='location-card'):
 titulo('3', texto('Nível do local', 'Site level'), texto('Qual a quantidade de lixo ou resíduo no local?', 'How much waste or debris is at the location?'))
 with st.form('enviar_foto'):
     niveis_exibicao = [texto(nivel, {'Sem resíduos': 'No visible waste', 'Pouco': 'Low', 'Moderado': 'Moderate', 'Muito poluído': 'Very polluted', 'Bloqueando': 'Blocking'}[nivel]) for nivel in NIVEIS]
-    nivel_exibido = st.segmented_control(texto('Como está o local?', 'What is the site like?'), niveis_exibicao, key='foto_nivel', width='stretch')
+    from ambiente import SIMBOLOS
+    nivel_exibido = st.segmented_control(texto('Como está o local?', 'What is the site like?'), niveis_exibicao,
+        format_func=lambda n: SIMBOLOS[NIVEIS[niveis_exibicao.index(n)]] + ' ' + n, key='foto_nivel', width='stretch')
     nivel = NIVEIS[niveis_exibicao.index(nivel_exibido)] if nivel_exibido else None
     st.caption(texto('Este nível é informado por você. A IA conta objetos visíveis; não determina se o canal está bloqueado.', 'You provide this level. AI counts visible objects; it does not determine whether the canal is blocked.'))
+    from mapa_visual import legenda
+    legenda('Condição ambiental')
+    from ambiente import SINAIS, validar_contexto
+    sinais = st.multiselect('One Health · sinais ambientais (opcional)', SINAIS, key='foto-sinais')
+    detalhe_ambiental = st.text_area('Detalhe ambiental (opcional)', max_chars=500, key='foto-ambiente')
+    st.caption('Somente observações ambientais. Não conclua causa, contaminação ou diagnóstico. '
+               'Deixar vazio significa não informado; estes campos não alteram WPS, CS ou AquaVerify.')
     observacoes = st.text_area(texto('Observações (opcional)', 'Notes (optional)'), max_chars=500, key='foto_obs',
                               placeholder='Ex.: acúmulo próximo à margem, cheiro forte…')
     local_confirmado = st.checkbox(texto('Conferi a foto e a localização desta ocorrência.', 'I checked this report photo and location.'), key='foto_confirmacao')
@@ -188,6 +199,7 @@ if enviar:
         recibo = secrets.token_urlsafe(24)
         registro['recibo_hash'] = hash_chave(recibo)
         registro['consentimento_publicacao'] = True
+        registro['contexto_ambiental'] = validar_contexto(sinais, detalhe_ambiental)
         if waterbody_id:
             corpo = obter_corpo(waterbody_id)
             registro.update(waterbody_id=corpo['id'], waterbody_nome=corpo['nome'], waterbody_confirmado=False)
@@ -223,6 +235,7 @@ if st.session_state.get('foto_salva_id'):
                 file_name=f"recibo-{salvo['id'][:8]}.txt", mime='text/plain')
             st.caption('Guarde o recibo antes de enviar outra foto. O código permite consultar seu registro mesmo antes da publicação.')
         st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro')
+        st.page_link('app_pages/dados.py', label='Exportar meus dados em CSV, Excel, JSON ou GeoJSON')
         from ciclo import feedback
         from relatos import listar_fotos
         for mensagem in feedback(salvo, listar_fotos()):
