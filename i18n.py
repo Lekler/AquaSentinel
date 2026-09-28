@@ -23,5 +23,9 @@ def alternador_html(base=''):
     destino = 'pt' if em_ingles() else 'en'
     parametros = {k:v for k,v in st.query_params.items() if k != 'lang'}
     parametros['lang'] = destino
-    return (f'<span class="language-switch"><span class="language-current">{atual}</span>'
-            f'<a href="{base}?{urlencode(parametros)}" target="_self">{destino.upper()}</a></span>')
+    from html import escape
+    label = texto('Idioma atual: português. Mudar para inglês.', 'Current language: English. Switch to Portuguese.')
+    return (f'<a class="language-switch language-{atual.lower()}" href="{escape(base + "?" + urlencode(parametros), quote=True)}" '
+            f'target="_self" aria-label="{label}" title="{label}">'
+            f'<span class="language-en">EN</span><span class="language-track" aria-hidden="true"><span></span></span>'
+            f'<span class="language-pt">PT</span></a>')

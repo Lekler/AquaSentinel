@@ -1,9 +1,9 @@
-"""Entrada única do AquaSentinela: participação por foto e painel ambiental."""
+"""Entrada única do AquaSentinel: participação por foto e painel ambiental."""
 from interface_idioma import st
 from pathlib import Path
 from i18n import texto
 
-st.set_page_config(page_title='AquaSentinela', page_icon=str(Path(__file__).parent / 'assets' / 'home' / 'Logo.png'), layout='wide')
+st.set_page_config(page_title='AquaSentinel', page_icon=str(Path(__file__).parent / 'assets' / 'home' / 'Logo.png'), layout='wide')
 st.session_state.setdefault('foto_epoch', 0)
 
 # Shared styles; retain component visibility during data reruns.

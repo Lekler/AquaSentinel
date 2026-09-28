@@ -18,8 +18,12 @@ ENQUADRAMENTOS = {
 }
 
 
-@lru_cache(maxsize=16)
 def imagem(nome, classe='', descricao=''):
+    return _imagem(nome, classe, descricao, em_ingles())
+
+
+@lru_cache(maxsize=32)
+def _imagem(nome, classe='', descricao='', ingles=False):
     x, y, w, h = ENQUADRAMENTOS[nome]
     dimensoes = ((2172, 724) if nome in ('Logo.png', 'f.png', 'g.png') else
                  (1448, 1086) if nome == 'mao-e-fundo.png' else (1254, 1254))
@@ -28,6 +32,15 @@ def imagem(nome, classe='', descricao=''):
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x} {y} {w} {h}" '
            f'preserveAspectRatio="{proporcao}"><image width="{dimensoes[0]}" '
            f'height="{dimensoes[1]}" href="{url}"/></svg>')
+    if nome == 'Logo.png':
+        # Keep the original emblem; render the updated name as vector lettering.
+        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1930 435">'
+               f'<svg width="360" height="435" viewBox="125 150 360 435" overflow="hidden">'
+               f'<image width="2172" height="724" href="{url}"/></svg>'
+               '<text x="400" y="270" font-family="Arial,sans-serif" font-size="225" font-weight="800" '
+               'textLength="1490" lengthAdjust="spacingAndGlyphs" fill="#072c4c">Aqua<tspan fill="#0098d4">Sentinel</tspan></text>'
+               '<text x="408" y="380" font-family="Arial,sans-serif" font-size="80" fill="#365678">'
+               f'{"Cleaner rivers. A better future." if ingles else "Rios mais limpos. Um futuro melhor."}</text></svg>')
     # st.html permite img, mas seu sanitizador remove SVG inline.
     src = 'data:image/svg+xml;base64,' + base64.b64encode(svg.encode()).decode('ascii')
     return f'<img class="asset {classe}" src="{src}" alt="{escape(descricao, quote=True)}" draggable="false">'
@@ -74,8 +87,8 @@ def construir_home(base_url=''):
 <div class="aqua-page"><div class="aqua-home {"english-home" if em_ingles() else ""}">
   <a class="skip-link" href="#como-funciona">{texto('Pular para como funciona', 'Skip to how it works')}</a>
   <header class="aqua-header">
-    <a class="brand" href="{prefixo or '/'}" target="_self" aria-label="AquaSentinela — início">
-      {imagem('Logo.png', 'brand-image', 'AquaSentinela. Rios mais limpos. Um futuro melhor.')}
+    <a class="brand" href="{prefixo or '/'}" target="_self" aria-label="AquaSentinel — início">
+      {imagem('Logo.png', 'brand-image', 'AquaSentinel. Rios mais limpos. Um futuro melhor.')}
     </a>
     <nav class="aqua-nav" aria-label="Navegação principal">
       <a class="nav-about" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>

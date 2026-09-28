@@ -6,16 +6,28 @@ cabecalho('Como funciona', 'Da observação segura ao acompanhamento de ações.
 from home_visual import tutorial_ilustrado
 st.html(tutorial_ilustrado())
 
-etapas = [
-    ('Foto', 'Tire uma foto de um ponto seguro ou envie JPG, PNG ou WEBP de até 12 MB.'),
-    ('IA', 'Confira os objetos detectados, a quantidade e a confiança. A IA pode errar.'),
-    ('Localização', 'Use GPS ou ajuste o ponto manualmente. Confira o local e o nível observado.'),
-    ('Evidência', 'AquaVerify avalia a qualidade documental. Hash e similaridade ajudam a localizar imagens repetidas.'),
-    ('Revisão', 'Autorize a publicação e envie. A equipe avalia o registro, a localização e possíveis duplicidades.'),
-    ('Mapa', 'Registros validados e autorizados aparecem no mapa. Condição e cobertura têm representações separadas.'),
-    ('Histórico', 'Consulte dias observados, níveis anteriores, fotografias e a página do local.'),
-    ('Hotspot', 'A recorrência, o tempo, o WPS e a qualidade sustentam uma classificação experimental de persistência.'),
-    ('Ação', 'A equipe registra ações e acompanha novas observações. Compare antes e depois sem presumir causalidade.')]
+etapas = [('Foto', 'Tire uma foto de um ponto seguro ou envie JPG, PNG ou WEBP de até 12 MB.'),
+ ('IA', 'A inteligência artificial ajuda a identificar os resíduos visíveis na sua foto.'),
+ ('Localização',
+  'É só marcar o local no mapa, usando o GPS ou ajustando o ponto manualmente, conferir o endereço e '
+  'pronto!'),
+ ('Verificação',
+  'O nosso sistema confere as informações registradas e compara a foto com as que já foram enviadas para '
+  'evitar repetições.'),
+ ('Revisão',
+  'Confira os dados, autorize a publicação e envie seu registro. Pronto! Você acaba de dar uma mãozinha para '
+  'cuidar das nossas águas.'),
+ ('Explore o mapa',
+  'Depois de verificados e autorizados, os registros aparecem no mapa. Você pode explorar onde há lixo '
+  'observado e também quais áreas ainda precisam de mais registros.'),
+ ('Histórico', 'Consulte dias observados, níveis anteriores, fotografias e a página do local.'),
+ ('Pontos de atenção',
+  'Quando os registros mostram lixo repetidamente em uma mesma região, o AquaSentinel pode destacá-lo como '
+  'um ponto que merece atenção. Essa indicação considera quando e com que frequência as observações foram '
+  'feitas.'),
+ ('Acompanhe as ações!',
+  'Depois de uma ação de limpeza, a equipe pode registrar o que foi feito e acompanhar novas fotos do local. '
+  'Assim, todos conseguem ver o antes e o depois e observar como a área muda com o tempo.')]
 st.html('<div class="fluxo-etapas" aria-label="Fluxo do registro">' +
         ''.join(f'<span>{i+1}. {titulo}</span>' for i, (titulo, _) in enumerate(etapas)) + '</div>')
 for i, (titulo, descricao) in enumerate(etapas, 1):
