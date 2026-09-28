@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/ux-cidadao-revisao`, mantendo `main` intacta.
+`feat/endereco-cep-localizacao`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -69,7 +69,7 @@ No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
 arquivos locais usados na primeira implantação em `~/AquaSentinel`.
 
 ```sh
-git clone --branch feat/ux-cidadao-revisao --single-branch \
+git clone --branch feat/endereco-cep-localizacao --single-branch \
   https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-resultado
 cd ~/AquaSentinel-resultado
 git log -1 --oneline
@@ -84,9 +84,9 @@ Se a pasta já existir com uma versão anterior, atualize sem clonar novamente:
 
 ```sh
 cd ~/AquaSentinel-resultado
-git fetch origin feat/ux-cidadao-revisao:refs/remotes/origin/feat/ux-cidadao-revisao
-git switch feat/ux-cidadao-revisao
-git pull --ff-only origin feat/ux-cidadao-revisao
+git fetch origin feat/endereco-cep-localizacao:refs/remotes/origin/feat/endereco-cep-localizacao
+git switch feat/endereco-cep-localizacao
+git pull --ff-only origin feat/endereco-cep-localizacao
 ```
 
 O deploy atualiza o serviço existente e preserva suas demais configurações.

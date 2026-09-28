@@ -1,3 +1,11 @@
+### 2026.09 · CEP, endereço e retorno ao mapa
+
+- Mapa e Registros como primeiro atalho, antes de Monitoramento, Lacunas e Acompanhar.
+- Busca explícita por CEP/endereço com sugestões nos formulários de foto e de trecho.
+- GPS e mapa ajustável preservados; coordenadas manuais recolhidas.
+- Estados separados para foto e trecho, cache de consultas e tratamento de falhas dos serviços.
+- Link público preservado; instruções em ENDERECOS.md.
+
 ### 2026.09 · Correção do mapa e contraste
 
 - Substituído o endpoint CARTO que exibia “API key required” por mapa de ruas Esri verificado com uma imagem real do Rio.

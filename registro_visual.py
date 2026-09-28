@@ -20,6 +20,7 @@ def cabecalho(titulo_pagina='Registrar ocorrência', descricao='Uma foto ajuda a
     st.html(f'<style>{css}</style><header class="registro-header"><a href="{base}/{query}" target="_self">{imagem("Logo.png",descricao="AquaSentinela")}</a><nav>{alternador_html(base + caminho or "/")}<a href="{base}/sobre{query}" target="_self">{sobre}</a><a href="{base}/como-funciona{query}" target="_self">{texto("Como funciona", "How it works")}</a><a href="{base}/mapa{query}" target="_self">{mapa}</a><a href="{base}/duvidas{query}" target="_self">{duvidas}</a><details class="menu-ciencia"><summary aria-label="{texto("Dados e ciência", "Data and science")}">☰</summary><div><a href="{base}/dados{query}" target="_self">{texto("Dados e ciência", "Data and science")}</a><a href="{base}/transparencia{query}" target="_self">{texto("Transparência", "Transparency")}</a></div></details></nav></header>')
     st.html(f'<div class="registro-title"><div><h1>{texto(titulo_pagina, titulo_ingles)}</h1><p>{texto(descricao, descricao_ingles)}</p></div>{etapas}</div>')
     with st.container(horizontal=True, key='atalhos-acompanhamento'):
+        st.page_link('app_pages/mapa.py', label=texto('Mapa e Registros', 'Map and Reports'))
         st.page_link('app_pages/monitoramento.py', label=texto('Monitoramento', 'Monitoring'))
         st.page_link('app_pages/lacunas.py', label=texto('Lacunas', 'Coverage gaps'))
         st.page_link('app_pages/acompanhamento.py', label=texto('Acompanhar', 'Track a report'))

@@ -128,7 +128,9 @@ if rascunho:
         st.button(texto('Usar outra foto', 'Use another photo'), on_click=nova_foto, key='outra_foto')
 
 with direita, st.container(key='location-card'):
-    titulo('2', texto('Confirme sua localização', 'Confirm your location'), texto('Use o GPS e ajuste o ponto no mapa, se necessário.', 'Use GPS and adjust the point on the map if needed.'))
+    titulo('2', texto('Confirme sua localização', 'Confirm your location'), texto('Busque por CEP ou endereço, ou use sua localização atual.', 'Search by postal code or address, or use your current location.'))
+    from endereco_visual import busca_endereco
+    busca_endereco('foto')
     posicao = obter_localizacao()
     if posicao:
         try:

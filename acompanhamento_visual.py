@@ -87,12 +87,25 @@ def equipe_acompanhamento(todos, responsavel=None):
         nome = st.text_input('Nome/descrição do trecho', key='trecho-nome', max_chars=100)
         corpo = st.selectbox('Corpo hídrico do trecho', [None, *corpos], key='trecho-corpo',
             format_func=lambda i: f"{i} · {corpos[i]['nome']}" if i else 'Selecione')
-        a,b,c = st.columns(3)
-        lat = a.number_input('Latitude de referência', -90., 90., value=-22.9, key='trecho-lat', format='%.6f')
-        lon = b.number_input('Longitude de referência', -180., 180., value=-43.2, key='trecho-lon', format='%.6f')
-        metros = c.number_input('Extensão planejada (m)', .1, 100000., value=100., key='trecho-metros')
+        from endereco_visual import busca_endereco
+        from localizacao import obter_localizacao, aplicar_posicao
+        from i18n import texto
+        busca_endereco('trecho')
+        posicao = obter_localizacao('trecho')
+        if posicao:
+            try:
+                if aplicar_posicao(posicao, 'trecho'):st.rerun()
+            except (ValueError, TypeError, KeyError):
+                st.warning(texto('Localização inválida. Escolha um ponto no mapa.', 'Invalid location. Choose a point on the map.'))
+        with st.expander(texto('Ajustar coordenadas manualmente', 'Adjust coordinates manually')):
+            a,b = st.columns(2)
+            lat = a.number_input('Latitude de referência', -90., 90., value=None, key='trecho-lat', format='%.6f')
+            lon = b.number_input('Longitude de referência', -180., 180., value=None, key='trecho-lon', format='%.6f')
+        metros = st.number_input('Extensão planejada (m)', .1, 100000., value=100., key='trecho-metros')
         if st.button('Cadastrar trecho planejado'):
             try:
+                if lat is None or lon is None:
+                    raise ValueError(texto('Escolha a localização do trecho pela busca, GPS ou mapa.', 'Choose the segment location using search, GPS or the map.'))
                 t = cadastrar_trecho(nome, corpo, lat, lon, metros, responsavel)
                 st.success(f"Trecho cadastrado: {t['id']}")
             except ValueError as exc:

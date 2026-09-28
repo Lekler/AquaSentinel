@@ -1,3 +1,11 @@
+### 2026.09 · Postal codes, addresses and returning to the map
+
+- Map and Reports is the first shortcut, before Monitoring, Coverage gaps and Track a report.
+- Explicit postal-code/address search with suggestions for photo reports and planned segments.
+- GPS and adjustable maps retained; manual coordinates collapsed.
+- Separate report/segment state, cached searches and graceful service failures.
+- Public URL unchanged; details in ENDERECOS.md.
+
 ### 2026.09 · Map and contrast fix
 
 - Replaced the CARTO endpoint displaying “API key required” with an Esri street basemap verified using an actual Rio map image.
