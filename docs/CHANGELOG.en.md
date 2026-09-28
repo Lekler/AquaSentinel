@@ -1,3 +1,13 @@
+### 2026.09 · Simple reporting and team review
+
+- Voyager basemap, persistent Leaflet instance and GPS circle only when accuracy is available.
+- Concise public results with count, classes and confidence when detections exist.
+- Technical record details restricted to the authenticated team; history and exports retained.
+- Explicit sign-in and sign-out, one-hour sessions invalidated by password changes.
+- Sequential review with one main image and optional original view.
+- Editable water body names, types and notes with stable IDs and duplicate prevention.
+- Additive water body metadata table; existing records preserved.
+
 ### 2026.09 · Navigation, map clarity and languages
 
 - Concise location summaries; persistence details are collapsible.

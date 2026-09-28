@@ -101,6 +101,7 @@ def test_interface_catalogo_protegido_e_cadastro(monkeypatch):
     assert not app.exception
     assert not any(b.label == 'Cadastrar corpo hídrico' for b in app.button)
     app.text_input(key='senha_revisao').set_value('senha-teste').run()
+    next(b for b in app.button if b.label == 'Entrar').click().run()
     app.text_input(key='equipe-responsavel').set_value('Equipe')
     app.text_input(key='cadastro-corpo').set_value('Canal novo')
     next(b for b in app.button if b.label == 'Cadastrar corpo hídrico').click().run()

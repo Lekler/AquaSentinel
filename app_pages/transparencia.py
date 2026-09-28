@@ -36,8 +36,8 @@ st.write('O detector identifica sacolas, garrafas, embalagens e outros plástico
          'disponível nesta aplicação; o hash identifica os pesos efetivamente utilizados.')
 st.subheader('Dados e rastreabilidade')
 st.write('São registrados foto, localização declarada/confirmada, precisão do GPS quando disponível, data de envio, '
-         'SHA-256, pHash, versão/hash do modelo, resultado, revisor e histórico de etapas. Cada observação pública '
-         'expõe sua rastreabilidade. A data de captura EXIF, quando existe, não é autenticada.')
+         'SHA-256, pHash, versão/hash do modelo, resultado, revisor e histórico de etapas. O histórico público mostra '
+         'a evolução das observações; a equipe autenticada consulta os detalhes técnicos. A data de captura EXIF, quando existe, não é autenticada.')
 st.write('Somente relatos validados e autorizados são publicados. Códigos de recibo e de sessão são privados e '
          'armazenados no banco como hash. O remetente acompanha sua ocorrência no site; não enviamos notificações '
          'externas automaticamente. Registros “Sem resíduos” permanecem no histórico.')

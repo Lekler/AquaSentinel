@@ -8,6 +8,12 @@ from observacao import FUSO
 
 
 def rastreabilidade(r):
+    from equipe_auth import autenticado
+    if not autenticado():
+        st.caption(f"ID: {r['id']} · {r['registrado_em'][:10]}")
+        st.dataframe([{'Data': e['data'], 'Etapa': e['etapa'], 'Nota': e['nota']}
+                      for e in historico_eventos(r)], hide_index=True, width='stretch')
+        return
     st.markdown('#### Rastreabilidade do registro')
     gps = r.get('gps') or {}
     st.dataframe([{'Campo': nome, 'Valor': str(valor)} for nome, valor in [
@@ -67,6 +73,9 @@ def antes_depois(grupo, registros):
 
 
 def equipe_acompanhamento(todos, responsavel=None):
+    from equipe_auth import autenticado
+    if not autenticado():
+        return
     from corpos_hidricos import listar_corpos
     st.markdown('#### Planejamento de trechos e acompanhamento')
     if responsavel is None:

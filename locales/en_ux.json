@@ -1,0 +1,14 @@
+{
+  "Rio": "River",
+  "Canal": "Canal",
+  "Lagoa": "Lagoon",
+  "Baía": "Bay",
+  "Lago": "Lake",
+  "Córrego": "Stream",
+  "Outro": "Other",
+  "tipo": "type",
+  "observacao": "note",
+  "Confira o tipo e a observação de até 500 caracteres.": "Check the type and note (up to 500 characters).",
+  "Já existe um corpo hídrico com esse nome. Selecione o cadastro existente.": "A water body with this name already exists. Select the existing entry.",
+  "São registrados foto, localização declarada/confirmada, precisão do GPS quando disponível, data de envio, SHA-256, pHash, versão/hash do modelo, resultado, revisor e histórico de etapas. O histórico público mostra a evolução das observações; a equipe autenticada consulta os detalhes técnicos. A data de captura EXIF, quando existe, não é autenticada.": "We store the photo, reported/confirmed location, GPS accuracy when available, submission date, SHA-256, pHash, model version/hash, results, reviewer and status history. Public history shows observations over time; the authenticated team can consult technical details. EXIF capture dates, when available, are not authenticated."
+}

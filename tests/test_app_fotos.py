@@ -110,7 +110,8 @@ def test_validacao_local_e_zero_deteccoes():
         carregar.return_value.analisar.return_value = (r, foto, anotada)
         app = iniciar()
         app.file_uploader[0].upload('foto.jpg', foto, 'image/jpeg').run()
-        assert app.metric[0].value == '0' and app.metric[1].value == '—'
+        assert not app.metric
+        assert any('Nenhum resíduo foi identificado automaticamente' in m.value for m in app.info)
         app.checkbox(key='foto_confirmacao').check()
         app.checkbox(key='foto_publicacao').check()
         submit(app)

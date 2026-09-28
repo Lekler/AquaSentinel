@@ -1,7 +1,7 @@
 # Publicação de teste no Cloud Run
 
 Projeto: `aquasentinel-509900`. Use a branch
-`feat/navegacao-mapa-idiomas`, mantendo `main` intacta.
+`feat/ux-cidadao-revisao`, mantendo `main` intacta.
 
 O Dockerfile executa Streamlit na porta fornecida pelo Cloud Run e instala
 PyTorch para CPU. O modelo e as imagens de interface entram no contêiner;
@@ -69,7 +69,7 @@ No Cloud Shell, baixe a nova branch em uma pasta separada. Isso preserva os
 arquivos locais usados na primeira implantação em `~/AquaSentinel`.
 
 ```sh
-git clone --branch fix/resultado-foto-layout --single-branch \
+git clone --branch feat/ux-cidadao-revisao --single-branch \
   https://github.com/Lekler/AquaSentinel.git ~/AquaSentinel-resultado
 cd ~/AquaSentinel-resultado
 git log -1 --oneline
@@ -80,7 +80,15 @@ gcloud run deploy aquasentinel \
   --concurrency=80
 ```
 
-Se a pasta já existir com esta branch, use `git pull --ff-only` dentro dela.
+Se a pasta já existir com uma versão anterior, atualize sem clonar novamente:
+
+```sh
+cd ~/AquaSentinel-resultado
+git fetch origin feat/ux-cidadao-revisao:refs/remotes/origin/feat/ux-cidadao-revisao
+git switch feat/ux-cidadao-revisao
+git pull --ff-only origin feat/ux-cidadao-revisao
+```
+
 O deploy atualiza o serviço existente e preserva suas demais configurações.
 O limite anterior de 8 requisições concorrentes com uma instância produziu
 respostas 429 nos arquivos da interface; esta versão usa 80.

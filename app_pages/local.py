@@ -31,7 +31,6 @@ else:
     st.caption(f"Trecho aproximado de até 200 m da primeira observação · "
                f"{grupo['latitude']:.5f}, {grupo['longitude']:.5f} · Todo o período")
     st.info(AVISO_COBERTURA)
-    resumo_grupo(resumo)
     a, b, c, d = st.columns(4)
     a.metric('Total de observações', resumo['total'])
     b.metric('Dias diferentes observados', resumo['dias'])

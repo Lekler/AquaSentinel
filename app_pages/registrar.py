@@ -1,15 +1,13 @@
 from hashlib import sha256
 import logging
-import math
 import secrets
 from interface_idioma import st
 from interface_fotos import carregar_detector, mostrar_analise, downloads
-from localizacao import obter_localizacao
+from localizacao import obter_localizacao, aplicar_posicao
 from relatos import NIVEIS, criar_registro, salvar_foto, obter_foto
 from registro_visual import cabecalho, titulo, fotos, rodape
 from i18n import texto
 from corpos_hidricos import listar_corpos, obter_corpo
-from evidencia_visual import mostrar_evidencia
 
 
 def limpar_foto():
@@ -126,8 +124,7 @@ with imagens.container():
     fotos(rascunho)
 if rascunho:
     with esquerda:
-        with st.expander(texto('Contagem, confiança e detalhes da análise', 'Count, confidence and analysis details')):
-            mostrar_analise(rascunho['analise'], rascunho['anotada'], exibir_imagem=False)
+        mostrar_analise(rascunho['analise'], rascunho['anotada'], exibir_imagem=False)
         st.button(texto('Usar outra foto', 'Use another photo'), on_click=nova_foto, key='outra_foto')
 
 with direita, st.container(key='location-card'):
@@ -135,14 +132,8 @@ with direita, st.container(key='location-card'):
     posicao = obter_localizacao()
     if posicao:
         try:
-            lat, lon = float(posicao['latitude']), float(posicao['longitude'])
-            if not math.isfinite(lat) or not math.isfinite(lon) or not (-90 <= lat <= 90 and -180 <= lon <= 180):
-                raise ValueError()
-            st.session_state.foto_lat = lat
-            st.session_state.foto_lon = lon
-            st.session_state.foto_gps = posicao if posicao.get('source') == 'gps' else None
-            st.session_state.foto_confirmacao = False
-            st.rerun()
+            if aplicar_posicao(posicao):
+                st.rerun()
         except (ValueError, TypeError, KeyError):
             st.warning('Localização inválida. Informe as coordenadas abaixo.')
     nome = st.text_input(texto('Nome do local, endereço ou ponto de referência', 'Location name, address or landmark'), max_chars=100,
@@ -151,17 +142,14 @@ with direita, st.container(key='location-card'):
     waterbody_id = st.selectbox('Corpo hídrico cadastrado', [None, *catalogo], key='foto-waterbody',
         disabled=bool(sessao_ativa),
         format_func=lambda i: f"{i} · {catalogo[i]['nome']}" if i else 'Não identificado — equipe fará a vinculação')
-    st.caption('O nome livre descreve o ponto. O agrupamento usa o código do corpo hídrico confirmado pela equipe.')
-    col1, col2 = st.columns(2)
-    lat = col1.number_input('Latitude', min_value=-90., max_value=90., value=None, format='%.6f',
-                            key='foto_lat', persist_state='session')
-    lon = col2.number_input('Longitude', min_value=-180., max_value=180., value=None, format='%.6f',
-                            key='foto_lon', persist_state='session')
-    st.caption(texto('O endereço descreve o ponto; o mapa usa as coordenadas. Confira se o ponto corresponde ao local da foto.', 'The address describes the point; the map uses coordinates. Check that the point matches the photo location.'))
-    gps = st.session_state.get('foto_gps')
-    if gps and lat == gps['latitude'] and lon == gps['longitude']:
-        st.caption(f"Precisão estimada do GPS: {gps['accuracy']:.0f} m. Confira o ponto antes de enviar.")
-    
+    st.caption(texto('Se souber, selecione o rio, canal ou baía. A equipe confirmará a escolha.', 'If known, select the river, canal or bay. The team will confirm your choice.'))
+    with st.expander(texto('Ajustar coordenadas manualmente', 'Adjust coordinates manually')):
+        col1, col2 = st.columns(2)
+        lat = col1.number_input('Latitude', min_value=-90., max_value=90., value=None, format='%.6f',
+                                key='foto_lat', persist_state='session')
+        lon = col2.number_input('Longitude', min_value=-180., max_value=180., value=None, format='%.6f',
+                                key='foto_lon', persist_state='session')
+
 titulo('3', texto('Nível do local', 'Site level'), texto('Qual a quantidade de lixo ou resíduo no local?', 'How much waste or debris is at the location?'))
 with st.form('enviar_foto'):
     niveis_exibicao = [texto(nivel, {'Sem resíduos': 'No visible waste', 'Pouco': 'Low', 'Moderado': 'Moderate', 'Muito poluído': 'Very polluted', 'Bloqueando': 'Blocking'}[nivel]) for nivel in NIVEIS]
@@ -169,13 +157,12 @@ with st.form('enviar_foto'):
         key='foto_nivel', width='stretch')
     nivel = NIVEIS[niveis_exibicao.index(nivel_exibido)] if nivel_exibido else None
     st.caption(texto('Este nível é informado por você. A IA conta objetos visíveis; não determina se o canal está bloqueado.', 'You provide this level. AI counts visible objects; it does not determine whether the canal is blocked.'))
-    from ambiente import SINAIS, validar_contexto
-    sinais = st.multiselect('One Health · sinais ambientais (opcional)', SINAIS, key='foto-sinais')
-    detalhe_ambiental = st.text_area('Detalhe ambiental (opcional)', max_chars=500, key='foto-ambiente')
-    st.caption('Somente observações ambientais. Não conclua causa, contaminação ou diagnóstico. '
-               'Deixar vazio significa não informado; estes campos não alteram WPS, CS ou AquaVerify.')
-    observacoes = st.text_area(texto('Observações (opcional)', 'Notes (optional)'), max_chars=500, key='foto_obs',
-                              placeholder='Ex.: acúmulo próximo à margem, cheiro forte…')
+    with st.expander(texto('Informações opcionais', 'Optional information')):
+        from ambiente import SINAIS, validar_contexto
+        sinais = st.multiselect('One Health · sinais ambientais (opcional)', SINAIS, key='foto-sinais')
+        detalhe_ambiental = st.text_area('Detalhe ambiental (opcional)', max_chars=500, key='foto-ambiente')
+        observacoes = st.text_area(texto('Observações (opcional)', 'Notes (optional)'), max_chars=500, key='foto_obs',
+                                  placeholder='Ex.: acúmulo próximo à margem, cheiro forte…')
     local_confirmado = st.checkbox(texto('Conferi a foto e a localização desta ocorrência.', 'I checked this report photo and location.'), key='foto_confirmacao')
     publicacao_autorizada = st.checkbox('Autorizo publicar a foto, o local e as coordenadas no mapa após revisão pela equipe.', key='foto_publicacao')
     enviar = st.form_submit_button(texto('Enviar ocorrência', 'Submit report'), type='primary', icon=':material/send:',
@@ -223,7 +210,6 @@ if st.session_state.get('foto_salva_id'):
             st.warning('Esta imagem já foi registrada. Mostramos o registro original; nada foi duplicado ou sobrescrito.')
         from resultado_visual import resumo_salvo
         resumo_salvo(salvo)
-        mostrar_evidencia(salvo)
         if st.session_state.get('foto_recibo'):
             with st.container(border=True, key='resultado-recibo'):
                 info, acao = st.columns([2.2, 1], vertical_alignment='center')

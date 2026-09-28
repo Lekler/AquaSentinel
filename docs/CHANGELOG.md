@@ -1,3 +1,13 @@
+### 2026.09 · Registro simples e revisão da equipe
+
+- Mapa-base Voyager, uma instância Leaflet preservada entre atualizações e círculo apenas com precisão GPS disponível.
+- Resultado público resumido em itens, classes e confiança quando há detecções; mensagem simples quando não há.
+- Detalhes técnicos por ocorrência restritos à equipe autenticada. Histórico e exportação mantidos.
+- Entrada explícita, saída e sessão com validade de uma hora; troca de senha invalida a sessão.
+- Revisão sequencial com uma imagem principal e alternância para original.
+- Cadastro de corpos hídricos com edição de nome, tipo e observação; código estável e prevenção de duplicados.
+- Migração aditiva: tabela de metadados dos corpos hídricos, sem apagar registros existentes.
+
 ### 2026.09 · Navegação, mapa e idiomas
 
 - Resumo de locais sem contagens repetidas; explicação de persistência recolhida.

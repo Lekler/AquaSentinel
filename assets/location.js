@@ -1,58 +1,78 @@
-
 export default function({parentElement, data, setTriggerValue}) {
-  const root=parentElement.querySelector('.location-map'), button=parentElement.querySelector('button'), status=parentElement.querySelector('[role=status]');
-  const text=(pt,en)=>data.language==='en'?en:pt;
-  button.textContent=text('◎ Usar minha localização','◎ Use my location');
-  // CCv2 can render again on the same DOM before calling the previous cleanup.
-  // Dispose explicitly and give Leaflet its own fresh container on every mount.
-  root.aquaDispose?.();
-  const canvas=document.createElement('div');
-  canvas.style.height='100%';
-  root.replaceChildren(canvas);
-  let active=true, marker, accuracyCircle;
-  const saved=data.saved===true;
-  const valid=Number.isFinite(data.latitude)&&Number.isFinite(data.longitude);
-  const map=window.L.map(canvas).setView(valid?[data.latitude,data.longitude]:[-22.91,-43.17],valid?16:11);
-  window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
-  const icon=window.L.divIcon({className:'aqua-marker',html:'<span></span>',iconSize:[30,40],iconAnchor:[15,40]});
-  function place(point) {
-    if(marker) marker.setLatLng(point);
-    else {marker=window.L.marker(point,{draggable:!saved,icon}).addTo(map);if(!saved)marker.on('dragend',()=>emit(marker.getLatLng()));}
+  const root=parentElement.querySelector('.location-map');
+  const button=parentElement.querySelector('button'), status=parentElement.querySelector('[role=status]');
+  // Retain the Leaflet instance, viewport and tiles across Python updates.
+  let state=root.aquaLocation;
+  if (!state) {
+    const canvas=document.createElement('div');canvas.style.height='100%';root.replaceChildren(canvas);
+    const map=window.L.map(canvas).setView([-22.91,-43.17],11);
+    window.L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+      maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    state={map, marker:null, circle:null, active:true, generation:0, initialized:false};
+    root.aquaLocation=state;
+    state.text=(pt,en)=>state.data.language==='en'?en:pt;
+    state.place=point=>{
+      if(state.marker)state.marker.setLatLng(point);
+      else {
+        const icon=window.L.divIcon({className:'aqua-marker',html:'<span></span>',iconSize:[30,40],iconAnchor:[15,40]});
+        state.marker=window.L.marker(point,{draggable:!state.data.saved,icon}).addTo(map);
+        state.marker.on('dragend',()=>state.emit(state.marker.getLatLng()));
+      }
+      if(state.data.saved)state.marker.dragging?.disable();else state.marker.dragging?.enable();
+    };
+    state.precision=(point,accuracy)=>{
+      if(state.circle){map.removeLayer(state.circle);state.circle=null;}
+      if(!state.data.saved && Number.isFinite(accuracy) && accuracy>0){
+        state.circle=window.L.circle(point,{radius:accuracy,color:'#008fa7',weight:1,fillColor:'#00aabb',fillOpacity:.15,interactive:false}).addTo(map);
+        state.status.textContent=state.text(`Precisão aproximada do GPS: ${Math.round(accuracy)} m. O círculo não representa a extensão da ocorrência.`,`Approximate GPS accuracy: ${Math.round(accuracy)} m. The circle does not show the extent of the report.`);
+      }
+    };
+    state.emit=point=>{
+      if(state.data.saved)return;
+      state.place(point);state.precision(point,null);state.initialized=true;
+      state.status.textContent=state.text('Ponto ajustado. Confira a localização antes de enviar.','Point adjusted. Check the location before submitting.');
+      state.send('position',{latitude:point.lat,longitude:point.lng,source:'map'});
+    };
+    map.on('click',e=>state.emit(e.latlng));
+    state.locate=()=>{
+      if(state.data.saved)return;
+      if(!window.isSecureContext||!navigator.geolocation){state.status.textContent=state.text('GPS indisponível. Marque o ponto no mapa.','GPS unavailable. Mark the point on the map.');return;}
+      state.button.disabled=true;state.status.textContent=state.text('Aguardando localização…','Waiting for location…');
+      navigator.geolocation.getCurrentPosition(pos=>{
+        if(!state.active || state.data.saved)return;
+        state.button.disabled=false;
+        const point=[pos.coords.latitude,pos.coords.longitude];
+        state.place(point);state.precision(point,pos.coords.accuracy);
+        map.panTo(point,{animate:true});state.initialized=true;
+        state.send('position',{latitude:point[0],longitude:point[1],accuracy:pos.coords.accuracy,timestamp:pos.timestamp,source:'gps'});
+      },err=>{
+        if(!state.active)return;state.button.disabled=!!state.data.saved;
+        state.status.textContent=err.code===1?state.text('Permissão negada. Marque o ponto no mapa.','Permission denied. Mark the point on the map.'):state.text('GPS indisponível. Tente novamente ou marque o ponto no mapa.','GPS unavailable. Try again or mark the point on the map.');
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+    };
+    state.resize=new ResizeObserver(()=>map.invalidateSize({pan:false}));state.resize.observe(root);
+    state.dispose=()=>{
+      if(!state.active)return;state.active=false;state.resize.disconnect();state.detach.disconnect();
+      if(state.button.onclick===state.locate)state.button.onclick=null;
+      map.remove();delete root.aquaLocation;
+    };
+    // Cleanup can precede a data rerender: only dispose on actual DOM removal.
+    state.detach=new MutationObserver(()=>{if(!root.isConnected)state.dispose();});
+    state.detach.observe(document.documentElement,{childList:true,subtree:true});
+    state.detach.observe(parentElement,{childList:true,subtree:true});
   }
-  function circle(point,accuracy) {
-    if(accuracyCircle){map.removeLayer(accuracyCircle);accuracyCircle=null;}
-    if(saved)return;
-    const measured=Number.isFinite(accuracy)&&accuracy>0;
-    accuracyCircle=window.L.circle(point,{radius:measured?accuracy:25,color:'#008fa7',weight:1,fillColor:'#00aabb',fillOpacity:.15,interactive:false}).addTo(map);
-    status.textContent=measured?text(`Precisão estimada do GPS: ${Math.round(accuracy)} m. Confira o ponto.`,`Estimated GPS accuracy: ${Math.round(accuracy)} m. Check the point.`):text('Círculo de referência de 25 m; não representa precisão de GPS.','25 m reference circle; it does not represent GPS accuracy.');
+  state.data=data;state.send=setTriggerValue;state.button=button;state.status=status;
+  const generation=++state.generation;
+  button.textContent=state.text('◎ Usar minha localização','◎ Use my location');
+  button.disabled=!!data.saved;button.hidden=!!data.saved;button.onclick=state.locate;
+  status.textContent=state.text('Clique no mapa ou arraste o marcador para ajustar.','Click the map or drag the marker to adjust.');
+  if(Number.isFinite(data.latitude)&&Number.isFinite(data.longitude)){
+    const point=[data.latitude,data.longitude];
+    state.place(point);state.precision(point,data.accuracy);
+    if(!state.initialized){state.map.setView(point,16);state.initialized=true;}
+    else if(!state.map.getBounds().contains(point))state.map.panTo(point,{animate:true});
   }
-  function emit(point) {if(saved)return;place(point);circle(point,null);setTriggerValue('position',{latitude:point.lat,longitude:point.lng,source:'map'});}
-  if(valid) place([data.latitude,data.longitude]);
-  if(!saved)map.on('click',e=>emit(e.latlng));
-  status.textContent=valid?text('Confira o ponto. Clique no mapa ou arraste o marcador para ajustar.','Check the point. Click the map or drag the marker to adjust.'):text('Use sua localização ou clique no mapa para marcar o local da foto.','Use your location or click the map to mark the photo location.');
-  if(valid&&!saved)circle([data.latitude,data.longitude],data.accuracy);
-  button.disabled=saved;button.hidden=saved;
-  if(saved)status.textContent=text('Localização salva. Apenas o marcador é exibido.','Location saved. Only the marker is shown.');
-  const locate=()=>{
-    if(saved)return;
-    if(!window.isSecureContext||!navigator.geolocation){status.textContent=text('O GPS precisa de HTTPS ou localhost. Você também pode marcar o ponto no mapa.','GPS requires HTTPS or localhost. You can also mark the point on the map.');return;}
-    button.disabled=true;status.textContent=text('Aguardando permissão e localização…','Waiting for permission and location…');
-    navigator.geolocation.getCurrentPosition(pos=>{
-      if(!active)return;button.disabled=false;
-      place([pos.coords.latitude,pos.coords.longitude]);circle([pos.coords.latitude,pos.coords.longitude],pos.coords.accuracy);
-      setTriggerValue('position',{latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy,timestamp:pos.timestamp,source:'gps'});
-    },err=>{if(!active)return;button.disabled=false;status.textContent=err.code===1?text('Permissão negada. Marque o ponto no mapa.','Permission denied. Mark the point on the map.'):text('GPS indisponível. Tente novamente ou marque o ponto no mapa.','GPS unavailable. Try again or mark the point on the map.');},
-    {enableHighAccuracy:true,timeout:15000,maximumAge:0});
-  };
-  button.onclick=locate;
-  const observer=new ResizeObserver(()=>map.invalidateSize());observer.observe(root);
-  const dispose=()=>{
-    if(!active)return;
-    active=false;observer.disconnect();
-    if(button.onclick===locate)button.onclick=null;
-    map.remove();
-    if(root.aquaDispose===dispose)delete root.aquaDispose;
-  };
-  root.aquaDispose=dispose;
-  return dispose;
+  if(data.saved)status.textContent=state.text('Localização salva.','Location saved.');
+  return ()=>{if(generation===state.generation&&!root.isConnected)state.dispose();};
 }

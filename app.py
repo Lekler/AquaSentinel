@@ -6,14 +6,10 @@ from i18n import texto
 st.set_page_config(page_title='AquaSentinela', page_icon=str(Path(__file__).parent / 'assets' / 'home' / 'Logo.png'), layout='wide')
 st.session_state.setdefault('foto_epoch', 0)
 
-# O estilo compartilhado chega antes das páginas e permanece nas transições.
-# Streamlit marca os elementos do render anterior com data-stale enquanto
-# recebe o novo conteúdo; preserve o espaço sem exibir a página antiga.
+# Shared styles; retain component visibility during data reruns.
 assets = Path(__file__).parent / 'assets'
 st.html('<style>' + (assets / 'home.css').read_text(encoding='utf-8')
-        + (assets / 'registro.css').read_text(encoding='utf-8')
-        + '\n[data-testid="stElementContainer"][data-stale="true"] '
-          '{visibility:hidden;pointer-events:none;}\n</style>')
+        + (assets / 'registro.css').read_text(encoding='utf-8') + '</style>')
 
 pagina = st.navigation([
     st.Page('app_pages/como_funciona.py', title='Como funciona', icon=':material/route:', url_path='como-funciona'),

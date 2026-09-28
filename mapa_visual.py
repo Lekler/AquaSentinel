@@ -77,21 +77,11 @@ def detalhes_ocorrencia(registro, revisados, chave):
     a.metric('Objetos detectados na foto', int(registro.get('total') or 0))
     confianca = registro.get('confianca_media')
     b.metric('Confiança média da IA', 'Sem detecções' if confianca is None else f'{confianca:.1f}%')
-    st.caption('WPS = 70% do nível declarado (W) + 30% da frequência de fotos distintas (F), '
-               'no mesmo corpo hídrico confirmado, em 200 m e nos 30 dias anteriores ao registro. '
-               'Similaridades pendentes/reutilizadas não ampliam F. A fórmula experimental foi mantida; '
-               'F pode aumentar com mais fotos e não comprova mais poluição. '
-               'CS = confiança média × 0,8; não é probabilidade calibrada de acerto.')
     if foto:
-        st.image(foto, caption='Foto da observação', width='stretch')
-        if st.checkbox('Mostrar foto com detecções', key=f'anotada-{chave}-{registro["id"]}'):
-            st.image(anotada, caption='Objetos identificados pelo modelo', width='stretch')
-    from evidencia_visual import mostrar_evidencia
+        mostrar_original = st.checkbox('Mostrar foto original', key=f'original-{chave}-{registro["id"]}')
+        st.image(foto if mostrar_original else anotada or foto, caption='Foto da observação', width='stretch')
     st.caption(f"Corpo hídrico: {registro.get('waterbody_id') or 'Não identificado'} · "
                f"{registro.get('waterbody_nome') or 'Aguardando vinculação pela equipe'}")
-    mostrar_evidencia(registro)
-    from acompanhamento_visual import rastreabilidade
-    rastreabilidade(registro)
     from ambiente import mostrar_contexto
     mostrar_contexto(registro)
 
