@@ -30,6 +30,9 @@ body:has(.registro-header) textarea::placeholder {color:#425a70!important;opacit
 @media(max-width:700px){body:has(.registro-header) .block-container{padding:16px 18px 0}.registro-header{flex-wrap:wrap;gap:18px}.registro-header nav{gap:20px;flex-wrap:wrap}.registro-title{padding:24px 0}.st-key-mapa-filtros{padding:16px}}
 .registro-header .menu-ciencia{position:relative;margin-left:auto}.menu-ciencia summary{font-size:25px;padding:4px 10px;list-style:none;cursor:pointer}.menu-ciencia>div{position:absolute;right:0;top:40px;z-index:20;width:220px;background:white;padding:12px;border:1px solid #d0e2f2;border-radius:12px;box-shadow:0 8px 24px #07305b16}.menu-ciencia>div a{display:block;padding:12px}
 .st-key-atalhos-acompanhamento{margin-bottom:24px;gap:24px!important}
+.st-key-pagina-sobre [role="tablist"]{gap:12px;margin-bottom:20px}
+.st-key-pagina-sobre [role="tab"]{padding:12px 18px;border:1px solid #c9dfed;border-radius:12px;background:#fff;height:auto;min-height:48px;color:#123957}
+.st-key-pagina-sobre [role="tab"][aria-selected="true"]{background:#e3f4f8;border-color:#008eac;color:#006c85;font-weight:700}
 .st-key-location-card{padding:18px!important;gap:12px!important}
 .st-key-location-card .st-key-location-address-alternative [data-testid="stForm"]{padding:0!important;border:0!important;background:transparent!important}
 .st-key-location-card [data-testid="stExpander"] details>summary{padding:10px 12px!important}
