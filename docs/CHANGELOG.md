@@ -1,3 +1,10 @@
+### 2026.09 · Correção do mapa e contraste
+
+- Substituído o endpoint CARTO que exibia “API key required” por mapa de ruas Esri verificado com uma imagem real do Rio.
+- Cadastro, mapa público e lacunas compartilham a mesma fonte; estilo público servido pelo próprio aplicativo.
+- Textos auxiliares, legendas e instruções com azul-escuro; contraste de 8,6:1 no fundo claro principal.
+- Preservados marcador, precisão GPS, zoom e atualização sem recriar o mapa.
+
 ### 2026.09 · Registro simples e revisão da equipe
 
 - Mapa-base Voyager, uma instância Leaflet preservada entre atualizações e círculo apenas com precisão GPS disponível.

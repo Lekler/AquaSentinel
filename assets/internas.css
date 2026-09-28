@@ -13,7 +13,14 @@ body:has(.registro-header) [data-testid="stMetricValue"] {font-size:34px;font-we
 body:has(.registro-header) h2 {letter-spacing:-.7px;color:#082d4b}
 body:has(.registro-header) button[kind="primary"] {background:#1976d2;border-radius:10px;min-height:44px}
 body:has(.registro-header) button:focus-visible,body:has(.registro-header) a:focus-visible {outline:3px solid #00869c;outline-offset:3px}
-body:has(.registro-header) [data-testid="stCaptionContainer"] {color:#526d86;line-height:1.6}
+body:has(.registro-header) [data-testid="stCaptionContainer"],
+body:has(.registro-header) [data-testid="stCaptionContainer"] p,
+body:has(.registro-header) [data-testid="stCaptionContainer"] span,
+body:has(.registro-header) [data-testid="stCaptionContainer"] li {color:#344b60!important;opacity:1!important;line-height:1.6}
+.card-heading p,.registro-title p,.foto-pair .foto-vazia,.foto-vazia small,
+.mapa-legenda small,.mapa-section-heading p,.registro-footer {color:#344b60!important}
+body:has(.registro-header) input::placeholder,
+body:has(.registro-header) textarea::placeholder {color:#425a70!important;opacity:1}
 .st-key-mapa-filtros {padding:24px;border:1px solid #d0e2f2;border-radius:18px;background:#fff}
 .foto-editorial {aspect-ratio:1;width:100%;display:grid;place-content:center;text-align:center;gap:12px;border:2px dashed #acc9df;border-radius:16px;background:#edf6fc;color:#365c78;padding:20px}
 .foto-editorial span {font-size:32px;font-weight:300}.foto-editorial small {font-size:14px}

@@ -1,0 +1,21 @@
+{
+  "version": 8,
+  "sources": {
+    "ruas": {
+      "type": "raster",
+      "tiles": [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+      ],
+      "tileSize": 256,
+      "maxzoom": 19,
+      "attribution": "Tiles &copy; <a href=\"https://www.esri.com/\">Esri</a> — Sources: Esri, HERE, Garmin, USGS, Intermap, INCREMENT P, NRCan, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), NGCC, &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>, GIS User Community"
+    }
+  },
+  "layers": [
+    {
+      "id": "ruas",
+      "type": "raster",
+      "source": "ruas"
+    }
+  ]
+}

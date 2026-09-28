@@ -10,12 +10,12 @@ globalThis.ResizeObserver=class{observe(){}disconnect(){}};
 globalThis.MutationObserver=class{observe(){}disconnect(){}};
 const map={setView(p,z){zoom=z;return this},panTo(){pans++},getBounds(){return {contains:()=>true}},
   on(n,f){handlers[n]=f},invalidateSize(){},removeLayer(){},remove(){destroyed++}};
-globalThis.window={isSecureContext:true,L:{map(){created++;return map},tileLayer:()=>({addTo(){tiles++}}),divIcon:x=>x,
+globalThis.window={isSecureContext:true,L:{map(){created++;return map},tileLayer:(url)=>{assert.ok(url.includes('World_Street_Map'));return {addTo(){tiles++}}},divIcon:x=>x,
   circle:(point,options)=>({addTo(){circles.push(options);return this}}),
   marker:point=>({addTo(){return this},on(){},setLatLng(){},getLatLng:()=>point,dragging:{enable(){},disable(){}}})}};
 Object.defineProperty(globalThis,'navigator',{value:{geolocation:{getCurrentPosition(ok){gpsCalls++;ok({coords:{latitude:-22.9,longitude:-43.1,accuracy:8},timestamp:123})}}},configurable:true});
 const args={parentElement:{querySelector:s=>s==='.location-map'?root:s==='button'?button:status},
-  data:{latitude:null,longitude:null},setTriggerValue:(key,value)=>events.push({key,value})};
+  data:{latitude:null,longitude:null,tiles:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'},setTriggerValue:(key,value)=>events.push({key,value})};
 const first=mount(args);
 assert.equal(gpsCalls,0);
 handlers.click({latlng:{lat:-22,lng:-43}});

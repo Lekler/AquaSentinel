@@ -2,6 +2,7 @@
 import logging
 
 import pydeck as pdk
+from mapa_base import estilo_url
 from interface_idioma import st
 
 from relatos import listar_fotos
@@ -78,7 +79,7 @@ with st.container(key='mapa-pontos'):
                           line_width_min_pixels=2, pickable=True, opacity=1)
         vista = pdk.ViewState(latitude=sum(p['latitude'] for p in pontos)/len(pontos),
                              longitude=sum(p['longitude'] for p in pontos)/len(pontos), zoom=10)
-        evento = st.pydeck_chart(pdk.Deck(map_style='https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json', initial_view_state=vista, layers=[layer],
+        evento = st.pydeck_chart(pdk.Deck(map_style=estilo_url(), map_provider='maplibre', initial_view_state=vista, layers=[layer],
             tooltip={'text': texto('{local} · {corpo}\nNível mais recente: {nivel}\n{ocorrencias} ocorrências neste local\n{dias} dias diferentes de observação\n{ultima}\nClique para foto e histórico.', '{local} · {corpo}\nLatest level: {nivel}\n{ocorrencias} reports at this location\n{dias} distinct observation days\n{ultima}\nClick for photos and history.')}),
             on_select='rerun', selection_mode='single-object', key=f'mapa-{periodo}-{camada}')
         legenda(camada)

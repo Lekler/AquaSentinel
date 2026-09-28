@@ -29,6 +29,8 @@ def test_mapa_camadas_periodos_detalhes_e_pagina(tmp_path, monkeypatch):
     assert any(m.label == 'Locais observados' and m.value == '1' for m in app.metric)
     chart = app.get('deck_gl_json_chart')[0]
     spec = json.loads(chart.proto.json)
+    assert spec['mapStyle'] == '/app/static/mapa-ruas.json'
+    assert spec['mapProvider'] == 'maplibre'
     layer = spec['layers'][0]
     assert layer['radiusMinPixels'] == layer['radiusMaxPixels'] == 10
     assert layer['data'][0]['cor'] == [0, 0, 0]

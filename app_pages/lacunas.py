@@ -1,5 +1,6 @@
 from interface_idioma import st
 import pydeck as pdk
+from mapa_base import estilo_url
 from monitoramento import listar_entidades, lacunas
 from relatos import listar_fotos
 from registro_visual import cabecalho, rodape
@@ -22,7 +23,7 @@ if dados:
             t[campo] = traduzir(t[campo])
     layer = pdk.Layer('ScatterplotLayer', id='lacunas', data=dados, get_position='[longitude,latitude]',
         get_fill_color='cor', get_radius=10, radius_units='pixels', pickable=True)
-    st.pydeck_chart(pdk.Deck(map_style='https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json', layers=[layer], initial_view_state=pdk.ViewState(
+    st.pydeck_chart(pdk.Deck(map_style=estilo_url(), map_provider='maplibre', layers=[layer], initial_view_state=pdk.ViewState(
         latitude=sum(t['latitude'] for t in dados)/len(dados), longitude=sum(t['longitude'] for t in dados)/len(dados), zoom=10),
         tooltip={'text':'{nome}\n{classe}\n{ultima}\n{estado}\n{chamada}'}))
     st.caption('Cinza: não temos dado · violeta: sem observação recente · azul-claro: pouco observado · azul-escuro: muito observado.')

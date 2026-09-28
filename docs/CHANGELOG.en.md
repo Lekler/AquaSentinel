@@ -1,3 +1,10 @@
+### 2026.09 · Map and contrast fix
+
+- Replaced the CARTO endpoint displaying “API key required” with an Esri street basemap verified using an actual Rio map image.
+- Report form, public map and coverage gaps share the same source; map style served by the app.
+- Darker helper text, captions and instructions; 8.6:1 contrast on the main light background.
+- Marker, GPS accuracy, zoom and persistent map updates retained.
+
 ### 2026.09 · Simple reporting and team review
 
 - Voyager basemap, persistent Leaflet instance and GPS circle only when accuracy is available.

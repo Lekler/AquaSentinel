@@ -6,8 +6,8 @@ export default function({parentElement, data, setTriggerValue}) {
   if (!state) {
     const canvas=document.createElement('div');canvas.style.height='100%';root.replaceChildren(canvas);
     const map=window.L.map(canvas).setView([-22.91,-43.17],11);
-    window.L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-      maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    window.L.tileLayer(data.tiles,{
+      maxZoom:19,attribution:data.attribution
     }).addTo(map);
     state={map, marker:null, circle:null, active:true, generation:0, initialized:false};
     root.aquaLocation=state;
