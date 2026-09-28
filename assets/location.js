@@ -65,6 +65,8 @@ export default function({parentElement, data, setTriggerValue}) {
   state.data=data;state.send=setTriggerValue;state.button=button;state.status=status;
   const generation=++state.generation;
   button.textContent=state.text('◎ Usar minha localização','◎ Use my location');
+  const heading=parentElement.querySelector('.location-title');
+  if(heading)heading.textContent=state.text('Localização','Location');
   button.disabled=!!data.saved;button.hidden=!!data.saved;button.onclick=state.locate;
   status.textContent=state.text('Clique no mapa ou arraste o marcador para ajustar.','Click the map or drag the marker to adjust.');
   if(Number.isFinite(data.latitude)&&Number.isFinite(data.longitude)){

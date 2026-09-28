@@ -1,0 +1,8 @@
+.location-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;font-family:Arial,sans-serif}
+.location-heading{display:flex;align-items:center;gap:12px;min-width:0}
+.location-heading b{display:grid;place-items:center;flex-shrink:0;width:42px;height:42px;border-radius:50%;background:#bfebfc;color:#066699;font-size:24px}
+.location-heading h2{font-size:21px;line-height:1.2;color:#082e5a;margin:0}
+.location-toolbar button{width:auto;margin:0;padding:10px 13px;font-size:13px;line-height:1.3;white-space:nowrap;min-height:40px}
+.location-map{height:220px}
+p[role=status]{margin:8px 0 0;font-size:12px;line-height:1.4}
+@media(max-width:400px){.location-toolbar{flex-wrap:wrap}.location-toolbar button{margin-left:auto}.location-heading h2{font-size:19px}.location-map{height:210px}}

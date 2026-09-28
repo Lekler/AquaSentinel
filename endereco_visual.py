@@ -18,13 +18,20 @@ def _escolher(contexto):
                 st.session_state['foto-endereco-nome-auto'] = nome
 
 
-def busca_endereco(contexto='foto'):
+def busca_endereco(contexto='foto', compacto=False):
     bloqueado = contexto == 'foto' and bool(st.session_state.get('foto_salva_id'))
     with st.form(f'buscar-endereco-{contexto}', border=False):
-        consulta = st.text_input(texto('CEP ou endereço completo', 'Postal code or full address'),
-            placeholder=texto('Ex.: 21941-901 ou rua, número, cidade e estado', 'Example: 21941-901 or street, number, city and state'),
-            max_chars=180, key=f'{contexto}-endereco-busca', disabled=bloqueado)
-        buscar = st.form_submit_button(texto('Buscar endereço', 'Find address'), disabled=bloqueado)
+        if compacto:
+            campo, acao = st.columns([3, 1.25], vertical_alignment='bottom')
+        else:
+            campo = acao = st.container()
+        with campo:
+            consulta = st.text_input(texto('CEP ou endereço completo', 'Postal code or full address'),
+                placeholder=texto('Ex.: 21941-901 ou rua, número, cidade e estado', 'Example: 21941-901 or street, number, city and state'),
+                max_chars=180, key=f'{contexto}-endereco-busca', disabled=bloqueado)
+        with acao:
+            buscar = st.form_submit_button(texto('Buscar endereço', 'Find address'), disabled=bloqueado, width='stretch')
+    mudou = False
     if buscar:
         st.session_state.pop(f'{contexto}-enderecos', None)
         st.session_state.pop(f'{contexto}-endereco-selecionado', None)
@@ -34,6 +41,7 @@ def busca_endereco(contexto='foto'):
             st.session_state[f'{contexto}-enderecos'] = resultados
             if resultados:
                 _escolher(contexto)
+                mudou = True
             else:
                 st.info(texto('Nenhum local encontrado. Inclua cidade e estado, use o GPS ou escolha no mapa.',
                               'No location found. Include city and state, use GPS or choose on the map.'))
@@ -48,3 +56,4 @@ def busca_endereco(contexto='foto'):
                          'Search suggests an approximate reference. Check and adjust the marker; a postal code does not identify the exact point.'))
     st.caption(texto('Ao buscar, o endereço é consultado em Photon / © OpenStreetMap; CEP em ViaCEP.',
                      'Search uses Photon / © OpenStreetMap for addresses and ViaCEP for postal codes.'))
+    return mudou

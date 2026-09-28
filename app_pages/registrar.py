@@ -128,9 +128,6 @@ if rascunho:
         st.button(texto('Usar outra foto', 'Use another photo'), on_click=nova_foto, key='outra_foto')
 
 with direita, st.container(key='location-card'):
-    titulo('2', texto('Confirme sua localização', 'Confirm your location'), texto('Busque por CEP ou endereço, ou use sua localização atual.', 'Search by postal code or address, or use your current location.'))
-    from endereco_visual import busca_endereco
-    busca_endereco('foto')
     posicao = obter_localizacao()
     if posicao:
         try:
@@ -138,13 +135,21 @@ with direita, st.container(key='location-card'):
                 st.rerun()
         except (ValueError, TypeError, KeyError):
             st.warning('Localização inválida. Informe as coordenadas abaixo.')
-    nome = st.text_input(texto('Nome do local, endereço ou ponto de referência', 'Location name, address or landmark'), max_chars=100,
+    from endereco_visual import busca_endereco
+    with st.container(key='location-address-alternative'):
+        with st.expander(texto('Buscar por CEP ou endereço (opcional)', 'Search by postal code or address (optional)')):
+            st.markdown(texto('**Confirme sua localização**', '**Confirm your location**'))
+            st.caption(texto('Busque por CEP ou endereço, ou use sua localização atual.', 'Search by postal code or address, or use your current location.'))
+            if busca_endereco('foto', compacto=True):
+                st.rerun()
+    local_col, corpo_col = st.columns(2, gap='small')
+    nome = local_col.text_input(texto('Nome do local ou referência', 'Location name or landmark'), max_chars=100,
                          placeholder='Ex.: Canal do Fundão, próximo à ponte', key='foto_nome', persist_state='session')
     catalogo = {c['id']: c for c in listar_corpos()}
-    waterbody_id = st.selectbox('Corpo hídrico cadastrado', [None, *catalogo], key='foto-waterbody',
+    waterbody_id = corpo_col.selectbox('Corpo hídrico cadastrado', [None, *catalogo], key='foto-waterbody',
         disabled=bool(sessao_ativa),
-        format_func=lambda i: f"{i} · {catalogo[i]['nome']}" if i else 'Não identificado — equipe fará a vinculação')
-    st.caption(texto('Se souber, selecione o rio, canal ou baía. A equipe confirmará a escolha.', 'If known, select the river, canal or bay. The team will confirm your choice.'))
+        format_func=lambda i: f"{i} · {catalogo[i]['nome']}" if i else texto('Não identificado', 'Unidentified'),
+        help=texto('Se souber, selecione o rio, canal ou baía. A equipe confirmará a escolha.', 'If known, select the river, canal or bay. The team will confirm your choice.'))
     with st.expander(texto('Ajustar coordenadas manualmente', 'Adjust coordinates manually')):
         col1, col2 = st.columns(2)
         lat = col1.number_input('Latitude', min_value=-90., max_value=90., value=None, format='%.6f',
