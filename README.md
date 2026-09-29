@@ -41,13 +41,58 @@ Esta implementação segue a metodologia WPS/CS fornecida pela equipe como **heu
 | `WPS` | `0,70 × W + 0,30 × F`, de 0 a 100 |
 | `CS` | Confiança média das detecções × confiabilidade da fonte comunitária (0,8), exibida em % |
 
-Para `F`, contam fotos distintas registradas nos últimos **30 dias**, a até **200 m**, com o mesmo nome de corpo hídrico e revisão validada. O hash da imagem reduz reenvios idênticos. **Não existe identidade verificada dos autores**: duas fotos podem vir da mesma pessoa. Por isso, `F` é uma aproximação de recorrência, e a independência entre relatos deve ser validada antes de uso operacional. O nome do corpo hídrico é texto livre; padronizar esse identificador é um próximo passo.
+Para `F`, contam fotos distintas registradas nos últimos **30 dias**, a até **200 m**, com o mesmo código de corpo hídrico confirmado e revisão validada. SHA-256 impede reenvios idênticos; similaridades pendentes ou reutilizadas não ampliam F. Sem código confirmado, a frequência fica restrita ao próprio registro. **Não existe identidade verificada dos autores**: duas fotos podem vir da mesma pessoa. Por isso, `F` é uma aproximação de recorrência, não comprova independência nem aumento de poluição.
 
 Faixas WPS: 0–24 baixa, 25–49 moderada, 50–74 alta, 75–100 crítica. Faixas CS: abaixo de 60% baixa, 60–79% moderada, 80% ou mais alta. A confiança do detector **não é probabilidade calibrada de acerto**. Todas as submissões usam confiabilidade 0,8; o app não concede 1,0 a quem apenas declara vínculo institucional. Sem detecções, o CS é 0 e exige interpretação humana. Ausência de pontos não prova ausência de resíduos.
 
 Exemplo: W=100, F=75 e confiança média=94% produzem WPS=92,5 e CS=75,2%.
 
 ## Arquitetura e dados
+
+### Transparência e acompanhamento
+
+A versão `2026.09-transparencia-v1` inclui página de Transparência com indicadores,
+rastreabilidade por registro, recibos privados para feedback, sessões estruturadas,
+mapa de lacunas sobre trechos planejados, ações e comparação antes/depois. O cadastro
+de trechos e as atualizações de ciclo de vida ficam na área autenticada da equipe.
+Veja [o guia de monitoramento](docs/TRANSPARENCIA_MONITORAMENTO.md) para taxas,
+observações sem resíduos, códigos de acompanhamento e limites de interpretação.
+
+Veja [AquaVerify e hotspots persistentes](docs/AQUAVERIFY.md) para regras,
+pesos, limiares e limitações da nova versão. Na área autenticada de revisão,
+cadastre os corpos hídricos, vincule os registros antigos e indexe fotos legadas
+para pHash. Os códigos são internos ao projeto. O hotspot usa recorrência,
+persistência temporal, WPS e qualidade da evidência; não é classificação de risco.
+
+### Mapa, cobertura e histórico por local
+
+- **Condição ambiental:** a cor representa o nível declarado na última observação
+  do período: cinza = sem resíduos, verde = pouco, amarelo = moderado,
+  laranja = muito poluído, preto = bloqueando. A legenda fica sempre visível
+  junto ao mapa. Todos os marcadores têm raio fixo de 10 pixels.
+- **Cobertura de observação:** uma camada independente em tons de azul representa
+  dias distintos (1, 2–3, 4–7, 8+), não gravidade. Mais ocorrências não significam
+  automaticamente mais poluição nem autores independentes.
+- Filtros: 7, 15, 30, 90 dias e todo o período. Os limites são dias de calendário,
+  incluindo hoje, no fuso `America/Sao_Paulo`; datas são as de registro, não uma
+  comprovação do momento de captura. Datas futuras são excluídas dos resumos.
+- Observações validadas e autorizadas são agrupadas pelo código `WB-BG` confirmado
+  em até 200 m da primeira observação. Não há encadeamento espacial nem união por
+  nome livre. Registros sem código confirmado ficam separados até vinculação.
+  Isso identifica trechos aproximados, não delimita todo um corpo hídrico.
+- Clique no ponto para foto, nível, data, objetos, confiança média, revisão,
+  WPS e CS. A lista abaixo oferece o mesmo acesso ao histórico.
+- `/local?id=<id-de-observacao-publica>` abre a página individual: totais,
+  dias observados, primeira/última observação, nível recente e anteriores,
+  principais resíduos e recorrência (dias com resíduos declarados / dias
+  observados). O histórico completo independe do filtro do mapa.
+- WPS aparece como número e barra separados da condição observada. A fórmula
+  original foi mantida; em detalhes históricos é recalculada na data do registro,
+  usando as fotos atualmente validadas dos 30 dias anteriores. Não é um snapshot
+  de decisões passadas de revisão. CS mantém confiança média × 0,8.
+- A quantidade total identificada soma detecções nas fotos: não deduplica objetos
+  entre fotos. Dados pendentes, rejeitados e sem autorização ficam fora de todos
+  os resumos e páginas públicas.
 
 ```text
 app.py → Streamlit multipágina
@@ -89,3 +134,9 @@ Não coloque valores reais no Git. A conexão usa TLS. Se a senha de revisão n�
 ```
 
 Veja [CONTRIBUTING.md](CONTRIBUTING.md). Não envie bancos locais, fotografias de usuários, senhas ou arquivos `.env` ao repositório. O modelo fornecido pela equipe está em `models/best.pt`; confirme a licença dos pesos antes de redistribuir o repositório publicamente.
+# Páginas internas e ciência aberta
+
+Sobre, Como funciona, Dúvidas, Fale Conosco e Dados e Ciência Aberta compartilham
+o novo layout interno. A inicial foi preservada. Consulte
+[CIENCIA_ABERTA.md](docs/CIENCIA_ABERTA.md) para exportação, recibos, contexto
+ambiental, contatos e versões; [CHANGELOG.md](docs/CHANGELOG.md) registra as mudanças.

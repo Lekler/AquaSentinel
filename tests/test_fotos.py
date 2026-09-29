@@ -81,7 +81,9 @@ def test_reenvio_mesma_foto_nao_duplica_nem_sobrescreve():
     repetido, novo = salvar_foto(outro, foto, anotada)
     assert not novo and repetido == salvo
     assert len(listar_fotos()) == 1
-    assert obter_foto(r['id']) == (r, foto, anotada)
+    assert obter_foto(r['id']) == (salvo, foto, anotada)
+    assert all(salvo[k] == v for k, v in r.items())
+    assert salvo['imagem_valida'] and salvo['phash']['versao']
 
 
 @pytest.mark.parametrize('lat,lon', [(None,-43),(-22,None),(91,0),(0,-181),(float('nan'),0)])
@@ -95,7 +97,7 @@ def test_excel_valores_e_pacote_com_recortes():
     r, foto, anotada = amostra()
     r['nome'] = '=HYPERLINK("https://example.org")'
     wb = load_workbook(BytesIO(gerar_excel(r)))
-    assert wb.sheetnames == ['Resumo', 'Detecções']
+    assert wb.sheetnames == ['Resumo', 'AquaVerify', 'Detecções']
     resumo = dict(wb['Resumo'].values)
     assert resumo['Itens identificados na foto'] == 2
     assert resumo['Confiança média (%)'] == 80

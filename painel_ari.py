@@ -9,7 +9,7 @@ import sqlite3
 from uuid import uuid4
 import altair as alt
 import pandas as pd
-import streamlit as st
+from interface_idioma import st
 from motor import DadosInvalidos, analisar_previsao, validar_entrada
 from ari import CLASSES_RESIDUOS, NIVEIS_RIO, calcular_ari, triar_confianca
 from historico import listar, salvar, confirmar, contar_proximos
@@ -78,9 +78,8 @@ if foto_origem:
 with st.sidebar:
     st.header(texto('Consultar ocorrência', 'Assess an occurrence'))
     st.caption(texto('Informe o local e uma avaliação manual de resíduos para explorar a previsão.', 'Enter the location and a manual waste assessment to explore the forecast.'))
-    senha_configurada = os.environ.get('AQUASENTINEL_REVIEW_PASSWORD', '')
-    senha_equipe = st.session_state.get('senha_ari', '')
-    autorizado = bool(senha_configurada and senha_equipe) and hmac.compare_digest(senha_equipe, senha_configurada)
+    from equipe_auth import autenticado, entrada
+    autorizado = autenticado()
     with st.form('consulta'):
         nome = st.text_input(texto('Nome do canal / ocorrência', 'Canal / occurrence name'), foto_origem['nome'] if foto_origem else texto('Canal de demonstração · Rio', 'Demo canal · River'), max_chars=100)
         latitude = st.number_input('Latitude', min_value=-90.0, max_value=90.0, value=float(foto_origem['latitude']) if foto_origem else -22.9068, step=0.0001, format='%.6f')
@@ -89,11 +88,11 @@ with st.sidebar:
         waste = CLASSES_RESIDUOS[classe]
         confianca = st.slider(texto('Confiança da classificação (%)', 'Classification confidence (%)'), 0, 100, 85)
         st.caption('Classe de acúmulo e confiança desta avaliação são informadas pela equipe. A análise de objetos da foto está em Registrar ocorrência e não comprova a gravidade ambiental.')
-        confirmado = st.checkbox(texto('Confirmar avaliação humana (confiança de 60 a <80%)', 'Confirm human assessment (confidence from 60 to <80%)'), disabled=not autorizado)
-        revisor = st.text_input(texto('Responsável pela confirmação', 'Person responsible for confirmation'), max_chars=100, disabled=not autorizado)
+        confirmado = st.checkbox(texto('Confirmar avaliação humana (confiança de 60 a <80%)', 'Confirm human assessment (confidence from 60 to <80%)')) if autorizado else False
+        revisor = st.text_input(texto('Responsável pela confirmação', 'Person responsible for confirmation'), max_chars=100) if autorizado else ''
         condicao = st.selectbox('Condição do rio (L)', ['Indisponível'] + list(NIVEIS_RIO))
         nivel = None if condicao == 'Indisponível' else condicao
-        oficial = st.checkbox('Condição transcrita de fonte oficial', disabled=not autorizado)
+        oficial = st.checkbox('Condição transcrita de fonte oficial') if autorizado else False
         fonte_nivel = st.text_input('Referência da fonte / estação / horário observado', max_chars=300)
         st.caption('O nível é informado manualmente. A referência permite rastrear a observação; não há consulta automática ao INEA.')
         raio = st.number_input('Raio para recorrência (metros)', min_value=1, max_value=10000, value=500, step=100)
@@ -108,8 +107,8 @@ with st.sidebar:
         for chave in ('resultado', 'erro', 'identidade_ocorrencia', 'ocorrencia_id'):
             st.session_state.pop(chave, None)
     st.caption('Atualizar a previsão mantém a ocorrência atual. Use Nova ocorrência para registrar outro relato no mesmo ponto.')
-    with st.expander('Acesso da equipe ao histórico'):
-        st.text_input('Senha da equipe', type='password', key='senha_ari')
+    with st.expander(texto('Área da equipe', 'Team area')):
+        entrada()
 
 if enviar:
     # Uma falha nunca deixa a pontuação da ocorrência anterior parecendo atual.
@@ -212,9 +211,9 @@ if resultado and resultado['ari_score'] is not None:
         df = pd.DataFrame(r['horas'])
         df['Intervalo'] = [f"{datetime.fromisoformat(a):%d/%m %H:%M}–{datetime.fromisoformat(b):%H:%M}" for a, b in zip(df.inicio, df.fim)]
         chart = alt.Chart(df).mark_bar(color='#138A97', cornerRadiusTopLeft=3, cornerRadiusTopRight=3).encode(
-            x=alt.X('Intervalo:N', sort=None, title='Intervalo no horário local', axis=alt.Axis(labelAngle=-55)),
-            y=alt.Y('precipitacao_mm:Q', title='Precipitação (mm em 1h)', scale=alt.Scale(domainMin=0)),
-            tooltip=[alt.Tooltip('Intervalo:N'), alt.Tooltip('precipitacao_mm:Q', title='Precipitação (mm)', format='.2f'), alt.Tooltip('probabilidade_pct:Q', title='Probabilidade (%)')],
+            x=alt.X('Intervalo:N', sort=None, title=texto('Intervalo no horário local', 'Local time interval'), axis=alt.Axis(labelAngle=-55)),
+            y=alt.Y('precipitacao_mm:Q', title=texto('Precipitação (mm em 1h)', 'Precipitation (mm in 1h)'), scale=alt.Scale(domainMin=0)),
+            tooltip=[alt.Tooltip('Intervalo:N', title=texto('Intervalo', 'Interval')), alt.Tooltip('precipitacao_mm:Q', title=texto('Precipitação (mm)', 'Precipitation (mm)'), format='.2f'), alt.Tooltip('probabilidade_pct:Q', title=texto('Probabilidade (%)', 'Probability (%)'))],
         ).properties(height=275)
         st.altair_chart(chart, width="stretch")
         st.caption('Cada barra representa uma hora completa. Probabilidade é a chance horária de precipitação; o pico não representa a chance de chuva em toda a janela.')

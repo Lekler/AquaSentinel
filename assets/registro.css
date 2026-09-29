@@ -16,10 +16,16 @@ body:has(.registro-header) button[kind="primary"] {background:linear-gradient(11
 body:has(.registro-header) [data-testid="stMetric"] {padding:8px!important}body:has(.registro-header) [data-testid="stMetricValue"] {font-size:25px}
 .st-key-foto_nivel [data-baseweb="select"] {border-radius:12px}
 .st-key-foto_nivel button {min-height:64px;border-radius:12px!important;margin:0 6px!important;background:#fff;font-weight:700;color:#07345c;border:1px solid #dcecf5!important;gap:10px}
-.st-key-foto_nivel button:before {content:'';width:29px;height:29px;border-radius:50%;flex-shrink:0;background:#46cb77}
-.st-key-foto_nivel button:nth-child(2):before {background:#ffcd2b}
-.st-key-foto_nivel button:nth-child(3):before {background:#ff8838}
-.st-key-foto_nivel button:nth-child(4):before {background:#ff3559}
+.st-key-foto_nivel button:before {content:'';width:29px;height:29px;border-radius:50%;flex-shrink:0;background:#94a3b8}
+.st-key-foto_nivel button:nth-child(2):before {background:#22a55b}
+.st-key-foto_nivel button:nth-child(3):before {background:#facc15}
+.st-key-foto_nivel button:nth-child(4):before {background:#f97316}
+.st-key-foto_nivel button:nth-child(5):before {background:#000000}
+.nivel-observado {display:inline-flex;align-items:center;gap:8px;color:#172b3a;font-weight:600;line-height:1.6}
+.nivel-observado i {display:inline-block;flex-shrink:0;width:16px;height:16px;border-radius:50%;border:1px solid #0002}
+.mapa-legenda {background:#fff;border:1px solid #dcecf5;border-radius:12px;padding:16px;color:#172b3a;margin:8px 0 16px}
+.mapa-legenda-itens {display:flex;flex-wrap:wrap;gap:12px 20px;margin:10px 0}
+.mapa-legenda small {color:#425669}
 .st-key-foto_nivel button[aria-pressed="true"] {outline:2px solid #009db9;background:#edfaff}
 body:has(.registro-header) [data-testid="stForm"] {border:1px solid #e0eef6;border-radius:18px;padding:22px;background:#ffffffd9}
 body:has(.registro-header) [data-testid="stFormSubmitButton"] {display:flex;justify-content:center;margin:18px auto 4px}
@@ -40,3 +46,11 @@ body:has(.registro-header) [data-testid="stMetric"] {background:#f5fbfe;border:1
 .registro-waves {display:flex;gap:0;width:100cqw;margin-left:calc(50% - 50cqw);height:clamp(65px,6.4cqw,130px);overflow:hidden;}
 .registro-waves > img {display:block;width:50%;min-width:0;height:100%;object-fit:fill;}
 @media(max-width:800px){body:has(.registro-header) .block-container{padding-bottom:0;}}
+
+/* Language control: fixed EN / PT positions and visible active state. */
+.language-switch,.registro-header .language-switch{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:126px;min-height:44px;box-sizing:border-box;padding:8px 12px;border:1px solid #b9d9eb;border-radius:24px;background:#fff;font-size:14px;font-weight:700;text-decoration:none!important;white-space:nowrap;color:#415a70!important}
+.language-track{display:inline-flex;width:42px;height:24px;padding:3px;box-sizing:border-box;border-radius:14px;background:#007fb2}
+.language-track>span{width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px #00354d55}
+.language-pt .language-track>span{transform:translateX(18px)}
+.language-en .language-en,.language-pt .language-pt{color:#005d87;font-weight:900;text-decoration:underline;text-underline-offset:4px}
+.language-switch:focus-visible{outline:3px solid #005d87;outline-offset:3px}

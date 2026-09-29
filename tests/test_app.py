@@ -43,7 +43,7 @@ def test_fluxo_cache_coordenadas_e_falha():
         app.number_input[0].set_value(-23.)
         app.button(key="atualizar").click().run()
         assert consulta.call_count == 2
-        app.checkbox[2].check()
+        next(c for c in app.checkbox if c.label=='Consultar API sem usar cache').check()
         app.button(key="atualizar").click().run()
         assert not app.exception
         assert consulta.call_count == 3
@@ -75,7 +75,7 @@ def test_historico_e_confirmacao_exigem_senha_da_equipe(monkeypatch):
     app = AppTest.from_file(APP, default_timeout=15).run()
     assert not app.exception
     assert not any(b.label == 'Confirmar relato' for b in app.button)
-    assert app.checkbox[1].disabled  # fonte oficial não pode ser autodeclarada
+    assert not any(c.label=='Condição transcrita de fonte oficial' for c in app.checkbox)
     app.button(key='atualizar').click().run()
     assert not any(b.key == 'salvar' for b in app.button)
 
@@ -91,7 +91,8 @@ def test_triagem_e_revisao_persistente(monkeypatch):
         assert app.session_state['resultado']['status_validacao'] == 'pendente'
         assert not app.metric
         consulta.assert_not_called()
-        app.text_input(key='senha_ari').set_value('senha-teste').run()
+        app.text_input(key='senha_revisao').set_value('senha-teste')
+        next(b for b in app.button if b.label=='Entrar').click().run()
         app.button(key='salvar').click().run()
         app.button(key='salvar').click().run()
         assert len(listar()) == 1
@@ -112,7 +113,8 @@ def test_transbordamento_com_api_indisponivel(monkeypatch):
     monkeypatch.setenv('AQUASENTINEL_REVIEW_PASSWORD', 'senha-teste')
     with patch('previsao.consultar_previsao', side_effect=ErroPrevisao('HTTP 503')):
         app = AppTest.from_file(APP, default_timeout=15).run()
-        app.text_input(key='senha_ari').set_value('senha-teste').run()
+        app.text_input(key='senha_revisao').set_value('senha-teste')
+        next(b for b in app.button if b.label=='Entrar').click().run()
         app.selectbox[1].select('Transbordamento')
         app.checkbox[1].check()
         app.text_input[2].set_value('Fonte oficial, estação e horário de exemplo')

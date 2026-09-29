@@ -1,0 +1,7 @@
+{
+  "Informe um CEP de 8 dígitos ou um endereço com cidade e estado.": "Enter an 8-digit Brazilian postal code or an address including city and state.",
+  "O CEP deve ter 8 dígitos.": "A Brazilian postal code must have 8 digits.",
+  "CEP não encontrado. Confira os números ou tente o endereço completo.": "Postal code not found. Check the digits or try the full address.",
+  "Não foi possível buscar o endereço agora. Use o GPS ou marque o ponto no mapa.": "Unable to search for the address right now. Use GPS or mark the point on the map.",
+  "Não foi possível interpretar a busca. Use o GPS ou marque o ponto no mapa.": "Unable to read the search response. Use GPS or mark the point on the map."
+}

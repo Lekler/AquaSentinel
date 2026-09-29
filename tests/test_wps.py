@@ -8,7 +8,7 @@ def registro(ident, dias=0, hash_=None):
             'longitude': -43.24, 'registrado_em': (datetime.now(timezone.utc)
             - timedelta(days=dias)).isoformat(), 'image_hash': hash_ or ident,
             'nivel_informado': 'Muito poluído', 'confianca_media': 94,
-            'revisao': 'validado'}
+            'revisao': 'validado', 'waterbody_id': 'WB-BG-001', 'waterbody_confirmado': True}
 
 
 def test_exemplo_metodologia_separa_prioridade_e_confianca():
@@ -31,6 +31,7 @@ def test_recorrencia_exige_revisao_e_foto_distinta():
     antigo = registro('d', dias=31)
     outro_local = registro('e')
     outro_local['nome'] = 'Rio Estrela'
+    outro_local['waterbody_id'] = 'WB-BG-002'
     resultado = pontuar(atual, [atual, repetida, pendente, antigo, outro_local])
     assert resultado['recorrencias'] == 1
     assert resultado['f'] == 25

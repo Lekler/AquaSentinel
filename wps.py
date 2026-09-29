@@ -29,14 +29,25 @@ def pontuar(registro, revisados, agora=None):
     recorrência e não comprova relatos independentes.
     """
     agora = agora or datetime.now(timezone.utc)
+    if agora.tzinfo is None:
+        agora = agora.replace(tzinfo=timezone.utc)
     data_minima = agora - timedelta(days=JANELA_DIAS)
     hashes = set()
     for item in revisados:
         if item.get('revisao') != 'validado':
             continue
+        if (item.get('similaridade_decisao') == 'reutilizada'
+                or ((item.get('similaridade') or {}).get('quantidade')
+                    and item.get('similaridade_decisao') != 'independente')):
+            continue
         try:
             data = datetime.fromisoformat(item['registrado_em'])
-            mesmo_local = item['nome'].strip().casefold() == registro['nome'].strip().casefold()
+            if data.tzinfo is None:
+                data = data.replace(tzinfo=timezone.utc)
+            mesmo_local = (bool(registro.get('waterbody_id'))
+                           and registro.get('waterbody_confirmado') is True
+                           and item.get('waterbody_confirmado') is True
+                           and item.get('waterbody_id') == registro['waterbody_id']) or item['id'] == registro['id']
             proximo = distancia_m(float(item['latitude']), float(item['longitude']),
                                   float(registro['latitude']), float(registro['longitude'])) <= RAIO_M
         except (KeyError, TypeError, ValueError):

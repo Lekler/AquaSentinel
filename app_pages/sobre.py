@@ -1,31 +1,58 @@
-import streamlit as st
-from i18n import texto
+from interface_idioma import st
 from registro_visual import cabecalho, rodape
+from editorial import espaco_foto
+from i18n import texto as traduz
 
-cabecalho('Sobre', 'Mais olhos pelos nossos rios.', mostrar_etapas=False,
-          titulo_ingles='About', descricao_ingles='More eyes on our rivers.', caminho='/sobre')
+cabecalho('Sobre o AquaSentinel', 'Um jeito de observar, registrar e cuidar das nossas águas, com a participação de todos.', False,
+          'About AquaSentinel', 'A way to observe, record and care for our waters, with everyone taking part.', '/sobre')
+sobre, trabalho = st.tabs([traduz('Sobre o AquaSentinel', 'About AquaSentinel'), traduz('Conheça nosso trabalho', 'Get to know our work')])
+with sobre:
+    with st.container(border=True):
+        st.subheader('Por que esse projeto existe?')
+        st.write('O lixo nos rios, canais e na Baía de Guanabara prejudica a paisagem, afeta a vida dos animais e torna mais difícil cuidar desses espaços. Muitas vezes, o problema é visto por quem vive ou passa por perto, mas essas observações ficam dispersas. O AquaSentinel nasceu para reunir esses registros, acompanhar o que acontece em cada local ao longo do tempo e ajudar comunidades, pesquisadores e equipes responsáveis a planejar ações de cuidado e limpeza.')
+        st.subheader('O que queremos fazer?')
+        st.write('O AquaSentinel reúne fotos, locais e datas dos registros para ajudar a acompanhar o lixo visível nas águas. As imagens passam por uma análise de IA e pela revisão da equipe antes de serem publicadas. Com o tempo, esse histórico pode apoiar a participação da comunidade, a pesquisa e o planejamento de ações.')
+    a, b = st.columns(2)
+    with a, st.container(border=True):
+        st.subheader('Sua participação faz a diferença!')
+        st.write('Você conhece um rio, canal ou trecho da Baía de Guanabara que precisa de atenção? Sua foto pode ajudar a dar visibilidade ao que acontece ali. Participe do AquaSentinel e ajude a transformar o seu olhar sobre a cidade em um convite para cuidar das nossas águas.')
+    with b, st.container(border=True):
+        st.subheader('Como a tecnologia ajuda?')
+        st.write('Você tira uma foto, e a inteligência artificial ajuda a identificar os resíduos visíveis na imagem. Assim, sua observação se transforma em um registro que pode ser acompanhado junto com outros feitos na região. A equipe confere os resultados para que as informações apresentadas sejam claras e confiáveis.')
+    with st.container(border=True):
+        st.subheader('Cuidar da água também é cuidar da vida!')
+        st.write('O projeto segue a ideia de Saúde Única (One Health): o ambiente, os animais e as pessoas estão ligados. Nossos registros ajudam a observar sinais no ambiente e a incentivar o cuidado com esses espaços!')
+        for col, titulo, texto in zip(st.columns(3), ['Ambiente', 'Animais e natureza', 'Pessoas'], [
+            'Observamos as águas, as margens e os resíduos que aparecem nas imagens.',
+            'Prestamos atenção à vegetação e aos animais que vivem nesses locais ou circulam perto dos resíduos.',
+            'Incentivamos a participação, a educação ambiental e o cuidado com a segurança de quem faz os registros.']):
+            col.markdown(f'**{titulo}**')
+            col.write(texto)
+    with st.container(border=True):
+        st.subheader('Para quem é o AquaSentinel?')
+        st.write('Para comunidades, educadores, estudantes, pesquisadores, organizações ambientais e equipes que desejam acompanhar lugares ao longo do tempo e registrar suas ações.')
+    with st.container(border=True):
+        st.subheader('O que queremos transformar')
+        st.write('Queremos que cada registro ajude a contar a história de um lugar: onde o lixo aparece, quais áreas ainda precisam de atenção e o que muda depois de uma ação de limpeza. Ao acompanhar essas informações ao longo do tempo, fica mais fácil decidir onde agir e observar os resultados.')
+        with st.container(horizontal=True):
+            st.page_link('app_pages/como_funciona.py', label='Conhecer o fluxo completo', icon=':material/route:')
+            st.page_link('app_pages/contato.py', label='Colaborar com o projeto', icon=':material/mail:')
 
-with st.container(border=True):
-    st.subheader(texto('Uma foto pode fazer a diferença', 'A photo can make a difference'))
-    st.write(texto(
-        'O AquaSentinela reúne registros com foto e localização para ajudar a identificar resíduos nos rios, canais e na Baía de Guanabara. A participação de cada pessoa ajuda a mostrar os pontos que precisam de atenção.',
-        'AquaSentinela brings together photo and location reports to help identify waste in rivers, canals and Guanabara Bay. Everyone can help highlight places that need attention.'))
+with trabalho:
+    st.subheader('Nossa equipe')
+    st.caption('Galeria em preparação. Fotos, nomes e funções serão incluídos após confirmação da equipe.')
+    for inicio in (1, 4):
+        for numero, col in zip(range(inicio, min(inicio + 3, 6)), st.columns(3)):
+            with col:
+                espaco_foto(f'Integrante {numero:02d}', 'Nome e função a inserir')
+    st.subheader('O projeto em imagens')
+    temas = [('Equipe', 'Pessoas que constroem o AquaSentinel'),
+             ('Baía', 'O território que queremos acompanhar'), ('Campo', 'Observação e trabalho de campo'),
+             ('Drones', 'Tecnologia em campo'), ('Desenvolvimento', 'Construção da plataforma'),
+             ('Testes', 'Validação e aprendizado')]
+    for inicio in (0, 3):
+        for col, (tema, legenda) in zip(st.columns(3), temas[inicio:inicio+3]):
+            with col:
+                espaco_foto(tema, legenda)
 
-with st.container(border=True):
-    st.subheader(texto('Como funciona', 'How it works'))
-    st.markdown(texto(
-        '1. Tire uma foto ou envie uma imagem do local.\n2. Aguarde a identificação de resíduos pela IA.\n3. Confira a localização e informe o nível de resíduos observado.\n4. Autorize a publicação e envie a ocorrência para revisão. Após validação pela equipe, ela aparece em **Mapa e registros**.',
-        '1. Take a photo or upload an image of the location.\n2. Wait for AI waste identification.\n3. Check the location and report the waste level you observed.\n4. Authorize publication and submit the report for review. After team validation, it appears in **Map and reports**.'))
-
-with st.container(border=True):
-    st.subheader(texto('Tecnologia para apoiar o cuidado ambiental', 'Technology to support environmental care'))
-    st.write(texto(
-        'A inteligência artificial identifica plásticos visíveis e estima a quantidade de itens na foto. A avaliação ambiental · ARI combina informações do local com a previsão de chuva para apoiar a análise.',
-        'Artificial intelligence identifies visible plastics and estimates the number of items in a photo. Environmental assessment · ARI combines site information with the rain forecast to support analysis.'))
-    st.write(texto(
-        'Os resultados precisam de revisão: a IA pode deixar de reconhecer objetos ou confundi-los. A confiança não comprova a autenticidade da foto nem determina, sozinha, a gravidade ambiental.',
-        'Results need review: AI may miss or confuse objects. Confidence does not prove photo authenticity or determine environmental severity on its own.'))
-
-if st.button(texto('Registrar ocorrência', 'Report an occurrence'), type='primary'):
-    st.switch_page('app_pages/registrar.py')
 rodape()

@@ -18,8 +18,12 @@ ENQUADRAMENTOS = {
 }
 
 
-@lru_cache(maxsize=16)
 def imagem(nome, classe='', descricao=''):
+    return _imagem(nome, classe, descricao, em_ingles())
+
+
+@lru_cache(maxsize=32)
+def _imagem(nome, classe='', descricao='', ingles=False):
     x, y, w, h = ENQUADRAMENTOS[nome]
     dimensoes = ((2172, 724) if nome in ('Logo.png', 'f.png', 'g.png') else
                  (1448, 1086) if nome == 'mao-e-fundo.png' else (1254, 1254))
@@ -28,6 +32,15 @@ def imagem(nome, classe='', descricao=''):
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x} {y} {w} {h}" '
            f'preserveAspectRatio="{proporcao}"><image width="{dimensoes[0]}" '
            f'height="{dimensoes[1]}" href="{url}"/></svg>')
+    if nome == 'Logo.png':
+        # Keep the original emblem; render the updated name as vector lettering.
+        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1930 435">'
+               f'<svg width="360" height="435" viewBox="125 150 360 435" overflow="hidden">'
+               f'<image width="2172" height="724" href="{url}"/></svg>'
+               '<text x="400" y="270" font-family="Arial,sans-serif" font-size="225" font-weight="800" '
+               'textLength="1490" lengthAdjust="spacingAndGlyphs" fill="#072c4c">Aqua<tspan fill="#0098d4">Sentinel</tspan></text>'
+               '<text x="408" y="380" font-family="Arial,sans-serif" font-size="80" fill="#365678">'
+               f'{"Cleaner rivers. A better future." if ingles else "Rios mais limpos. Um futuro melhor."}</text></svg>')
     # st.html permite img, mas seu sanitizador remove SVG inline.
     src = 'data:image/svg+xml;base64,' + base64.b64encode(svg.encode()).decode('ascii')
     return f'<img class="asset {classe}" src="{src}" alt="{escape(descricao, quote=True)}" draggable="false">'
@@ -74,21 +87,17 @@ def construir_home(base_url=''):
 <div class="aqua-page"><div class="aqua-home {"english-home" if em_ingles() else ""}">
   <a class="skip-link" href="#como-funciona">{texto('Pular para como funciona', 'Skip to how it works')}</a>
   <header class="aqua-header">
-    <a class="brand" href="{prefixo or '/'}" target="_self" aria-label="AquaSentinela — início">
-      {imagem('Logo.png', 'brand-image', 'AquaSentinela. Rios mais limpos. Um futuro melhor.')}
+    <a class="brand" href="{prefixo or '/'}" target="_self" aria-label="AquaSentinel — início">
+      {imagem('Logo.png', 'brand-image', 'AquaSentinel. Rios mais limpos. Um futuro melhor.')}
     </a>
     <nav class="aqua-nav" aria-label="Navegação principal">
       <a class="nav-about" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>
-      <a class="nav-how" href="#como-funciona">{label_como}</a>
+      <a class="nav-how" href="{prefixo}/como-funciona{query}" target="_self">{label_como}</a>
       <a href="{mapa}{query}" target="_self">{label_mapa}</a>
       <a class="nav-faq" href="{prefixo}/duvidas{query}" target="_self">{label_duvidas}</a>
-      {language_switch}<details class="nav-disclosure nav-more"><summary aria-label="Mais opções"><span aria-hidden="true">•••</span></summary>
-        <div class="nav-panel more-links"><a href="{registrar}{query}" target="_self">{texto('Registrar ocorrência', 'Report an occurrence')}</a>
-        <a href="{mapa}{query}" target="_self">{texto('Mapa e registros', 'Map and reports')}</a>
-        <a href="{ari}{query}" target="_self">{texto('Avaliação ambiental · ARI', 'Environmental assessment · ARI')}</a>
-        <a class="mobile-only" href="#como-funciona">{label_como}</a>
-        <a class="mobile-only" href="{prefixo}/sobre{query}" target="_self">{label_sobre}</a>
-        <a class="mobile-only" href="{prefixo}/duvidas{query}" target="_self">{label_duvidas}</a></div>
+      {language_switch}<details class="nav-disclosure nav-more"><summary aria-label="{texto('Dados e ciência', 'Data and science')}"><span aria-hidden="true">☰</span></summary>
+        <div class="nav-panel more-links"><a href="{prefixo}/dados{query}" target="_self">{texto('Dados e ciência', 'Data and science')}</a>
+        <a href="{prefixo}/transparencia{query}" target="_self">{texto('Transparência', 'Transparency')}</a></div>
       </details>
     </nav>
   </header>
@@ -105,7 +114,24 @@ def construir_home(base_url=''):
         </div>
       </div>
     </section>
-    <section class="how-section" id="como-funciona" aria-labelledby="how-title">
+    <section class="home-how-link" id="como-funciona"><a href="{prefixo}/como-funciona{query}" target="_self">{texto('Veja como funciona, passo a passo', 'See how it works, step by step')} →</a></section>
+    <section class="benefits" aria-label="{texto('Nossa contribuição', 'Our contribution')}">
+      <div class="benefit">{imagem('F1.1.png', 'benefit-leaf')}<div><h3>{texto('Cidadãos engajados', 'Engaged citizens')}</h3><p>{texto('Mais olhos pelos nossos rios', 'More eyes on our rivers')}</p></div></div>
+      <div class="benefit">{imagem('F2.2.png', 'benefit-target')}<div><h3>{texto('Ações mais rápidas', 'Faster action')}</h3><p>{texto('Informações que viram impacto', 'Information that drives impact')}</p></div></div>
+      <div class="benefit">{imagem('F3.3.png', 'benefit-water')}<div><h3>{texto('Rios e Baía mais limpos', 'Cleaner rivers and bay')}</h3><p>{texto('Um futuro melhor pra todos', 'A better future for everyone')}</p></div></div>
+      <div class="benefit">{imagem('F4.4.png', 'benefit-heart')}<div><h3>{texto('Tecnologia a serviço<br>do bem comum', 'Technology for<br>the common good')}</h3></div></div>
+    </section>
+  </main>
+  <footer class="aqua-footer">{ondas_rodape('footer-waves')}
+    <span class="footer-signature">{texto('Água limpa move vidas', 'Clean water moves lives')} {icone(ONDA, '#46b2cb', 'traco-onda')}</span>
+  </footer>
+</div></div>'''
+
+
+def tutorial_ilustrado():
+    simples = texto('É muito simples', 'It is very simple')
+    simples_desc = texto('Uma observação segura começa com estes passos.', 'A safe observation starts with these steps.')
+    return f'''<div class="tutorial-ilustrado">    <section class="how-section" id="como-funciona" aria-labelledby="how-title">
       <h2 id="how-title">{simples}</h2>
       <p class="how-intro">{simples_desc}</p>
       <div class="step-grid">
@@ -120,7 +146,7 @@ def construir_home(base_url=''):
         <article class="step-card level-card"><span class="step-number" aria-label="Etapa 3">3</span>
           <div class="step-art">{imagem('F3.png', 'step-level')}</div>
           <h3>{texto('Informe o nível', 'Report the level')}</h3><p>{texto('Diga o quanto de resíduo<br>há no local.', 'Tell us how much waste<br>is at the location.')}</p>
-          <div class="level-badges" aria-label="{texto('Níveis de resíduos', 'Waste levels')}"><span class="low"><i></i>{texto('Pouco', 'Low')}</span><span class="medium"><i></i>{texto('Moderado', 'Moderate')}</span><span class="high"><i></i>{texto('Muito', 'High')}</span><span class="blocked"><i></i>{texto('Bloqueando', 'Blocking')}</span></div>
+          <div class="level-badges" aria-label="{texto('Níveis de resíduos', 'Waste levels')}"><span class="low"><i></i>{texto('Pouco', 'Low')}</span><span class="medium"><i></i>{texto('Moderado', 'Moderate')}</span><span class="high"><i></i>{texto('Muito poluído', 'Very polluted')}</span><span class="blocked"><i></i>{texto('Bloqueando', 'Blocking')}</span></div>
         </article>
         <article class="community-card">
           <div class="community-art">{imagem('F4.png', 'step-community')}</div>
@@ -128,14 +154,4 @@ def construir_home(base_url=''):
         </article>
       </div>
     </section>
-    <section class="benefits" aria-label="{texto('Nossa contribuição', 'Our contribution')}">
-      <div class="benefit">{imagem('F1.1.png', 'benefit-leaf')}<div><h3>{texto('Cidadãos engajados', 'Engaged citizens')}</h3><p>{texto('Mais olhos pelos nossos rios', 'More eyes on our rivers')}</p></div></div>
-      <div class="benefit">{imagem('F2.2.png', 'benefit-target')}<div><h3>{texto('Ações mais rápidas', 'Faster action')}</h3><p>{texto('Informações que viram impacto', 'Information that drives impact')}</p></div></div>
-      <div class="benefit">{imagem('F3.3.png', 'benefit-water')}<div><h3>{texto('Rios e Baía mais limpos', 'Cleaner rivers and bay')}</h3><p>{texto('Um futuro melhor pra todos', 'A better future for everyone')}</p></div></div>
-      <div class="benefit">{imagem('F4.4.png', 'benefit-heart')}<div><h3>{texto('Tecnologia a serviço<br>do bem comum', 'Technology for<br>the common good')}</h3></div></div>
-    </section>
-  </main>
-  <footer class="aqua-footer">{ondas_rodape('footer-waves')}
-    <span class="footer-signature">{texto('Água limpa move vidas', 'Clean water moves lives')} {icone(ONDA, '#46b2cb', 'traco-onda')}</span>
-  </footer>
-</div></div>'''
+</div>'''
