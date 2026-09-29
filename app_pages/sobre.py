@@ -40,11 +40,28 @@ with sobre:
 
 with trabalho:
     st.subheader('Nossa equipe')
-    st.caption('Galeria em preparação. Fotos, nomes e funções serão incluídos após confirmação da equipe.')
-    for inicio in (1, 4):
-        for numero, col in zip(range(inicio, min(inicio + 3, 6)), st.columns(3)):
+    st.caption('Equipe do AquaSentinel. As demais fotos serão incluídas à medida que forem confirmadas pelos integrantes.')
+
+    integrantes = [
+        ('Larissa Oliveira de Sá', 'Equipe AquaSentinel'),
+        ('Alessandra Vaz dos Anjos Santos', 'Equipe AquaSentinel'),
+        ('Felipe Mamed de Souza', 'Equipe AquaSentinel'),
+        ('Alexandre Rodrigues', 'Mestrando em Sistemas e Computação no IME; atua na arquitetura, backend e integração do AquaSentinel.'),
+        ('Marcela', 'Equipe AquaSentinel'),
+        ('Adriel Faddul Stelzenberger Saber', 'Equipe AquaSentinel'),
+    ]
+
+    for inicio in (0, 3):
+        for indice, col in zip(range(inicio, inicio + 3), st.columns(3)):
+            nome, bio = integrantes[indice]
             with col:
-                espaco_foto(f'Integrante {numero:02d}', 'Nome e função a inserir')
+                if indice == 3:
+                    st.image('assets/equipe/alexandre-rodrigues.jpg', use_container_width=True)
+                    st.markdown(f'**{nome}**')
+                    st.caption(bio)
+                else:
+                    espaco_foto(nome, bio)
+
     st.subheader('O projeto em imagens')
     temas = [('Equipe', 'Pessoas que constroem o AquaSentinel'),
              ('Baía', 'O território que queremos acompanhar'), ('Campo', 'Observação e trabalho de campo'),
