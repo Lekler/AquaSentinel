@@ -48,11 +48,11 @@ with trabalho:
         ('Felipe Mamed de Souza', 'Equipe AquaSentinel'),
         ('Alexandre Rodrigues', 'Mestrando em Sistemas e Computação no IME; atua na arquitetura, backend e integração do AquaSentinel.'),
         ('Marcela', 'Equipe AquaSentinel'),
-        ('Adriel Faddul Stelzenberger Saber', 'Equipe AquaSentinel'),
     ]
 
-    for inicio in (0, 3):
-        for indice, col in zip(range(inicio, inicio + 3), st.columns(3)):
+    for inicio in range(0, len(integrantes), 3):
+        indices = range(inicio, min(inicio + 3, len(integrantes)))
+        for indice, col in zip(indices, st.columns(3)):
             nome, bio = integrantes[indice]
             with col:
                 if indice == 3:
