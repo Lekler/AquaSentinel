@@ -1,0 +1,2207 @@
+[
+  {
+    "itens": [
+      {
+        "bbox": [
+          177.61648559570312,
+          357.51971435546875,
+          296.4145812988281,
+          460.54339599609375
+        ],
+        "confidence": 0.9056099653244019,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0001",
+        "confidence_pct": 90.56,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          468.1025085449219,
+          445.6649169921875,
+          561.8125,
+          512.96533203125
+        ],
+        "confidence": 0.8076101541519165,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0002",
+        "confidence_pct": 80.76,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          400.8555603027344,
+          473.72235107421875,
+          448.7579040527344,
+          513.5994873046875
+        ],
+        "confidence": 0.7773069739341736,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0003",
+        "confidence_pct": 77.73,
+        "classe_pt": "Embalagem plástica"
+      }
+    ],
+    "total": 3,
+    "deteccoes_modelo": 3,
+    "duplicadas_removidas": 0,
+    "confianca_media": 83.02,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Sacola plástica": 2,
+      "Embalagem plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "7efbad584ab04723f7915c9d3d2963104907b139af804ceccf153f7ec4f1ad94",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:20.205061+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-7efbad584ab04723",
+    "registrado_em": "2026-10-03T08:47:20.318402+00:00",
+    "nome": "Rio Botas · Comendador Soares, Nova Iguaçu",
+    "latitude": -22.752,
+    "longitude": -43.478,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Resíduos entre raízes e margem",
+    "arquivo_original": "Frame 1010.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://novaiguacu.rj.gov.br/2025/01/20/nova-iguacu-intensifica-limpeza-de-rios-e-valoes-para-evitar-enchentes-causadas-pelas-chuvas-de-verao-2/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          296.2967529296875,
+          259.5451965332031,
+          347.5648193359375,
+          297.4091491699219
+        ],
+        "confidence": 0.8078258037567139,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 80.78,
+        "classe_pt": "Garrafa plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 80.78,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "1f0b1f999e582d0e1c8fa7a11255acf0e468a730b21ae18c79248376d8ad48d4",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:20.422482+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-1f0b1f999e582d0e",
+    "registrado_em": "2026-10-03T08:47:20.440548+00:00",
+    "nome": "Rio Botas · Santa Eugênia, Nova Iguaçu",
+    "latitude": -22.759,
+    "longitude": -43.45,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Objeto flutuante junto ao concreto",
+    "arquivo_original": "Frame 169.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://novaiguacu.rj.gov.br/2025/01/20/nova-iguacu-intensifica-limpeza-de-rios-e-valoes-para-evitar-enchentes-causadas-pelas-chuvas-de-verao-2/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          364.98944091796875,
+          272.69622802734375,
+          504.70416259765625,
+          397.72564697265625
+        ],
+        "confidence": 0.9494051933288574,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0001",
+        "confidence_pct": 94.94,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          113.31893157958984,
+          273.161376953125,
+          364.4438781738281,
+          390.321533203125
+        ],
+        "confidence": 0.6259886622428894,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0002",
+        "confidence_pct": 62.6,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          86.55416870117188,
+          274.42694091796875,
+          299.9520263671875,
+          438.40667724609375
+        ],
+        "confidence": 0.7265431880950928,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0003",
+        "confidence_pct": 72.65,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          21.176040649414062,
+          279.0304260253906,
+          87.45315551757812,
+          439.6907043457031
+        ],
+        "confidence": 0.8715911507606506,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0004",
+        "confidence_pct": 87.16,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          437.3056335449219,
+          464.34765625,
+          607.070556640625,
+          594.09716796875
+        ],
+        "confidence": 0.6557952165603638,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0005",
+        "confidence_pct": 65.58,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          294.6043701171875,
+          592.0859985351562,
+          453.4417724609375,
+          640
+        ],
+        "confidence": 0.7089921832084656,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0006",
+        "confidence_pct": 70.9,
+        "classe_pt": "Garrafa plástica"
+      }
+    ],
+    "total": 6,
+    "deteccoes_modelo": 6,
+    "duplicadas_removidas": 0,
+    "confianca_media": 75.64,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Outros plásticos": 2,
+      "Garrafa plástica": 4
+    },
+    "possivel_limite": false,
+    "image_hash": "12516838f0c03d1aa75b5575d1b052bc10ece3577baa60ee7988bee07f0b6c73",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:20.546320+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-12516838f0c03d1a",
+    "registrado_em": "2026-10-03T08:47:20.607568+00:00",
+    "nome": "Baía de Guanabara · Praia da Bica, Jardim Guanabara",
+    "latitude": -22.8216,
+    "longitude": -43.19,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Recipientes acumulados na água",
+    "arquivo_original": "Frame 1981.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.rio.rj.gov.br/web/guest/exibeconteudo?id=6082231",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          308.64471435546875,
+          339.3507080078125,
+          384.94635009765625,
+          423.2535400390625
+        ],
+        "confidence": 0.7814122438430786,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0001",
+        "confidence_pct": 78.14,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 78.14,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "020ec2dc937b7e228c1ba0a69024a2dd1dffba303278aaa237d00a03ab5d906f",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:20.703953+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-020ec2dc937b7e22",
+    "registrado_em": "2026-10-03T08:47:20.723061+00:00",
+    "nome": "Rio Botas · Caioaba, Nova Iguaçu",
+    "latitude": -22.737,
+    "longitude": -43.441,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Embalagem próxima à passagem de água",
+    "arquivo_original": "Frame 2021.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://novaiguacu.rj.gov.br/2025/01/20/nova-iguacu-intensifica-limpeza-de-rios-e-valoes-para-evitar-enchentes-causadas-pelas-chuvas-de-verao-2/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          318.300048828125,
+          221.83602905273438,
+          408.8975830078125,
+          301.3364562988281
+        ],
+        "confidence": 0.9476379752159119,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0001",
+        "confidence_pct": 94.76,
+        "classe_pt": "Embalagem plástica"
+      },
+      {
+        "bbox": [
+          205.1744384765625,
+          364.40966796875,
+          290.518310546875,
+          401.60675048828125
+        ],
+        "confidence": 0.8141359686851501,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0002",
+        "confidence_pct": 81.41,
+        "classe_pt": "Embalagem plástica"
+      }
+    ],
+    "total": 2,
+    "deteccoes_modelo": 2,
+    "duplicadas_removidas": 0,
+    "confianca_media": 88.09,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Embalagem plástica": 2
+    },
+    "possivel_limite": false,
+    "image_hash": "b1dc2dde4ecea3d564e2bf04e964fe1d36c4915fdd91c2e4437b7d6816684fb3",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:20.844550+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-b1dc2dde4ecea3d5",
+    "registrado_em": "2026-10-03T08:47:20.876675+00:00",
+    "nome": "Rio Botas · Engenho Pequeno, Nova Iguaçu",
+    "latitude": -22.726,
+    "longitude": -43.423,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Embalagens claras na superfície",
+    "arquivo_original": "Frame 313.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://novaiguacu.rj.gov.br/2025/01/20/nova-iguacu-intensifica-limpeza-de-rios-e-valoes-para-evitar-enchentes-causadas-pelas-chuvas-de-verao-2/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          122.28666687011719,
+          18.57709503173828,
+          190.2896270751953,
+          94.67988586425781
+        ],
+        "confidence": 0.7530578970909119,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0001",
+        "confidence_pct": 75.31,
+        "classe_pt": "Embalagem plástica"
+      },
+      {
+        "bbox": [
+          400.555419921875,
+          351.80615234375,
+          457.715087890625,
+          416.41339111328125
+        ],
+        "confidence": 0.7307879328727722,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0002",
+        "confidence_pct": 73.08,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          235.26600646972656,
+          525.0695190429688,
+          277.63037109375,
+          616.6171264648438
+        ],
+        "confidence": 0.8712543249130249,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0003",
+        "confidence_pct": 87.13,
+        "classe_pt": "Garrafa plástica"
+      }
+    ],
+    "total": 3,
+    "deteccoes_modelo": 3,
+    "duplicadas_removidas": 0,
+    "confianca_media": 78.5,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Embalagem plástica": 1,
+      "Sacola plástica": 1,
+      "Garrafa plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "84ba62cbab2bf06a7a85ee2eecfbc7f2cef5e64820211e7e6205f4750501b4e3",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:21.185830+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-84ba62cbab2bf06a",
+    "registrado_em": "2026-10-03T08:47:21.225459+00:00",
+    "nome": "Rio Botas · Heliópolis, Belford Roxo",
+    "latitude": -22.747,
+    "longitude": -43.392,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Objetos dispersos na água",
+    "arquivo_original": "Frame 344.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://prefeituradebelfordroxo.rj.gov.br/2025/09/25/corpo-de-bombeiros-em-parceria-com-secretaria-de-protecao-animal-resgatam-macaco-prego-e-jiboia/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          294.42138671875,
+          184.68597412109375,
+          334.21337890625,
+          262.1944580078125
+        ],
+        "confidence": 0.8528967499732971,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 85.29,
+        "classe_pt": "Garrafa plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 85.29,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "4679514fd61fc61945cd6a795232b22ae8ee3903e042a421db12d2c63db48492",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:21.401516+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-4679514fd61fc619",
+    "registrado_em": "2026-10-03T08:47:21.418611+00:00",
+    "nome": "Rio Iguaçu · Baixada Fluminense, trecho oeste",
+    "latitude": -22.686,
+    "longitude": -43.41,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Garrafa isolada na superfície",
+    "arquivo_original": "Frame 44.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.inea.rj.gov.br/biodiversidade-territorio/conheca-as-unidades-de-conservacao/apa-do-alto-iguacu/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          512.6912841796875,
+          169.822021484375,
+          550.1505126953125,
+          216.55218505859375
+        ],
+        "confidence": 0.6986117959022522,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0001",
+        "confidence_pct": 69.86,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 69.86,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "ae44eedf15cd65a870b635a8adea6389c55f85915ef23dc46c4ff3adf33267cc",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:21.546470+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-ae44eedf15cd65a8",
+    "registrado_em": "2026-10-03T08:47:21.566310+00:00",
+    "nome": "Rio Iguaçu · Baixada Fluminense, trecho central",
+    "latitude": -22.708,
+    "longitude": -43.365,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Resíduos entre a vegetação aquática",
+    "arquivo_original": "Frame 546.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.inea.rj.gov.br/biodiversidade-territorio/conheca-as-unidades-de-conservacao/apa-do-alto-iguacu/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          418.16558837890625,
+          150.41876220703125,
+          477.04449462890625,
+          317.99371337890625
+        ],
+        "confidence": 0.7136068940162659,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 71.36,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          124.70541381835938,
+          326.6658935546875,
+          261.803955078125,
+          450.5152587890625
+        ],
+        "confidence": 0.844745397567749,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0002",
+        "confidence_pct": 84.47,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 2,
+    "deteccoes_modelo": 2,
+    "duplicadas_removidas": 0,
+    "confianca_media": 77.92,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 1,
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "049b7242a163af67e63790508fe654a1caae5cdd5d314cbd6f5378dce11c849b",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:21.680716+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-049b7242a163af67",
+    "registrado_em": "2026-10-03T08:47:21.707683+00:00",
+    "nome": "Rio Iguaçu · Baixada Fluminense, trecho leste",
+    "latitude": -22.725,
+    "longitude": -43.321,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Material claro flutuante",
+    "arquivo_original": "Frame 646.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.inea.rj.gov.br/biodiversidade-territorio/conheca-as-unidades-de-conservacao/apa-do-alto-iguacu/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          381.7327880859375,
+          226.23919677734375,
+          479.36737060546875,
+          263.658203125
+        ],
+        "confidence": 0.7683411240577698,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 76.83,
+        "classe_pt": "Garrafa plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 76.83,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "b43415a0a1c0e8dc35e39466afea050628993f871fff3b1f00f6a95fb795e092",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:21.836411+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-b43415a0a1c0e8dc",
+    "registrado_em": "2026-10-03T08:47:21.854781+00:00",
+    "nome": "Rio Sarapuí · Baixada Fluminense, trecho oeste",
+    "latitude": -22.795,
+    "longitude": -43.401,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Garrafa junto à margem vegetada",
+    "arquivo_original": "Frame 713.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://transparencia.duquedecaxias.rj.gov.br/portal/images/arquivos/docs/Licitacoes/62882.2014.pdf",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          152.56149291992188,
+          129.70411682128906,
+          471.5317687988281,
+          395.068603515625
+        ],
+        "confidence": 0.9458741545677185,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0001",
+        "confidence_pct": 94.59,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 94.59,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "ee6d3caab34864a621e98d3146c0e37fb8f919eb00039335428e9099d074f9f2",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:21.971761+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-ee6d3caab34864a6",
+    "registrado_em": "2026-10-03T08:47:21.989709+00:00",
+    "nome": "Rio Sarapuí · Baixada Fluminense, trecho central",
+    "latitude": -22.773,
+    "longitude": -43.363,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Sacola branca na água",
+    "arquivo_original": "Frame 774.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://transparencia.duquedecaxias.rj.gov.br/portal/images/arquivos/docs/Licitacoes/62882.2014.pdf",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          138.20912170410156,
+          101.06336975097656,
+          546.6895751953125,
+          554.650390625
+        ],
+        "confidence": 0.9356809258460999,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0001",
+        "confidence_pct": 93.57,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 93.57,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "8e60b3baff2551ef58785c3f1b6e9ca363cece3f2a78d426626878254d099a10",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:22.146429+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-8e60b3baff2551ef",
+    "registrado_em": "2026-10-03T08:47:22.167932+00:00",
+    "nome": "Rio Sarapuí · Baixada Fluminense, trecho leste",
+    "latitude": -22.748,
+    "longitude": -43.31,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Sacola transparente na margem",
+    "arquivo_original": "Frame 815.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://transparencia.duquedecaxias.rj.gov.br/portal/images/arquivos/docs/Licitacoes/62882.2014.pdf",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          329.5048828125,
+          375.3436279296875,
+          460.060546875,
+          515.1083984375
+        ],
+        "confidence": 0.8677140474319458,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0001",
+        "confidence_pct": 86.77,
+        "classe_pt": "Embalagem plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 86.77,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Embalagem plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "a6c23d6a41da672c2d9d5892f68a63bd3c7aa5b48c5ed61dd92c5e6992060cca",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:22.278460+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-a6c23d6a41da672c",
+    "registrado_em": "2026-10-03T08:47:22.296449+00:00",
+    "nome": "Baía de Guanabara · Praia da Bandeira, Ilha do Governador",
+    "latitude": -22.815,
+    "longitude": -43.173,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Recipiente claro na água escura",
+    "arquivo_original": "Frame 871.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://prefeitura.rio/infraestrutura/orla-da-ilha-do-governador-e-entregue-a-populacao-apos-reforma-e-reurbanizacao-de-quatro-praias/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          324.1165771484375,
+          354.7071533203125,
+          428.0811767578125,
+          464.97601318359375
+        ],
+        "confidence": 0.9616061449050903,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0001",
+        "confidence_pct": 96.16,
+        "classe_pt": "Embalagem plástica"
+      }
+    ],
+    "total": 1,
+    "deteccoes_modelo": 1,
+    "duplicadas_removidas": 0,
+    "confianca_media": 96.16,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Embalagem plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "7f45d99eb0da3391abb3ce30f55ac1d20389a13533d6b3cec0b805cb534bae09",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:22.431648+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-7f45d99eb0da3391",
+    "registrado_em": "2026-10-03T08:47:22.452274+00:00",
+    "nome": "Baía de Guanabara · Cocotá, Ilha do Governador",
+    "latitude": -22.803,
+    "longitude": -43.177,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Acúmulo de embalagens no canal",
+    "arquivo_original": "Frame 882.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://prefeitura.rio/infraestrutura/orla-da-ilha-do-governador-e-entregue-a-populacao-apos-reforma-e-reurbanizacao-de-quatro-praias/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          328.0914306640625,
+          114.16063690185547,
+          530.6641845703125,
+          272.8912353515625
+        ],
+        "confidence": 0.5745134353637695,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 57.45,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          482.0482482910156,
+          222.5386505126953,
+          639.9344482421875,
+          350.71929931640625
+        ],
+        "confidence": 0.6545053720474243,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0002",
+        "confidence_pct": 65.45,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          2.442169189453125,
+          377.45501708984375,
+          319.9895324707031,
+          611.0552368164062
+        ],
+        "confidence": 0.7959481477737427,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0003",
+        "confidence_pct": 79.59,
+        "classe_pt": "Embalagem plástica"
+      },
+      {
+        "bbox": [
+          354.301513671875,
+          501.13653564453125,
+          596.3099365234375,
+          640
+        ],
+        "confidence": 0.8642953038215637,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0004",
+        "confidence_pct": 86.43,
+        "classe_pt": "Garrafa plástica"
+      }
+    ],
+    "total": 4,
+    "deteccoes_modelo": 5,
+    "duplicadas_removidas": 1,
+    "confianca_media": 72.23,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 3,
+      "Embalagem plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "94081d2689a0b443af3dee89adcda9e13d6bb46abfd89d6383d657eab74cf507",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:22.559562+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-94081d2689a0b443",
+    "registrado_em": "2026-10-03T08:47:22.605402+00:00",
+    "nome": "Baía de Guanabara · Pitangueiras, Ilha do Governador",
+    "latitude": -22.817,
+    "longitude": -43.178,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Recipientes agrupados na margem",
+    "arquivo_original": "Frame 940.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://prefeitura.rio/infraestrutura/orla-da-ilha-do-governador-e-entregue-a-populacao-apos-reforma-e-reurbanizacao-de-quatro-praias/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          278.5337219238281,
+          190.38046264648438,
+          376.4652404785156,
+          244.13229370117188
+        ],
+        "confidence": 0.8095782995223999,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 80.96,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          184.35317993164062,
+          237.7048797607422,
+          304.9535827636719,
+          348.17352294921875
+        ],
+        "confidence": 0.7657909989356995,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0002",
+        "confidence_pct": 76.58,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 2,
+    "deteccoes_modelo": 2,
+    "duplicadas_removidas": 0,
+    "confianca_media": 78.77,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 1,
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "21528de67e1e6284560b975f0fb9d3f81dec77e6ac3bca5919aedbc7fe48a655",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:22.711451+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-21528de67e1e6284",
+    "registrado_em": "2026-10-03T08:47:22.738877+00:00",
+    "nome": "Baía de Guanabara · Praia da Guanabara, Freguesia",
+    "latitude": -22.787,
+    "longitude": -43.166,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Sacola e resíduos na borda da água",
+    "arquivo_original": "Frame 987.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://prefeitura.rio/infraestrutura/orla-da-ilha-do-governador-e-entregue-a-populacao-apos-reforma-e-reurbanizacao-de-quatro-praias/",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          356.73907470703125,
+          120.21676635742188,
+          371.36273193359375,
+          142.05593872070312
+        ],
+        "confidence": 0.475871741771698,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0001",
+        "confidence_pct": 47.59,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          449.75933837890625,
+          190.45257568359375,
+          468.86285400390625,
+          219.8564453125
+        ],
+        "confidence": 0.8060034513473511,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0002",
+        "confidence_pct": 80.6,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          219.068359375,
+          368.4335632324219,
+          236.466796875,
+          394.2707824707031
+        ],
+        "confidence": 0.676516592502594,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0003",
+        "confidence_pct": 67.65,
+        "classe_pt": "Outros plásticos"
+      }
+    ],
+    "total": 3,
+    "deteccoes_modelo": 3,
+    "duplicadas_removidas": 0,
+    "confianca_media": 65.28,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Outros plásticos": 2,
+      "Garrafa plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "e68b8fc53b5038a3c3883f430822ee62e2d649a555f91d4cae89795ae02a486d",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:22.837984+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-e68b8fc53b5038a3",
+    "registrado_em": "2026-10-03T08:47:22.872096+00:00",
+    "nome": "Baía de Guanabara · Bancários, Ilha do Governador",
+    "latitude": -22.785,
+    "longitude": -43.181,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Pequenos objetos dispersos",
+    "arquivo_original": "frame0074_jpg.jpg",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.rio.rj.gov.br/web/guest/exibeconteudo?id=4360872",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          355.801025390625,
+          3.3246803283691406,
+          369.4136962890625,
+          33.39456558227539
+        ],
+        "confidence": 0.6870713233947754,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0001",
+        "confidence_pct": 68.71,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          541.1170043945312,
+          62.61651611328125,
+          572.5346069335938,
+          122.96432495117188
+        ],
+        "confidence": 0.7287994027137756,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0002",
+        "confidence_pct": 72.88,
+        "classe_pt": "Embalagem plástica"
+      }
+    ],
+    "total": 2,
+    "deteccoes_modelo": 2,
+    "duplicadas_removidas": 0,
+    "confianca_media": 70.79,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Outros plásticos": 1,
+      "Embalagem plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "0c2407582082d71258223b8bf4dce83b24e07a1c38f2f3e52f57400cc585c5b1",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:23.003505+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-0c2407582082d712",
+    "registrado_em": "2026-10-03T08:47:23.030094+00:00",
+    "nome": "Baía de Guanabara · Ribeira, Ilha do Governador",
+    "latitude": -22.826,
+    "longitude": -43.17,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Embalagem vermelha flutuante",
+    "arquivo_original": "frame0217_jpg.jpg",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://multirio.rio.rj.gov.br/index.php/reportagens/906-conheca-os-15-bairros-que-integram-a-20-regiao-administrativa-ilha-do-governador",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          481.86932373046875,
+          0,
+          507.71917724609375,
+          32.648014068603516
+        ],
+        "confidence": 0.7067270278930664,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0001",
+        "confidence_pct": 70.67,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          505.30029296875,
+          146.11141967773438,
+          623.7139892578125,
+          320.4755554199219
+        ],
+        "confidence": 0.9423824548721313,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0002",
+        "confidence_pct": 94.24,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          416.00592041015625,
+          152.05377197265625,
+          472.09283447265625,
+          256.1160583496094
+        ],
+        "confidence": 0.8737110495567322,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0003",
+        "confidence_pct": 87.37,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          97.74589538574219,
+          201.64202880859375,
+          123.71772766113281,
+          224.94891357421875
+        ],
+        "confidence": 0.6424430012702942,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0004",
+        "confidence_pct": 64.24,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          413.750244140625,
+          224.21493530273438,
+          507.4632568359375,
+          360.0342102050781
+        ],
+        "confidence": 0.9474738240242004,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0005",
+        "confidence_pct": 94.75,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          139.20541381835938,
+          279.12957763671875,
+          220.24429321289062,
+          380.66583251953125
+        ],
+        "confidence": 0.9078236222267151,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0006",
+        "confidence_pct": 90.78,
+        "classe_pt": "Sacola plástica"
+      },
+      {
+        "bbox": [
+          13.65060043334961,
+          310.9981689453125,
+          39.50801086425781,
+          347.5863037109375
+        ],
+        "confidence": 0.43858957290649414,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0007",
+        "confidence_pct": 43.86,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          71.69599151611328,
+          323.190185546875,
+          95.14350128173828,
+          349.66064453125
+        ],
+        "confidence": 0.7402209639549255,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0008",
+        "confidence_pct": 74.02,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          243.27029418945312,
+          433.01226806640625,
+          287.1660461425781,
+          465.93402099609375
+        ],
+        "confidence": 0.8390997648239136,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0009",
+        "confidence_pct": 83.91,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          431.770263671875,
+          560.3565063476562,
+          453.68115234375,
+          596.1431274414062
+        ],
+        "confidence": 0.7755546569824219,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0010",
+        "confidence_pct": 77.56,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          277.8326110839844,
+          615.7615966796875,
+          296.6904602050781,
+          640
+        ],
+        "confidence": 0.5063418745994568,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0011",
+        "confidence_pct": 50.63,
+        "classe_pt": "Outros plásticos"
+      }
+    ],
+    "total": 11,
+    "deteccoes_modelo": 11,
+    "duplicadas_removidas": 0,
+    "confianca_media": 75.64,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Garrafa plástica": 3,
+      "Sacola plástica": 4,
+      "Outros plásticos": 4
+    },
+    "possivel_limite": false,
+    "image_hash": "53fe6d407a6ebc098e5d6d632716d60ff1b67da12e4312eca05b2afdee5c0162",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:23.138540+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-53fe6d407a6ebc09",
+    "registrado_em": "2026-10-03T08:47:23.243706+00:00",
+    "nome": "Baía de Guanabara · Zumbi, Ilha do Governador",
+    "latitude": -22.823,
+    "longitude": -43.176,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Sacolas e embalagens na superfície",
+    "arquivo_original": "frame0451_jpg.jpg",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.rio.rj.gov.br/web/guest/exibeconteudo?id=4360872",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          398.4206848144531,
+          0,
+          413.8719787597656,
+          20.080698013305664
+        ],
+        "confidence": 0.6679800748825073,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0001",
+        "confidence_pct": 66.8,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          92.01921081542969,
+          0.01224517822265625,
+          116.6453857421875,
+          23.687122344970703
+        ],
+        "confidence": 0.518497109413147,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0002",
+        "confidence_pct": 51.85,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          497.2760009765625,
+          23.9476318359375,
+          557.6983642578125,
+          79.15434265136719
+        ],
+        "confidence": 0.6801525354385376,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0003",
+        "confidence_pct": 68.02,
+        "classe_pt": "Embalagem plástica"
+      },
+      {
+        "bbox": [
+          374.1656494140625,
+          59.34126281738281,
+          398.5240478515625,
+          97.68296813964844
+        ],
+        "confidence": 0.6836212277412415,
+        "class_id": 0,
+        "class_name": "other_plastic",
+        "item_id": "MAR-0004",
+        "confidence_pct": 68.36,
+        "classe_pt": "Outros plásticos"
+      },
+      {
+        "bbox": [
+          347.48907470703125,
+          429.93975830078125,
+          384.78094482421875,
+          482.12530517578125
+        ],
+        "confidence": 0.6908586025238037,
+        "class_id": 2,
+        "class_name": "plastic_bottle",
+        "item_id": "MAR-0005",
+        "confidence_pct": 69.09,
+        "classe_pt": "Garrafa plástica"
+      },
+      {
+        "bbox": [
+          235.90475463867188,
+          490.361083984375,
+          270.57733154296875,
+          551.2659912109375
+        ],
+        "confidence": 0.5182390213012695,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0006",
+        "confidence_pct": 51.82,
+        "classe_pt": "Embalagem plástica"
+      }
+    ],
+    "total": 6,
+    "deteccoes_modelo": 7,
+    "duplicadas_removidas": 1,
+    "confianca_media": 62.66,
+    "triagem": "revisao_recomendada",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Outros plásticos": 3,
+      "Embalagem plástica": 2,
+      "Garrafa plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "500fde10425f777117697ad0f483f495216492fb455454142d2365bf31988ff2",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:23.336117+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-500fde10425f7771",
+    "registrado_em": "2026-10-03T08:47:23.395854+00:00",
+    "nome": "Baía de Guanabara · Moneró, Ilha do Governador",
+    "latitude": -22.788,
+    "longitude": -43.201,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Recipientes espalhados na água",
+    "arquivo_original": "frame0463_jpg.jpg",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.rio.rj.gov.br/web/guest/exibeconteudo?id=4360872",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  },
+  {
+    "itens": [
+      {
+        "bbox": [
+          245.65989685058594,
+          16.378402709960938,
+          276.1734619140625,
+          45.217933654785156
+        ],
+        "confidence": 0.7640507817268372,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0001",
+        "confidence_pct": 76.41,
+        "classe_pt": "Embalagem plástica"
+      },
+      {
+        "bbox": [
+          209.02182006835938,
+          334.09356689453125,
+          253.62490844726562,
+          368.05609130859375
+        ],
+        "confidence": 0.9060908555984497,
+        "class_id": 3,
+        "class_name": "plastic_package",
+        "item_id": "MAR-0002",
+        "confidence_pct": 90.61,
+        "classe_pt": "Embalagem plástica"
+      },
+      {
+        "bbox": [
+          11.109733581542969,
+          538.8878784179688,
+          57.430755615234375,
+          607.8264770507812
+        ],
+        "confidence": 0.8987112045288086,
+        "class_id": 1,
+        "class_name": "plastic_bag",
+        "item_id": "MAR-0003",
+        "confidence_pct": 89.87,
+        "classe_pt": "Sacola plástica"
+      }
+    ],
+    "total": 3,
+    "deteccoes_modelo": 3,
+    "duplicadas_removidas": 0,
+    "confianca_media": 85.63,
+    "triagem": "deteccao_consistente",
+    "autenticidade": "nao_verificada",
+    "por_classe": {
+      "Embalagem plástica": 2,
+      "Sacola plástica": 1
+    },
+    "possivel_limite": false,
+    "image_hash": "733fd1f81fd774b65517986958e5f0a3d42d2932cc61e5eea63f040878d8d725",
+    "model_hash": "cb3094e99e6c024b3f194a7d31fad18e6f07ea91f2715c5ff1e4d4982adc7de2",
+    "analisado_em": "2026-10-03T08:47:23.502392+00:00",
+    "dimensoes": [
+      640,
+      640
+    ],
+    "dimensoes_originais": [
+      640,
+      640
+    ],
+    "parametros": {
+      "confidence": 0.4,
+      "iou": 0.55,
+      "image_size": 640,
+      "max_det": 1000
+    },
+    "metodo": "foto-nms-1",
+    "classes_modelo": [
+      "other_plastic",
+      "plastic_bag",
+      "plastic_bottle",
+      "plastic_package"
+    ],
+    "modelo_arquivo": "best.pt",
+    "modelo_runtime": "ultralytics 8.4.156",
+    "id": "acervo-733fd1f81fd774b6",
+    "registrado_em": "2026-10-03T08:47:23.538040+00:00",
+    "nome": "Baía de Guanabara · Galeão, Ilha do Governador",
+    "latitude": -22.818,
+    "longitude": -43.244,
+    "nivel_informado": "Não classificado",
+    "observacoes": "Localização de referência atribuída ao acervo; não comprova o local de captura.",
+    "origem_foto": "acervo_de_testes",
+    "origem_localizacao": "atribuida_para_demonstracao",
+    "revisao": "analise_tecnica",
+    "consentimento_publicacao": false,
+    "modo": "oportunistico",
+    "versao_app": "2026.09-ciencia-aberta-v1",
+    "versao_metodologia": "wps-corpo-confirmado-v2",
+    "etapa": "aguardando revisão",
+    "versoes_indices": {
+      "wps": "WPS v1",
+      "cs": "CS v1",
+      "aquaverify": "AquaVerify v1"
+    },
+    "titulo": "Objeto claro junto à estrutura",
+    "arquivo_original": "yr.png",
+    "coordenadas_aproximadas": true,
+    "local_captura_confirmado": false,
+    "fonte_geografica": "https://www.rio.rj.gov.br/web/guest/exibeconteudo?id=4360872",
+    "conjunto": "acervo-apresentacao-2026-10",
+    "validacao_campo": false
+  }
+]

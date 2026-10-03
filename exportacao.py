@@ -34,6 +34,7 @@ def gerar_excel(registro):
         ('pHash — método', (registro.get('phash') or {}).get('versao', 'Não disponível')),
         ('pHash — principal', (registro.get('phash') or {}).get('principal', 'Não informativo')),
         ('Latitude', registro['latitude']), ('Longitude', registro['longitude']),
+        ('Origem da localização', registro.get('origem_localizacao', 'informada_pelo_usuario')),
         ('Registro (UTC)', registro['registrado_em']), ('Origem da foto', registro['origem_foto']),
         ('Nível informado pela pessoa', registro['nivel_informado']),
         ('Itens identificados na foto', registro['total']),

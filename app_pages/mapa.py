@@ -25,6 +25,20 @@ except Exception:
     st.stop()
 
 revisados = publicos(todos)
+from acervo import listar_acervo, mostrar_acervo
+if listar_acervo():
+    conjunto = st.segmented_control(texto('Conteúdo do mapa', 'Map content'),
+        ['Acervo de imagens', 'Ocorrências da comunidade'],
+        default='Ocorrências da comunidade' if revisados else 'Acervo de imagens', key='mapa-conjunto')
+    if conjunto == 'Acervo de imagens':
+        mostrar_acervo()
+        from equipe_auth import entrada
+        with st.expander(texto('Área da equipe', 'Team area')):
+            if entrada():
+                from revisao_visual import area_equipe
+                area_equipe(todos)
+        rodape()
+        st.stop()
 with st.container(key='mapa-filtros'):
     periodo = st.selectbox('Período de observação', list(PERIODOS), index=2, key='mapa-periodo')
     camada = st.segmented_control('Camada do mapa', ['Condição ambiental', 'Cobertura de observação'],
