@@ -17,7 +17,6 @@ def test_idioma_persiste_na_navegacao_e_pode_voltar(tmp_path, monkeypatch):
         assert not app.exception
         assert app.session_state['idioma'] == 'en'
     app.switch_page('app_pages/mapa.py').run()
-    app.button_group(key='mapa-conjunto').set_value('Ocorrências da comunidade').run()
     period = app.selectbox(key='mapa-periodo')
     assert '30 days' in period.options
     period.select('30 dias').run()

@@ -79,6 +79,7 @@ def test_filtro_antigo_e_sem_residuos_continua_visivel(tmp_path, monkeypatch):
 
 def test_clique_no_ponto_abre_detalhes_e_ignora_id_desconhecido(tmp_path, monkeypatch):
     r, _, _ = preparar(tmp_path, monkeypatch)
+    monkeypatch.setattr('acervo.listar_acervo', lambda: [])  # Isola as imagens do acervo.
     for ident, esperado in [(r['id'], True), ('id-privado-injetado', False)]:
         evento = SimpleNamespace(selection={'objects': {'locais': [{'id': ident}]}})
         with patch('streamlit.pydeck_chart', return_value=evento):

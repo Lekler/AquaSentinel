@@ -43,18 +43,17 @@ def test_mapa_acervo_busca_selecao_downloads_e_equipe(tmp_path, monkeypatch):
     app = AppTest.from_file(APP, default_timeout=30).run()
     app.switch_page('app_pages/mapa.py').run()
     assert not app.exception
-    spec = json.loads(app.get('deck_gl_json_chart')[0].proto.json)
-    assert len(spec['layers'][0]['data']) == 21
+    assert any(len(json.loads(m.proto.json)['layers'][0]['data']) == 21 for m in app.get('deck_gl_json_chart'))
     assert len(app.get('download_button')) == 2
     for r in listar_acervo():
         app.selectbox(key='acervo-foto').select(r['id']).run()
         assert not app.exception
-        assert app.subheader[0].value == r['titulo']
+        assert any(h.value == r['titulo'] for h in app.subheader)
     app.text_input(key='acervo-busca').set_value('bica').run()
     assert not app.exception
-    assert app.metric[0].value == '1'
+    assert any(m.label == 'Imagens no acervo' and m.value == '1' for m in app.metric)
     app.text_input(key='acervo-busca').set_value('inexistente123').run()
-    assert not app.exception and not app.get('deck_gl_json_chart')
+    assert not app.exception and any('Nenhum resultado' in i.value for i in app.info)
     app.switch_page('app_pages/sobre.py').run()
     assert not app.exception
     nomes = ['Alessandra Vaz', 'Alexandre Rodrigues', 'Felipe Mamed', 'Larisa de Sá', 'Marcela Rabelo']

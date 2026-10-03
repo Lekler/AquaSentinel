@@ -25,20 +25,6 @@ except Exception:
     st.stop()
 
 revisados = publicos(todos)
-from acervo import listar_acervo, mostrar_acervo
-if listar_acervo():
-    conjunto = st.segmented_control(texto('Conteúdo do mapa', 'Map content'),
-        ['Acervo de imagens', 'Ocorrências da comunidade'],
-        default='Ocorrências da comunidade' if revisados else 'Acervo de imagens', key='mapa-conjunto')
-    if conjunto == 'Acervo de imagens':
-        mostrar_acervo()
-        from equipe_auth import entrada
-        with st.expander(texto('Área da equipe', 'Team area')):
-            if entrada():
-                from revisao_visual import area_equipe
-                area_equipe(todos)
-        rodape()
-        st.stop()
 with st.container(key='mapa-filtros'):
     periodo = st.selectbox('Período de observação', list(PERIODOS), index=2, key='mapa-periodo')
     camada = st.segmented_control('Camada do mapa', ['Condição ambiental', 'Cobertura de observação'],
@@ -129,6 +115,18 @@ if grupos:
                 st.session_state['mapa-local-aberto'] = g['id']
             if st.session_state.get('mapa-local-aberto') == g['id']:
                 historico_local(g['resumo'], revisados, f'lista-{g["id"]}-{periodo}')
+
+# Acervo de imagens analisadas: mapa próprio (marcadores azuis), separado das ocorrências da comunidade.
+from acervo import listar_acervo, mostrar_acervo
+if listar_acervo():
+    st.divider()
+    with st.container(key='mapa-acervo'):
+        st.subheader(texto('Acervo de imagens analisadas', 'Analyzed image collection'))
+        st.caption(texto('Imagens de referência analisadas pela IA. Localizações atribuídas para demonstração; '
+                         'não são ocorrências enviadas pela comunidade.',
+                         'Reference images analyzed by the AI. Locations assigned for demonstration; '
+                         'these are not community reports.'))
+        mostrar_acervo()
 
 from equipe_auth import entrada
 with st.expander(texto('Área da equipe', 'Team area')):
