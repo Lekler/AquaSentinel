@@ -25,6 +25,7 @@ def test_login_revisao_imagem_unica_saida_e_expiracao(monkeypatch):
     salvar_foto(r, foto, anotada)
     app = AppTest.from_file(APP, default_timeout=30).run()
     app.switch_page('app_pages/mapa.py').run()
+    app.button_group(key='mapa-conjunto').set_value('Ocorrências da comunidade').run()
     assert not any(b.label=='Validar relato' for b in app.button)
     login(app, 'incorreta')
     assert app.error and not any(b.label=='Validar relato' for b in app.button)

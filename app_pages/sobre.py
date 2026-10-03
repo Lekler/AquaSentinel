@@ -1,6 +1,6 @@
 from interface_idioma import st
 from registro_visual import cabecalho, rodape
-from editorial import espaco_foto
+from pathlib import Path
 from i18n import texto as traduz
 
 cabecalho('Sobre o AquaSentinel', 'Um jeito de observar, registrar e cuidar das nossas águas, com a participação de todos.', False,
@@ -40,19 +40,13 @@ with sobre:
 
 with trabalho:
     st.subheader('Nossa equipe')
-    st.caption('Galeria em preparação. Fotos, nomes e funções serão incluídos após confirmação da equipe.')
-    for inicio in (1, 4):
-        for numero, col in zip(range(inicio, min(inicio + 3, 6)), st.columns(3)):
-            with col:
-                espaco_foto(f'Integrante {numero:02d}', 'Nome e função a inserir')
-    st.subheader('O projeto em imagens')
-    temas = [('Equipe', 'Pessoas que constroem o AquaSentinel'),
-             ('Baía', 'O território que queremos acompanhar'), ('Campo', 'Observação e trabalho de campo'),
-             ('Drones', 'Tecnologia em campo'), ('Desenvolvimento', 'Construção da plataforma'),
-             ('Testes', 'Validação e aprendizado')]
-    for inicio in (0, 3):
-        for col, (tema, legenda) in zip(st.columns(3), temas[inicio:inicio+3]):
-            with col:
-                espaco_foto(tema, legenda)
+    st.html('<style>.st-key-fotos-equipe [data-testid="stImage"] img {height:320px;object-fit:contain;object-position:center;background:#f5fbfc;border-radius:12px}</style>')
+    fotos = sorted((Path(__file__).resolve().parents[1] / 'assets' / 'equipe').glob('*.jpeg'))
+    with st.container(key='fotos-equipe'):
+        for inicio in range(0, len(fotos), 3):
+            for col, foto in zip(st.columns(3), fotos[inicio:inicio + 3]):
+                with col, st.container(border=True):
+                    st.image(str(foto), width='stretch')
+                    st.markdown(f'**{foto.stem}**')
 
 rodape()
