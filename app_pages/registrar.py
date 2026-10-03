@@ -1,6 +1,5 @@
 from hashlib import sha256
 import logging
-import secrets
 from interface_idioma import st
 from interface_fotos import carregar_detector, mostrar_analise, downloads
 from localizacao import obter_localizacao, aplicar_posicao
@@ -12,7 +11,7 @@ from corpos_hidricos import listar_corpos, obter_corpo
 
 def limpar_foto():
     for chave in ('rascunho_foto', 'erro_foto', 'assinatura_foto', 'foto_salva_id', 'pacote_foto',
-                  'foto_confirmacao', 'foto_publicacao', 'foto_nivel', 'foto_obs', 'foto_duplicada', 'foto_para_repetir', 'foto_recibo', 'foto_posicao_salva', 'foto-sinais', 'foto-ambiente'):
+                  'foto_publicacao', 'foto_nivel', 'foto_obs', 'foto_duplicada', 'foto_para_repetir', 'foto_recibo', 'foto_posicao_salva', 'foto-sinais', 'foto-ambiente'):
         st.session_state.pop(chave, None)
 
 
@@ -135,16 +134,23 @@ with direita, st.container(key='location-card'):
                 st.rerun()
         except (ValueError, TypeError, KeyError):
             st.warning('Localização inválida. Informe as coordenadas abaixo.')
+    marcada_lat, marcada_lon = st.session_state.get('foto_lat'), st.session_state.get('foto_lon')
+    if marcada_lat is not None and marcada_lon is not None:
+        st.success(texto(f'Localização definida: {marcada_lat:.5f}, {marcada_lon:.5f}. Se precisar, toque no mapa ou arraste o marcador.',
+                         f'Location set: {marcada_lat:.5f}, {marcada_lon:.5f}. If needed, tap the map or drag the marker.'),
+                   icon=':material/where_to_vote:')
+    else:
+        st.caption(texto('Toque em "Usar minha localização" ou toque no mapa para marcar o ponto.',
+                         'Tap "Use my location" or tap the map to mark the point.'))
     from endereco_visual import busca_endereco
     with st.container(key='location-address-alternative'):
         with st.expander(texto('Buscar por CEP ou endereço (opcional)', 'Search by postal code or address (optional)')):
-            st.markdown(texto('**Confirme sua localização**', '**Confirm your location**'))
-            st.caption(texto('Busque por CEP ou endereço, ou use sua localização atual.', 'Search by postal code or address, or use your current location.'))
+            st.caption(texto('Alternativa ao GPS: busque por CEP ou endereço.', 'Alternative to GPS: search by postal code or address.'))
             if busca_endereco('foto', compacto=True):
                 st.rerun()
     local_col, corpo_col = st.columns(2, gap='small')
     nome = local_col.text_input(texto('Nome do local ou referência', 'Location name or landmark'), max_chars=100,
-                         placeholder='Ex.: Canal do Fundão, próximo à ponte', key='foto_nome', persist_state='session')
+                         placeholder='Opcional · Ex.: Canal do Fundão, próximo à ponte', key='foto_nome', persist_state='session')
     catalogo = {c['id']: c for c in listar_corpos()}
     waterbody_id = corpo_col.selectbox('Corpo hídrico cadastrado', [None, *catalogo], key='foto-waterbody',
         disabled=bool(sessao_ativa),
@@ -170,8 +176,9 @@ with st.form('enviar_foto'):
         detalhe_ambiental = st.text_area('Detalhe ambiental (opcional)', max_chars=500, key='foto-ambiente')
         observacoes = st.text_area(texto('Observações (opcional)', 'Notes (optional)'), max_chars=500, key='foto_obs',
                                   placeholder='Ex.: acúmulo próximo à margem, cheiro forte…')
-    local_confirmado = st.checkbox(texto('Conferi a foto e a localização desta ocorrência.', 'I checked this report photo and location.'), key='foto_confirmacao')
-    publicacao_autorizada = st.checkbox('Autorizo publicar a foto, o local e as coordenadas no mapa após revisão pela equipe.', key='foto_publicacao')
+    publicacao_autorizada = st.checkbox(texto('Conferi a foto e a localização e autorizo publicar a foto, o local e as coordenadas no mapa após revisão pela equipe.',
+                                              'I checked the photo and location and authorize publishing the photo, place and coordinates on the map after team review.'),
+                                        key='foto_publicacao')
     enviar = st.form_submit_button(texto('Enviar ocorrência', 'Submit report'), type='primary', icon=':material/send:',
                                    disabled=not rascunho or bool(st.session_state.get('foto_salva_id')))
 
@@ -179,15 +186,20 @@ if enviar:
     try:
         if not rascunho:
             raise ValueError('Adicione e analise uma foto antes de enviar.')
-        if not local_confirmado:
-            raise ValueError('Confirme a foto e a localização antes de enviar.')
+        if lat is None or lon is None:
+            raise ValueError('Falta a localização: toque em "Usar minha localização" ou toque no mapa (passo 2).')
+        if not nivel:
+            raise ValueError('Escolha como está o local no passo 3 (Sem resíduos, Pouco, Moderado…).')
+        if not (nome or '').strip():
+            # Nome é opcional para quem usou o GPS; a equipe pode ajustar na revisão.
+            nome = f'Ponto {lat:.4f}, {lon:.4f}'
         if not publicacao_autorizada:
-            raise ValueError('Autorize a publicação no mapa para enviar o relato.')
+            raise ValueError('Marque a caixa "Conferi a foto e a localização…" logo acima do botão Enviar.')
         if modo_registro == 'Monitoramento estruturado' and not sessao_ativa:
             raise ValueError('Inicie uma sessão de monitoramento antes de salvar.')
         registro = criar_registro(rascunho['analise'], nome, lat, lon, nivel, observacoes, rascunho['origem'])
-        from ciclo import hash_chave
-        recibo = secrets.token_urlsafe(24)
+        from ciclo import hash_chave, gerar_codigo
+        recibo = gerar_codigo(12)
         registro['recibo_hash'] = hash_chave(recibo)
         registro['consentimento_publicacao'] = True
         registro['contexto_ambiental'] = validar_contexto(sinais, detalhe_ambiental)
@@ -219,15 +231,16 @@ if st.session_state.get('foto_salva_id'):
         resumo_salvo(salvo)
         if st.session_state.get('foto_recibo'):
             with st.container(border=True, key='resultado-recibo'):
-                info, acao = st.columns([2.2, 1], vertical_alignment='center')
-                with info:
-                    st.subheader('Recibo de acompanhamento', icon=':material/receipt_long:')
-                    st.caption('Guarde o recibo antes de enviar outra foto. O código permite consultar seu registro mesmo antes da publicação.')
-                with acao:
-                    st.download_button('Guardar recibo de acompanhamento',
-                        f"ID: {salvo['id']}\nCódigo privado: {st.session_state.foto_recibo}\nConsulte em Acompanhar meu registro.\n",
-                        file_name=f"recibo-{salvo['id'][:8]}.txt", mime='text/plain',
-                        type='primary', icon=':material/receipt_long:', width='stretch')
+                st.subheader('Código de acompanhamento', icon=':material/receipt_long:')
+                st.caption('Guarde este código: só com ele você consulta seu registro em "Acompanhar meu registro", '
+                           'mesmo antes da publicação. Toque no ícone de copiar ao lado do código.')
+                st.code(st.session_state.foto_recibo, language=None)
+                st.download_button('Guardar código em arquivo',
+                    f"Código de acompanhamento: {st.session_state.foto_recibo}\n"
+                    f"Número do registro: {salvo['id']}\n"
+                    "Consulte em Acompanhar meu registro informando apenas o código de acompanhamento.\n",
+                    file_name=f"aquasentinel-{salvo['id']}.txt", mime='text/plain',
+                    icon=':material/download:', width='stretch')
         with st.container(border=True, key='resultado-acoes'):
             st.subheader('Outras ações', icon=':material/link:')
             st.page_link('app_pages/acompanhamento.py', label='Acompanhar meu registro', icon=':material/description:')

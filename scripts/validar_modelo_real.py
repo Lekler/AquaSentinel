@@ -32,7 +32,7 @@ def main():
         app.number_input(key='foto_lat').set_value(-22.9068)
         app.number_input(key='foto_lon').set_value(-43.1729)
         app.button_group(key='foto_nivel').set_value('Moderado')
-        app.checkbox(key='foto_confirmacao').check()
+        app.checkbox(key='foto_publicacao').check()
         next(b for b in app.button if b.label == 'Enviar ocorrência').click().run()
         assert not app.exception, app.exception
         registros = listar_fotos()

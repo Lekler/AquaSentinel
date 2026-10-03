@@ -18,6 +18,24 @@ TRANSICOES = {
 }
 
 
+# Sem 0/O, 1/I/L: códigos fáceis de ler, digitar e copiar no celular.
+ALFABETO_CODIGO = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
+
+
+def gerar_codigo(tamanho=12):
+    import secrets
+    return ''.join(secrets.choice(ALFABETO_CODIGO) for _ in range(tamanho))
+
+
+def variantes_codigo(chave):
+    """Formas aceitas de um código colado: texto exato (recibos antigos) e sem espaços/hífens."""
+    bruto = (chave or '').strip()
+    if ':' in bruto:  # Linha copiada do recibo, ex.: "Código de acompanhamento: ABC…"
+        bruto = bruto.rsplit(':', 1)[1].strip()
+    limpo = ''.join(c for c in bruto if c.isalnum()).upper()
+    return [v for v in dict.fromkeys([bruto, limpo]) if v]
+
+
 def hash_chave(chave):
     return sha256(chave.encode('utf-8')).hexdigest()
 
@@ -89,11 +107,21 @@ def feedback(registro, todos):
 
 
 def consultar_recibo(ident, chave):
-    from relatos import obter_foto
-    try:
-        r, _, _ = obter_foto(ident)
-    except ValueError:
-        raise ValueError('ID ou código de acompanhamento inválido.') from None
-    if not chave or not r.get('recibo_hash') or not hmac.compare_digest(r['recibo_hash'], hash_chave(chave)):
-        raise ValueError('ID ou código de acompanhamento inválido.')
-    return r
+    """Consulta pelo código de acompanhamento; o ID é opcional (recibos antigos o incluíam)."""
+    from relatos import obter_foto, listar_fotos
+    erro = ValueError('Código de acompanhamento inválido. Confira e tente novamente.')
+    hashes = [hash_chave(v) for v in variantes_codigo(chave)]
+    if not hashes:
+        raise erro
+    ident = (ident or '').strip()
+    if ident:
+        try:
+            candidatos = [obter_foto(ident)[0]]
+        except ValueError:
+            raise erro from None
+    else:
+        candidatos = listar_fotos()
+    for r in candidatos:
+        if r.get('recibo_hash') and any(hmac.compare_digest(r['recibo_hash'], h) for h in hashes):
+            return r
+    raise erro

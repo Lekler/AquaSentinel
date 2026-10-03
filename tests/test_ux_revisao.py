@@ -12,6 +12,8 @@ APP = str(Path(__file__).resolve().parents[1]/'app.py')
 def banco(tmp_path, monkeypatch):
     monkeypatch.setenv('AQUASENTINEL_DB', str(tmp_path/'ux.sqlite3'))
     monkeypatch.setenv('AQUASENTINEL_REVIEW_PASSWORD', 'teste-ux')
+    # O acervo tem seu próprio mapa e imagens; aqui contamos só as imagens da revisão.
+    monkeypatch.setattr('acervo.listar_acervo', lambda: [])
 
 
 def login(app, senha='teste-ux'):
@@ -25,7 +27,6 @@ def test_login_revisao_imagem_unica_saida_e_expiracao(monkeypatch):
     salvar_foto(r, foto, anotada)
     app = AppTest.from_file(APP, default_timeout=30).run()
     app.switch_page('app_pages/mapa.py').run()
-    app.button_group(key='mapa-conjunto').set_value('Ocorrências da comunidade').run()
     assert not any(b.label=='Validar relato' for b in app.button)
     login(app, 'incorreta')
     assert app.error and not any(b.label=='Validar relato' for b in app.button)

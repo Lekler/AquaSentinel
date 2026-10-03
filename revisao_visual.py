@@ -5,6 +5,86 @@ from i18n import texto
 from equipe_auth import autenticado
 
 
+def miniatura(conteudo, lado=240):
+    from base64 import b64encode
+    from io import BytesIO
+    from PIL import Image
+    with Image.open(BytesIO(conteudo)) as imagem:
+        imagem = imagem.convert('RGB')
+        imagem.thumbnail((lado, lado))
+        saida = BytesIO()
+        imagem.save(saida, format='JPEG', quality=70)
+    return 'data:image/jpeg;base64,' + b64encode(saida.getvalue()).decode()
+
+
+def revisao_em_lote(todos, responsavel):
+    """Validação rápida de vários relatos pendentes; casos com similaridade exigem revisão individual."""
+    from relatos import obter_foto, revisar_foto
+    pendentes = [r for r in todos if r.get('revisao', 'nao_revisado') == 'nao_revisado']
+    resultado = st.session_state.pop('lote-resultado', None)
+    if resultado:
+        feitos, pulados, decisao = resultado
+        st.success(texto(f"{feitos} registro(s) {'validado(s)' if decisao == 'validado' else 'rejeitado(s)'}."
+                         + (f' {pulados} ficaram para revisão individual.' if pulados else ''),
+                         f'{feitos} report(s) {decisao}.' + (f' {pulados} left for individual review.' if pulados else '')))
+    with st.expander(texto(f'Revisão rápida em lote · {len(pendentes)} aguardando',
+                           f'Quick batch review · {len(pendentes)} awaiting'), expanded=bool(pendentes)):
+        if not pendentes:
+            st.info(texto('Nenhum registro aguardando revisão.', 'No reports awaiting review.'))
+            return
+        st.caption(texto('Confira a miniatura, marque os registros e valide ou rejeite de uma vez. '
+                         'Registros com imagem semelhante a outra precisam da revisão individual abaixo.',
+                         'Check the thumbnail, tick reports and validate or reject them at once. '
+                         'Reports with a similar image need the individual review below.'))
+        linhas = []
+        for r in pendentes:
+            try:
+                _, _, anotada = obter_foto(r['id'])
+                foto = miniatura(anotada)
+            except Exception:
+                logging.exception('Falha ao gerar miniatura')
+                foto = None
+            similar = bool((r.get('similaridade') or {}).get('quantidade'))
+            linhas.append({'Selecionar': False, 'Foto': foto, 'Local': r['nome'],
+                           'Data': r['registrado_em'][:16].replace('T', ' '),
+                           'Nível': r.get('nivel_informado'), 'Itens IA': int(r.get('total') or 0),
+                           'Alerta': 'Imagem semelhante' if similar else '', 'ID': r['id']})
+        tabela = st.data_editor(linhas, hide_index=True, width='stretch', key='revisao-lote',
+            row_height=90, disabled=['Foto', 'Local', 'Data', 'Nível', 'Itens IA', 'Alerta', 'ID'],
+            column_config={'Selecionar': st.column_config.CheckboxColumn('✓', width='small'),
+                           'Foto': st.column_config.ImageColumn('Foto', width='medium')})
+        escolhidos = [l['ID'] for l in tabela if l['Selecionar']]
+        a, b, c = st.columns(3)
+        todos_sem_alerta = a.button(texto('Validar todos sem alerta', 'Validate all without alerts'), key='lote-todos')
+        validar = b.button(texto(f'Validar selecionados ({len(escolhidos)})', f'Validate selected ({len(escolhidos)})'),
+                           type='primary', key='lote-validar', disabled=not escolhidos)
+        rejeitar = c.button(texto(f'Rejeitar selecionados ({len(escolhidos)})', f'Reject selected ({len(escolhidos)})'),
+                            key='lote-rejeitar', disabled=not escolhidos)
+        if not (todos_sem_alerta or validar or rejeitar):
+            return
+        if not responsavel or not responsavel.strip():
+            st.error(texto('Informe o responsável da equipe acima antes de revisar.', 'Enter the team member above before reviewing.'))
+            return
+        if not autenticado():
+            return
+        alvo = [l['ID'] for l in linhas if not l['Alerta']] if todos_sem_alerta else escolhidos
+        decisao = 'rejeitado' if rejeitar else 'validado'
+        feitos, pulados = 0, 0
+        com_alerta = {l['ID'] for l in linhas if l['Alerta']}
+        for ident in alvo:
+            if decisao == 'validado' and ident in com_alerta:
+                pulados += 1
+                continue
+            try:
+                revisar_foto(ident, decisao, responsavel)
+                feitos += 1
+            except ValueError:
+                pulados += 1
+        st.session_state['lote-resultado'] = (feitos, pulados, decisao)
+        st.session_state.pop('revisao-lote', None)
+        st.rerun()
+
+
 def area_equipe(todos):
     if not autenticado():
         return
@@ -17,7 +97,8 @@ def area_equipe(todos):
     from observacao import agrupar_locais, resumo_local, publicos
     from mapa_visual import nivel_html, resumo_grupo
     responsavel = st.text_input('Responsável da equipe', key='equipe-responsavel', max_chars=100)
-    with st.expander(texto('Revisar ocorrências', 'Review reports'), expanded=True):
+    revisao_em_lote(todos, responsavel)
+    with st.expander(texto('Revisar ocorrências uma a uma', 'Review reports one by one')):
         fila = st.selectbox(texto('Lista de revisão', 'Review list'),
             [texto('Aguardando revisão', 'Awaiting review'), texto('Todos os registros', 'All reports')], key='revisao-fila')
         pendentes = {r['id']:r for r in todos if fila == texto('Todos os registros', 'All reports') or r.get('revisao') == 'nao_revisado'}
