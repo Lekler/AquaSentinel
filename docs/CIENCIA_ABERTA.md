@@ -7,12 +7,10 @@ inicial, seus assets ou a configuração global de tema.
 ## Conteúdo editorial
 
 Sobre reúne problema, propósito, ciência cidadã, IA, One Health, público-alvo,
-equipe e visão de impacto. A galeria da equipe agora identifica os integrantes,
-com a foto e uma mini-bio de Alexandre Rodrigues já incluídas; as demais fotos
-continuam como espaços reservados até confirmação individual. Há ainda seis
-espaços editoriais para equipe, Baía, campo, drones, desenvolvimento e testes.
-Os espaços e legendas estão em `app_pages/sobre.py`. O tutorial está em Como
-funciona e o menu interno permite acessar todas as páginas.
+equipe e visão de impacto. A galeria da equipe mostra a foto, o nome completo e
+a função dos cinco integrantes; as fotos ficam em `assets/equipe` com nomes sem
+espaços nem acentos, e nomes e mini-bios estão em `app_pages/sobre.py`. O
+tutorial está em Como funciona e o menu interno permite acessar todas as páginas.
 
 Fale Conosco só mostra contatos configurados: `AQUASENTINEL_CONTACT_EMAIL` e
 `AQUASENTINEL_CONTACT_URL` (HTTPS). Sem configuração, informa indisponibilidade.

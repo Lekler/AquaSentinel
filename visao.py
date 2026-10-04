@@ -16,7 +16,8 @@ CLASSES_PT = {
 }
 MAX_BYTES = 12 * 1024 * 1024
 MAX_PIXELS = 24_000_000
-LIMITES = {'confidence': .40, 'iou': .55, 'image_size': 640, 'max_det': 1000}
+LIMITES = {'confidence': .40, 'iou': .55, 'image_size': 640, 'max_det': 1000,
+           'bloco': 960, 'sobreposicao_bloco': .2, 'contencao': .7}
 
 
 def preparar_imagem(conteudo):
@@ -76,8 +77,41 @@ def remover_duplicadas(candidatas, largura, altura, limiar=.55):
     return mantidas
 
 
+def remover_contidas(candidatas, limiar=.7):
+    """Remove recortes parciais de um objeto já detectado, comuns na borda dos blocos."""
+    mantidas = []
+    for d in sorted(candidatas, key=lambda item: item['confidence'], reverse=True):
+        a = d['bbox']
+        area_a = (a[2] - a[0]) * (a[3] - a[1])
+        contida = False
+        for outra in mantidas:
+            b = outra['bbox']
+            inter = max(0, min(a[2], b[2]) - max(a[0], b[0])) * max(0, min(a[3], b[3]) - max(a[1], b[1]))
+            if inter / max(min(area_a, (b[2] - b[0]) * (b[3] - b[1])), 1e-9) > limiar:
+                contida = True
+                break
+        if not contida:
+            mantidas.append(d)
+    return mantidas
+
+
+def janelas(largura, altura, lado, sobreposicao):
+    """Blocos sobrepostos que cobrem a foto inteira; vazio se a foto já cabe em um bloco."""
+    if max(largura, altura) <= lado * 1.15:
+        return []
+    passo = max(1, int(lado * (1 - sobreposicao)))
+    def posicoes(total):
+        if total <= lado:
+            return [0]
+        pos = list(range(0, total - lado + 1, passo))
+        return pos if pos[-1] + lado >= total else pos + [total - lado]
+    return [(x, y, min(x + lado, largura), min(y + lado, altura))
+            for y in posicoes(altura) for x in posicoes(largura)]
+
+
 def resumir(candidatas, largura, altura):
-    mantidas = remover_duplicadas(candidatas, largura, altura, LIMITES['iou'])
+    mantidas = remover_contidas(remover_duplicadas(candidatas, largura, altura, LIMITES['iou']),
+                                LIMITES['contencao'])
     # Numeração em ordem de posição para facilitar a inspeção da imagem.
     mantidas.sort(key=lambda d: (d['bbox'][1], d['bbox'][0]))
     itens = [{**d, 'item_id': f'MAR-{i:04d}', 'confidence_pct': round(d['confidence'] * 100, 2),
@@ -132,19 +166,26 @@ class Detector:
     def analisar(self, conteudo):
         imagem, digest, tamanho_original = preparar_imagem(conteudo)
         # O predictor Ultralytics é mutável; o modelo compartilhado é serializado.
+        # Foto inteira + blocos sobrepostos: objetos pequenos somem quando a foto
+        # grande é reduzida a 640 px; os blocos preservam esses detalhes.
+        recortes = [(0, 0, *imagem.size)] + janelas(*imagem.size, LIMITES['bloco'], LIMITES['sobreposicao_bloco'])
+        candidatas = []
         with self.lock:
-            resultado = self.modelo.predict(imagem, conf=LIMITES['confidence'],
-                iou=LIMITES['iou'], imgsz=LIMITES['image_size'],
-                max_det=LIMITES['max_det'], agnostic_nms=False, verbose=False)[0]
-            candidatas = [{'bbox': box, 'confidence': conf, 'class_id': int(classe),
-                           'class_name': resultado.names[int(classe)]}
-                          for box, conf, classe in zip(resultado.boxes.xyxy.cpu().tolist(),
-                              resultado.boxes.conf.cpu().tolist(), resultado.boxes.cls.cpu().tolist())]
+            for x, y, x2, y2 in recortes:
+                parte = imagem if (x, y, x2, y2) == (0, 0, *imagem.size) else imagem.crop((x, y, x2, y2))
+                resultado = self.modelo.predict(parte, conf=LIMITES['confidence'],
+                    iou=LIMITES['iou'], imgsz=LIMITES['image_size'],
+                    max_det=LIMITES['max_det'], agnostic_nms=False, verbose=False)[0]
+                candidatas += [{'bbox': [box[0] + x, box[1] + y, box[2] + x, box[3] + y],
+                                'confidence': conf, 'class_id': int(classe),
+                                'class_name': resultado.names[int(classe)]}
+                               for box, conf, classe in zip(resultado.boxes.xyxy.cpu().tolist(),
+                                   resultado.boxes.conf.cpu().tolist(), resultado.boxes.cls.cpu().tolist())]
         resumo = resumir(candidatas, *imagem.size)
         resumo.update(image_hash=digest, model_hash=self.model_hash,
                       analisado_em=datetime.now(timezone.utc).isoformat(),
                       dimensoes=list(imagem.size), dimensoes_originais=list(tamanho_original),
-                      parametros=dict(LIMITES), metodo='foto-nms-1',
+                      parametros=dict(LIMITES), metodo='foto-blocos-nms-2', blocos=len(recortes),
                       classes_modelo=list(self.modelo.names.values()))
         from importlib.metadata import version
         resumo.update(modelo_arquivo=self.caminho.name, modelo_runtime='ultralytics ' + version('ultralytics'))

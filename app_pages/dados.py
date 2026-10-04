@@ -26,7 +26,7 @@ with st.container(border=True):
     origem = st.segmented_control('Origem dos dados', ['Públicos validados', 'Meus registros'], default='Públicos validados')
     registros = []
     if origem == 'Meus registros':
-        st.caption('Informe um recibo por linha: ID; código privado. Os códigos são usados apenas para autorizar '
+        st.caption('Informe um código de acompanhamento por linha (recibos antigos: ID; código privado). Os códigos são usados apenas para autorizar '
                    'a consulta e nunca entram nos arquivos. Não há conta de usuário nem busca por nome de autor.')
         with st.form('autorizar-exportacao'):
             recibos = st.text_area('Recibos privados', height=110, key='dados-recibos')
@@ -34,16 +34,16 @@ with st.container(border=True):
         if autorizar:
             st.session_state.pop('dados-autorizados', None)
             try:
-                pares = [v.strip().split(';', 1) for v in recibos.splitlines() if v.strip()]
-                if not pares or len(pares) > 100 or any(len(p) != 2 for p in pares):
-                    raise ValueError('Informe de 1 a 100 recibos no formato ID; código privado.')
+                pares = [v.split(';', 1) if ';' in v else ['', v] for v in recibos.splitlines() if v.strip()]
+                if not pares or len(pares) > 100:
+                    raise ValueError('Informe de 1 a 100 códigos de acompanhamento, um por linha.')
                 for ident, chave in pares:
                     consultar_recibo(ident.strip(), chave.strip())
                 st.session_state['dados-autorizados'] = [(i.strip(), c.strip()) for i, c in pares]
             except ValueError as exc:
                 st.error(str(exc))
         try:
-            registros = list({i: consultar_recibo(i, c) for i, c in st.session_state.get('dados-autorizados', [])}.values())
+            registros = list({r['id']: r for r in (consultar_recibo(i, c) for i, c in st.session_state.get('dados-autorizados', []))}.values())
         except ValueError:
             st.session_state.pop('dados-autorizados', None)
             st.error('Um recibo não é mais válido. Autorize novamente.')

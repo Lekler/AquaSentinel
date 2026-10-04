@@ -12,6 +12,8 @@ APP = str(Path(__file__).resolve().parents[1]/'app.py')
 def banco(tmp_path, monkeypatch):
     monkeypatch.setenv('AQUASENTINEL_DB', str(tmp_path/'ux.sqlite3'))
     monkeypatch.setenv('AQUASENTINEL_REVIEW_PASSWORD', 'teste-ux')
+    # O acervo tem seu próprio mapa e imagens; aqui contamos só as imagens da revisão.
+    monkeypatch.setattr('acervo.listar_acervo', lambda: [])
 
 
 def login(app, senha='teste-ux'):

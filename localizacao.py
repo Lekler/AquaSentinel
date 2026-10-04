@@ -28,7 +28,6 @@ def aplicar_posicao(posicao, contexto='foto'):
  mudou=(st.session_state.get(lat_key)!=lat or st.session_state.get(lon_key)!=lon or st.session_state.get(gps_key)!=gps)
  if mudou:
   st.session_state[lat_key]=lat;st.session_state[lon_key]=lon;st.session_state[gps_key]=gps
-  if contexto=='foto':st.session_state.foto_confirmacao=False
  return mudou
 
 def _posicao_alterada(contexto='foto'):

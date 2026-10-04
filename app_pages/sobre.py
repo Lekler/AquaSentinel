@@ -1,6 +1,6 @@
 from interface_idioma import st
 from registro_visual import cabecalho, rodape
-from editorial import espaco_foto
+from pathlib import Path
 from i18n import texto as traduz
 
 cabecalho('Sobre o AquaSentinel', 'Um jeito de observar, registrar e cuidar das nossas águas, com a participação de todos.', False,
@@ -40,36 +40,21 @@ with sobre:
 
 with trabalho:
     st.subheader('Nossa equipe')
-    st.caption('Equipe do AquaSentinel. As demais fotos serão incluídas à medida que forem confirmadas pelos integrantes.')
-
+    st.html('<style>.st-key-fotos-equipe [data-testid="stImage"] img {height:320px;object-fit:contain;object-position:center;background:#f5fbfc;border-radius:12px}</style>')
+    equipe = Path(__file__).resolve().parents[1] / 'assets' / 'equipe'
     integrantes = [
-        ('Larissa Oliveira de Sá', 'Equipe AquaSentinel'),
-        ('Alessandra Vaz dos Anjos Santos', 'Equipe AquaSentinel'),
-        ('Felipe Mamed de Souza', 'Equipe AquaSentinel'),
-        ('Alexandre Rodrigues', 'Mestrando em Sistemas e Computação no IME; atua na arquitetura, backend e integração do AquaSentinel.'),
-        ('Marcela', 'Equipe AquaSentinel'),
+        ('larissa-de-sa.jpg', 'Larissa Oliveira de Sá', 'Equipe AquaSentinel'),
+        ('alessandra-vaz.jpg', 'Alessandra Vaz dos Anjos Santos', 'Equipe AquaSentinel'),
+        ('felipe-mamed.jpg', 'Felipe Mamed de Souza', 'Equipe AquaSentinel'),
+        ('alexandre-rodrigues.jpg', 'Alexandre Rodrigues', 'Mestrando em Sistemas e Computação no IME; atua na arquitetura, backend e integração do AquaSentinel.'),
+        ('marcela-rabelo.jpg', 'Marcela Rabelo', 'Equipe AquaSentinel'),
     ]
-
-    for inicio in range(0, len(integrantes), 3):
-        indices = range(inicio, min(inicio + 3, len(integrantes)))
-        for indice, col in zip(indices, st.columns(3)):
-            nome, bio = integrantes[indice]
-            with col:
-                if indice == 3:
-                    st.image('assets/equipe/alexandre-rodrigues.jpg', use_container_width=True)
+    with st.container(key='fotos-equipe'):
+        for inicio in range(0, len(integrantes), 3):
+            for col, (foto, nome, bio) in zip(st.columns(3), integrantes[inicio:inicio + 3]):
+                with col, st.container(border=True):
+                    st.image(str(equipe / foto), width='stretch')
                     st.markdown(f'**{nome}**')
                     st.caption(bio)
-                else:
-                    espaco_foto(nome, bio)
-
-    st.subheader('O projeto em imagens')
-    temas = [('Equipe', 'Pessoas que constroem o AquaSentinel'),
-             ('Baía', 'O território que queremos acompanhar'), ('Campo', 'Observação e trabalho de campo'),
-             ('Drones', 'Tecnologia em campo'), ('Desenvolvimento', 'Construção da plataforma'),
-             ('Testes', 'Validação e aprendizado')]
-    for inicio in (0, 3):
-        for col, (tema, legenda) in zip(st.columns(3), temas[inicio:inicio+3]):
-            with col:
-                espaco_foto(tema, legenda)
 
 rodape()

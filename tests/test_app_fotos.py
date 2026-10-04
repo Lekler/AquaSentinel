@@ -43,7 +43,6 @@ def test_fluxo_upload_salvar_revisar_e_abrir_mapa():
         app.button_group(key='foto_nivel').set_value('Moderado')
         app.multiselect(key='foto-sinais').select('Aves')
         app.text_area(key='foto-ambiente').set_value('Aves próximas à margem.')
-        app.checkbox(key='foto_confirmacao').check()
         app.checkbox(key='foto_publicacao').check()
         submit(app)
         assert not app.exception
@@ -85,7 +84,7 @@ def test_gps_e_ajuste_manual_do_mapa():
     assert not app.exception
     assert app.number_input(key='foto_lat').value == -22.8
     assert app.session_state['foto_gps'] is None
-    assert not app.checkbox(key='foto_confirmacao').value
+    assert app.session_state['foto_lon'] == -43.2
 
 
 def test_troca_invalida_remove_analise_antiga_e_impede_salvar():
@@ -112,7 +111,6 @@ def test_validacao_local_e_zero_deteccoes():
         app.file_uploader[0].upload('foto.jpg', foto, 'image/jpeg').run()
         assert not app.metric
         assert any('Nenhum resíduo foi identificado automaticamente' in m.value for m in app.info)
-        app.checkbox(key='foto_confirmacao').check()
         app.checkbox(key='foto_publicacao').check()
         submit(app)
         assert not app.exception and app.error and not listar_fotos()
@@ -135,15 +133,13 @@ def test_reenvio_e_troca_pedem_nova_confirmacao():
         app.number_input(key='foto_lat').set_value(-22.)
         app.number_input(key='foto_lon').set_value(-43.)
         app.button_group(key='foto_nivel').set_value('Pouco')
-        app.checkbox(key='foto_confirmacao').check()
         app.checkbox(key='foto_publicacao').check()
         submit(app)
         assert not app.exception and len(listar_fotos()) == 1
         app.button(key='outra_foto').click().run()
         app.file_uploader[0].upload('mesma_renomeada.jpg', foto, 'image/jpeg').run()
-        assert not app.checkbox(key='foto_confirmacao').value
+        assert not app.checkbox(key='foto_publicacao').value
         app.button_group(key='foto_nivel').set_value('Muito poluído')
-        app.checkbox(key='foto_confirmacao').check()
         app.checkbox(key='foto_publicacao').check()
         submit(app)
         assert not app.exception and len(listar_fotos()) == 1

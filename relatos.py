@@ -2,7 +2,6 @@
 from datetime import datetime, timezone
 from contextlib import contextmanager
 import json
-from uuid import uuid4
 from historico import conectar, marcador
 from motor import numero
 
@@ -37,7 +36,8 @@ def criar_registro(analise, nome, latitude, longitude, nivel, observacoes='', or
     numero(longitude, -180, 180)
     if nivel not in NIVEIS or len(observacoes) > 500:
         raise ValueError('Confira o nível e as observações (até 500 caracteres).')
-    return {**analise, 'id': str(uuid4()), 'registrado_em': datetime.now(timezone.utc).isoformat(),
+    from ciclo import gerar_codigo
+    return {**analise, 'id': gerar_codigo(10), 'registrado_em': datetime.now(timezone.utc).isoformat(),
             'nome': nome.strip(), 'latitude': latitude, 'longitude': longitude,
             'nivel_informado': nivel, 'observacoes': observacoes.strip(), 'origem_foto': origem,
             'origem_localizacao': 'informada_pelo_usuario', 'revisao': 'nao_revisado',
