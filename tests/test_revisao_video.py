@@ -86,11 +86,14 @@ def test_localizacao_gps_nao_desmarca_confirmacao():
     from unittest.mock import patch
     app = AppTest.from_file(APP, default_timeout=20).run()
     app.switch_page('app_pages/registrar.py').run()
-    app.checkbox(key='foto_publicacao').check().run()
+    # Valores de formulário só chegam ao servidor no envio; simula a caixa já marcada na sessão.
+    app.session_state['foto_publicacao'] = True
+    app.run()
     gps = {'latitude': -22.9, 'longitude': -43.1, 'accuracy': 8, 'timestamp': 1, 'source': 'gps'}
     with patch('localizacao.obter_localizacao', side_effect=[gps, None]):
         app.run()
     assert not app.exception
+    assert app.session_state['foto_publicacao']
     assert app.checkbox(key='foto_publicacao').value
     assert any('Localização definida' in s.value for s in app.success)
 
